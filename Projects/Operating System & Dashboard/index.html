@@ -1,0 +1,124 @@
+<!DOCTYPE HTML>
+<html>
+
+<head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <meta name="author" content="Alan G. Labouseur" />
+        <link rel="stylesheet" href="dist/css/tsos.css" type="text/css" media="screen" />
+        <title>TienOS - CMPT424</title>
+        <!-- FavIcon Link -->
+        <link rel="icon" href="dist/img/red-eye.png" type="image/png" sizes="16x16">
+        <!-- Global CSS: Bootstrap -->
+        <link href="dist/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <!-- Global CSS: Custom -->
+        <link href="dist/css/title.css" rel="stylesheet">
+        <!-- Globals CONSTANTS and _Variables. Must included be first. -->
+        <script type="text/javascript" src="dist/globals.js"></script>
+</head>
+
+<body onload="onDocumentLoad()">
+        <div class="container">
+                <div class="row">
+                        <div class="col-lg-12 text-center">
+                                <h1 class="page-header">T<img id="red-i-eye" src="dist/img/red-i-eye.png" />enminat<img id="red-eye" src="dist/img/red-eye.png"
+                                        />S<br/><img id="teeth" src="dist/img/cgTeeth.png" /></h1>
+
+                        </div>
+                </div>
+                <!-- /.row -->
+                <div class="row text-center">
+                        <div class="col-lg-12 text-center">
+                                <button type="button" class="btn btn-primary btn-lg" id="btnStartOS" name="brnStartOS" value="Start" onclick="TSOS.Control.hostBtnStartOS_click(this);">Start</button>
+                                <button type="button" class="btn btn-success btn-lg" id="btnHaltOS" name="brnHaltOS" disabled="disabled" value="Halt" onclick="TSOS.Control.hostBtnHaltOS_click(this);">Halt</button>
+                                <button type="button" class="btn btn-warning btn-lg" id="btnReset" name="brnReset" disabled="disabled" value="Reset" onclick="TSOS.Control.hostBtnReset_click(this);">Reset</button>
+                        </div>
+                </div>
+                <br/>
+                <div class="row">
+                        <div id="divConsole" class="col-lg-6" width="553px" height="414px">
+                                <label>Console</label>
+                                <canvas id="display" tabindex="3" width="553px" height="414px"></canvas>
+                        </div>
+                        <div class="col-lg-6">
+                                <label>Host Log</label>
+                                <div class="panel panel-default">
+                                        <textarea readonly class="form-control" name="taHostLog" id="taHostLog" rows="20"></textarea>
+                                </div>
+                        </div>
+                </div>
+                <!-- row -->
+                <div class="row">
+                        <div class="col-lg-12">
+                                <label>User Program Input</label>
+                                <textarea id="taProgramInput" class="form-control" name="taProgramInput"></textarea>
+                        </div>
+                </div>
+                <!-- <div id="divMain" style="width:100%;">
+                        <div id="divButtonBar" style="margin:4px;">
+                                <input type="button" id="btnStartOS" name="brnStartOS" class="normal_button" value="Start" tabindex="0" onclick="TSOS.Control.hostBtnStartOS_click(this);">
+                                <input type="button" id="btnHaltOS" name="brnHaltOS" class="normal_button" disabled="disabled" value="Halt" tabindex="1"
+                                        onclick="TSOS.Control.hostBtnHaltOS_click(this);">
+                                <input type="button" id="btnReset" name="brnReset" class="normal_button" disabled="disabled" value="Reset" tabindex="2" onclick="TSOS.Control.hostBtnReset_click(this);">
+                        </div>
+                        <div id="divUserProgramInput" style="margin-left:520px;">
+                                <label>
+                        User Program Input
+                        <br>
+                        <textarea name="taProgramInput"
+                        id  ="taProgramInput"
+                        rows="8"
+                        cols="48"
+                        ></textarea>
+                        </label>
+                        </div>
+                </div> 
+                <p class="footerText" style="clear:both;">
+                        <br> Copyright &copy; 2008 - 2016 No Rights Reserved.
+                        <br> Reproduction is inhibited without the express written consent of Ted Codd, Stevie Ray Vaughan,
+                        and Ian Fleming.
+                </p> -->
+        </div>
+        <!-- /#wrapper -->
+        <hr />
+        <footer class="footer">
+                <div class="container text-center">
+                        <small>
+				<a href="http://labouseur.com/courses/compilers/grammar.pdf" target="_blank">Grammar</a> | 
+				<a href="http://labouseur.com/courses/os/iProject1.pdf" target="_blank">Project 1</a> | 
+				<a href="http://labouseur.com/courses/os/iProject2.pdf" target="_blank">Project 2</a> | 
+				<a href="http://labouseur.com/courses/os/iProject3.pdf" target="_blank">Project 3</a> |
+				<a href="http://labouseur.com/courses/os/iProject4.pdf" target="_blank">Project 4</a>
+			</small>
+                        <br />
+                        <small class="text-muted">Copyright © 2017 - &infin; No Rights Reserved.</small>
+                        <br />
+                        <small class="text-muted">By: Piradon (Tien) Liengtiraphan</small>
+                </div>
+        </footer>
+        <!-- /.footer -->
+        <!-- jQuery -->
+        <script src="dist/jquery/jquery.min.js"></script>
+        <!-- Global JS: Bootstrap -->
+        <script src="dist/bootstrap/js/bootstrap.min.js"></script>
+        <!-- Host (Virtual Machine / Hardware Simulation) Routines -->
+        <script type="text/javascript" src="dist/host/control.js"></script>
+        <script type="text/javascript" src="dist/host/devices.js"></script>
+        <script type="text/javascript" src="dist/host/cpu.js"></script>
+        <!-- Virtual OS Routines: Make sure Kernel code is last, since it needs those above it. -->
+        <script type="text/javascript" src="dist/os/interrupt.js"></script>
+        <script type="text/javascript" src="dist/os/canvastext.js"></script>
+        <script type="text/javascript" src="dist/os/console.js"></script>
+        <script type="text/javascript" src="dist/os/deviceDriver.js"></script>
+        <script type="text/javascript" src="dist/os/deviceDriverKeyboard.js"></script>
+        <script type="text/javascript" src="dist/os/queue.js"></script>
+        <script type="text/javascript" src="dist/os/shell.js"></script>
+        <script type="text/javascript" src="dist/os/shellCommand.js"></script>
+        <script type="text/javascript" src="dist/os/userCommand.js"></script>
+        <script type="text/javascript" src="dist/os/kernel.js"></script>
+        <!-- Other Routines -->
+        <script type="text/javascript" src="dist/utils.js"></script>
+        <!-- Uncomment the line below to enable GLaDOS testing. -->
+        <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script> -->
+</body>
+
+</html>

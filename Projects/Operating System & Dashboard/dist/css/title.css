@@ -1,0 +1,19 @@
+.untouchable {
+	user-select: none;
+	moz-user-select: none;
+	khtml-user-select: none;
+	webkit-user-select: none;
+	o-user-select: none;
+} 
+#teeth {
+	height: 30%;
+	width: 30%;
+}
+#red-i-eye {
+	height: 10%;
+	width: 10%;
+}
+#red-eye {
+	height: 10%;
+	width: 10%;
+}
