@@ -33,6 +33,7 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             // time
             sc = new TSOS.ShellCommand(this.shellTime, "time", "- Displays the current time.");
+            this.commandList[this.commandList.length] = sc;
             // datetime
             sc = new TSOS.ShellCommand(this.shellDateTime, "datetime", "- Displays the current datetime.");
             this.commandList[this.commandList.length] = sc;
