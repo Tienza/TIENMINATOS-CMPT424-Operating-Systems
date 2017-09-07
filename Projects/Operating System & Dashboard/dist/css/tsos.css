@@ -30,6 +30,10 @@ h3 {
   font-style: normal;
 }
 
+textarea {
+  resize: none;
+}
+
 #display {
   background-color:#FFFFFF;
   border: 1px solid #CCCCCC;

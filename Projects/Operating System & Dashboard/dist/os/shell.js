@@ -28,6 +28,17 @@ var TSOS;
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
+            // date
+            sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
+            this.commandList[this.commandList.length] = sc;
+            // time
+            sc = new TSOS.ShellCommand(this.shellTime, "time", "- Displays the current time.");
+            // datetime
+            sc = new TSOS.ShellCommand(this.shellDateTime, "datetime", "- Displays the current datetime.");
+            this.commandList[this.commandList.length] = sc;
+            // latlong
+            sc = new TSOS.ShellCommand(this.shellLatLong, "latlong", "- Displays user's current latlong.");
+            this.commandList[this.commandList.length] = sc;
             // help
             sc = new TSOS.ShellCommand(this.shellHelp, "help", "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
@@ -246,6 +257,53 @@ var TSOS;
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         };
+        Shell.prototype.shellDate = function (args) {
+            var today = new Date();
+            var dd = today.getDate();
+            var mm = today.getMonth() + 1; //January is 0!
+            var yyyy = today.getFullYear();
+
+            if (dd < 10) {
+                dd = '0' + dd
+            }
+
+            if (mm < 10) {
+                mm = '0' + mm
+            }
+
+            today = yyyy + '-' + mm + '-' + dd;
+            _StdOut.putText("Current Date: " + today);
+        }
+        Shell.prototype.shellTime = function (args) {
+            var d = new Date();
+
+            var hh = (d.getHours() < 10 ? "0" : "") + d.getHours();
+            var mm = (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
+            var ss = (d.getSeconds() < 10 ? "0" : "") + d.getSeconds();
+
+            var time = hh + ":" + mm + ":" + ss;
+
+            _StdOut.putText("Current Time: " + time);
+        }
+        Shell.prototype.shellDateTime = function (args) {
+            _StdOut.putText("Current DateTime: " + new Date());
+        }
+        Shell.prototype.shellLatLong = function (args) {
+            getLocation();
+            function getLocation() {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                } else {
+                    _StdOut.putText("Geolocation is not supported by this browser.");
+                }
+                function showPosition(position) {
+                    if (position.coords.latitude && position.coords.longitude)
+                        _StdOut.putText("Latitude: " + position.coords.latitude + " / Longitude: " + position.coords.longitude);
+                    else
+                        _StdOut.putText("User apparently does not want to be stalked... :(");
+                }
+            }
+        }
         return Shell;
     })();
     TSOS.Shell = Shell;
