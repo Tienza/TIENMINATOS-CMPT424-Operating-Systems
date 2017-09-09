@@ -48,6 +48,11 @@ textarea {
   width: 100%;
 }
 
+#statusBar {
+  font-family: monospace;
+  font-weight: bold;
+}
+
 .footerText {
   color: black;
   font-family: Arial, Helvetica, sans-serif;

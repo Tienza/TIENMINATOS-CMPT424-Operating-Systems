@@ -66,6 +66,12 @@ var TSOS;
         // Host Events
         //
         Control.hostBtnStartOS_click = function (btn) {
+            // Activate DateTime Clock
+            function updateClock() {
+                var dateTime = Date().match(/(.*)\(/);
+                $('#dateTime').html(dateTime[1]);
+            }
+            setInterval(updateClock, 1000);
             // Disable the (passed-in) start button...
             btn.disabled = true;
             // .. enable the Halt and Reset buttons ...

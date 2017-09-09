@@ -28,6 +28,9 @@ var TSOS;
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
+            // load
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Verify user input and load into memory.");
+            this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
             this.commandList[this.commandList.length] = sc;
@@ -40,11 +43,17 @@ var TSOS;
             // latlong
             sc = new TSOS.ShellCommand(this.shellLatLong, "latlong", "- Displays user's current latlong.");
             this.commandList[this.commandList.length] = sc;
+            // whereami
+            sc = new TSOS.ShellCommand(this.shellWhereAmI, "whereami", "- Where are you?");
+            this.commandList[this.commandList.length] = sc;
             // help
             sc = new TSOS.ShellCommand(this.shellHelp, "help", "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
             // shutdown
             sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
+            this.commandList[this.commandList.length] = sc;
+            // 死を欲しい - death - shiohoshii
+            sc = new TSOS.ShellCommand(this.shellShiWoHoShii, "shiwohoshii", "- End It All.");
             this.commandList[this.commandList.length] = sc;
             // cls
             sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
@@ -60,6 +69,9 @@ var TSOS;
             this.commandList[this.commandList.length] = sc;
             // prompt <string>
             sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
+            this.commandList[this.commandList.length] = sc;
+            // status <string>
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Sets the status.");
             this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
@@ -181,7 +193,33 @@ var TSOS;
             }
         };
         Shell.prototype.shellVer = function (args) {
-            _StdOut.putText(APP_NAME + " version " + APP_VERSION);
+            _StdOut.putText(APP_NAME + " version " + APP_VERSION + ": " + USER_AGENT);
+        };
+        Shell.prototype.shellLoad = function (args) {
+            var userInput = $('#taProgramInput').val();
+            var isHex = isHex(userInput).isHex;
+            var message = "";
+
+            if (isHex && userInput !== "")
+                message = "Program is valid HEX, and will be loaded soon.";
+            else
+                message = "Please enter valid HEX and try again."
+
+            _StdOut.putText(message);
+
+            function isHex(userInput) {
+                var testInput = userInput.replace(/ /g, "");
+                testInput = testInput.split("");
+                var isHex = true;
+                for (var i = 0; i < testInput.length; i++) {
+                    var processedString = parseInt(testInput[i], 16);
+                    if ((processedString.toString(16) === testInput[i].toLowerCase()) === false) {
+                        isHex = false;
+                        break;
+                    }
+                }
+                return { isHex: isHex, userInput: userInput };
+            }
         };
         Shell.prototype.shellHelp = function (args) {
             _StdOut.putText("Commands:");
@@ -195,6 +233,11 @@ var TSOS;
             // Call Kernel shutdown routine.
             _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
+        };
+        Shell.prototype.shellShiWoHoShii = function (args) {
+            _StdOut.putText("Initializing Death of Operating System");
+            // Call Kernel traperror routine.
+            _Kernel.krnTrapError();
         };
         Shell.prototype.shellCls = function (args) {
             _StdOut.clearScreen();
@@ -258,6 +301,18 @@ var TSOS;
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
             }
         };
+        Shell.prototype.shellStatus = function (args) {
+            if (args.length > 0) {
+                var status = "";
+                for (var i = 0; i < args.length; i++) {
+                    status += (i !== args.length - 1) ? args[i] + " " : args[i];
+                }
+                $('#status').html(status);
+            }
+            else {
+                _StdOut.putText("Usage: status <string>  Please supply a string.");
+            }
+        };
         Shell.prototype.shellDate = function (args) {
             var today = new Date();
             var dd = today.getDate();
@@ -305,7 +360,14 @@ var TSOS;
                 }
             }
         }
+        Shell.prototype.shellWhereAmI = function (args) {
+            _StdOut.putText("Where are any of us really? Is there even a point to contemplate such a moot point? We are here, we are there, we can be anywhere we want if we change our point of reference. So the question becomes - Should you ask where you are to the rest of the world or where the rest of the world is to you? For the real answer type 'latlong'...");
+        }
         return Shell;
     })();
     TSOS.Shell = Shell;
+    function isHex(h) {
+        var a = parseInt(h, 16);
+        return (a.toString(16) === h.toLowerCase())
+    }
 })(TSOS || (TSOS = {}));
