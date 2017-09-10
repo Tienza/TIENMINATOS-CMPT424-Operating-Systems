@@ -16,7 +16,7 @@ var TSOS;
     var Shell = (function () {
         function Shell() {
             // Properties
-            this.promptStr = ">";
+            this.promptStr = "TienminatOS$~";
             this.commandList = [];
             this.curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
             this.apologies = "[sorry]";
@@ -328,7 +328,7 @@ var TSOS;
             }
 
             today = yyyy + '-' + mm + '-' + dd;
-            _StdOut.putText("Current Date: " + today);
+            _StdOut.putText(today);
         }
         Shell.prototype.shellTime = function (args) {
             var d = new Date();
@@ -339,10 +339,10 @@ var TSOS;
 
             var time = hh + ":" + mm + ":" + ss;
 
-            _StdOut.putText("Current Time: " + time);
+            _StdOut.putText(time);
         }
         Shell.prototype.shellDateTime = function (args) {
-            _StdOut.putText("Current DateTime: " + new Date());
+            _StdOut.putText(Date());
         }
         Shell.prototype.shellLatLong = function (args) {
             getLocation();

@@ -32,7 +32,9 @@ var TSOS;
         };
         CanvasTextFunctions.measure = function (font, size, str) {
             var total = 0;
-            var len = str.length;
+            var len = 0;
+            if (str !== undefined)
+                len = str.length;
             for (var i = 0; i < len; i++) {
                 var c = CanvasTextFunctions.letter(str.charAt(i));
                 if (c) {
@@ -43,7 +45,9 @@ var TSOS;
         };
         CanvasTextFunctions.draw = function (ctx, font, size, x, y, str) {
             var total = 0;
-            var len = str.length;
+            var len = 0;
+            if (str !== undefined)
+                len = str.length;
             var mag = size / 25.0;
             ctx.save();
             ctx.lineCap = "round";
