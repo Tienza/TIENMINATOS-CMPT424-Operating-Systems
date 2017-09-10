@@ -119,6 +119,10 @@ var TSOS;
                 else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {
                     this.execute(this.shellApology);
                 }
+                else if (buffer === "") {
+                    _StdOut.advanceLine();
+                    this.putPrompt();
+                }
                 else {
                     this.execute(this.shellInvalidCommand);
                 }
@@ -141,8 +145,9 @@ var TSOS;
             var retVal = new TSOS.UserCommand();
             // 1. Remove leading and trailing spaces.
             buffer = TSOS.Utils.trim(buffer);
-            // 2. Lower-case it.
-            buffer = buffer.toLowerCase();
+            // 2. Lower-case it. - Unless it is the 'status' command
+            if (!/^status/.test(buffer))
+                buffer = buffer.toLowerCase();
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
             var tempList = buffer.split(" ");
             // 4. Take the first (zeroth) element and use that as the command.
@@ -361,7 +366,12 @@ var TSOS;
             }
         }
         Shell.prototype.shellWhereAmI = function (args) {
-            _StdOut.putText("Where are any of us really? Is there even a point to contemplate such a moot point? We are here, we are there, we can be anywhere we want if we change our point of reference. So the question becomes - Should you ask where you are to the rest of the world or where the rest of the world is to you? For the real answer type 'latlong'...");
+            var existentialCrisis = "Where are any of us really? Is there even a point to contemplate such a moot point? We are here, we are there, we can be anywhere we want if we change our point of reference. So the question becomes - Should you ask where you are to the rest of the world or where the rest of the world is to you? For the real answer type 'latlong'";
+            var message = existentialCrisis.split("");
+            // Sends the message to the console
+            for (var i = 0; i < message.length; i++) {
+                _StdOut.putText(message[i]);
+            }
         }
         return Shell;
     })();

@@ -147,7 +147,15 @@ var TSOS;
                 _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
                 // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                this.currentXPosition = this.currentXPosition + offset;
+                if (this.currentXPosition >= 533) {
+                    _WrappedPosition.push({ X: this.currentXPosition, Y: this.currentYPosition });
+                    this.advanceLine();
+                    this.currentXPosition = 0;
+                    console.log(_WrappedPosition);
+                }
+                else {
+                    this.currentXPosition = this.currentXPosition + offset;
+                }
             }
         };
         Console.prototype.handleBackSpace = function () {
