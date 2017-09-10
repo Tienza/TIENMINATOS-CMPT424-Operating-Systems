@@ -48,6 +48,10 @@ textarea {
   width: 100%;
 }
 
+#taHostLog {
+  font-family: monospace;
+}
+
 #statusBar {
   font-family: monospace;
   font-weight: bold;
