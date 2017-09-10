@@ -41,6 +41,13 @@ var _StdOut;
 // UI
 var _Console;
 var _OsShell;
+// Variables for up_down key press - Console History
+var _CommandList = [];
+var _CommandIndex = 0;
+// Variables for Tab Complete
+var _ShellCommandList = ["ver","load","date","time","datetime","latlong","whereami","help","shutdown","shiwohoshii","cls","man","trace","rot13","prompt","status"];
+var _TabCompleteList = _ShellCommandList;
+var _TabCompleteIndex = -1;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12
