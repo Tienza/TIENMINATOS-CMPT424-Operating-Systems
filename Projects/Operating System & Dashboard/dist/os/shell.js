@@ -81,6 +81,7 @@ var TSOS;
         };
         Shell.prototype.putPrompt = function () {
             _StdOut.putText(this.promptStr);
+            _ConsoleBuffer.push(this.promptStr);
         };
         Shell.prototype.handleInput = function (buffer) {
             _Kernel.krnTrace("Shell Command~" + buffer);
@@ -129,11 +130,13 @@ var TSOS;
             }
         };
         // Note: args is an option parameter, ergo the ? which allows TypeScript to understand that.
-        Shell.prototype.execute = function (fn, args) {
+        Shell.prototype.execute = function (fn, args) {         
             // We just got a command, so advance the line...
             _StdOut.advanceLine();
             // ... call the command function passing in the args with some über-cool functional programming ...
+            _FromShell = true;
             fn(args);
+            _FromShell = false;
             // Check to see if we need to advance the line again
             if (_StdOut.currentXPosition > 0) {
                 _StdOut.advanceLine();
@@ -319,10 +322,14 @@ var TSOS;
                 for (var i = 0; i < args.length; i++) {
                     status += (i !== args.length - 1) ? args[i] + " " : args[i];
                 }
-                $('#status').html(status);
+                $('#status').html(encodeHTML(status));
             }
             else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
+            }
+
+            function encodeHTML(s) {
+                return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
             }
         };
         Shell.prototype.shellDate = function (args) {

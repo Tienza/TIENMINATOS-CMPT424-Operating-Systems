@@ -43,6 +43,10 @@ var TSOS;
                 /* ------------------- Start Key Handling Section ------------------- */
                 // Process Enter
                 if (chr === "enter") {
+                    // Update _ConsoleBuffer
+                    var _ConsoleBufferInput = this.buffer.split("");
+                    for (i in _ConsoleBufferInput)
+                        _ConsoleBuffer.push(_ConsoleBufferInput[i]);
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
@@ -58,14 +62,13 @@ var TSOS;
                 // Process Tab
                 else if (chr === "tab") {
                     this.clearLine();
-                    console.log("Ready to process tab");
-                    console.log("Old _TabCompleIndex: " + _TabCompleteIndex);
+                    // console.log("Old _TabCompleIndex: " + _TabCompleteIndex);
                     // Increment _TabCompleteIndex for Tab Completion - If end reached reset the index
                     if (_TabCompleteIndex < _TabCompleteList.length)
                         _TabCompleteIndex++;
                     else if (_TabCompleteIndex >= _TabCompleteList.length - 1)
                         _TabCompleteIndex = 0;
-                    console.log("New _TabCompleteIndex: " + _TabCompleteIndex);
+                    // console.log("New _TabCompleteIndex: " + _TabCompleteIndex);
                     // Enter the complete/predicted command into the console and set the buffer to the command
                     if (_TabCompleteIndex < _TabCompleteList.length) {
                         this.putText(_TabCompleteList[_TabCompleteIndex]);
@@ -89,7 +92,7 @@ var TSOS;
                 else if (chr === "up_key" || chr === "down_key") {
                     this.clearLine();
                     // console.log("Ready to input previous command...");
-
+                    
                     if (chr === "up_key") {
                         if (_CommandIndex > 0)
                             _CommandIndex--;
@@ -100,18 +103,17 @@ var TSOS;
 
                     }
                     console.log("_CommandIndex: " + _CommandIndex);
-                    // These commands are suggestions and should not be inserted into _ConsoleBuffer
-                    _ConsoleSuggestion = true;
                     // Enter the command into the console and set the buffer to the command
+                    var _ConsoleBufferInput = "";
                     if (_CommandIndex < _CommandList.length) {
                         this.putText(_CommandList[_CommandIndex]);
                         this.buffer = _CommandList[_CommandIndex];
+                        _ConsoleBufferInput = _CommandList[_CommandIndex];
                     }
                     else {
                         this.putText("");
                         this.buffer = "";
                     }
-                    _ConsoleSuggestion = false;
                 }
                 else {
                     // This is a "normal" character, so ...
@@ -157,9 +159,8 @@ var TSOS;
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
                 // Push text to _ConsoleBuffer
-                if (!_Scrolling && !_ConsoleSuggestion)
+                if (_FromShell && !_ConsoleScrolling)
                     _ConsoleBuffer.push(text);
-
                 console.log("currentXPosition: " + this.currentXPosition);
                 console.log("currentYPosition: " + this.currentYPosition);
             }
@@ -185,13 +186,13 @@ var TSOS;
             console.log(_ConsoleBuffer);
             console.log(_ConsoleBuffer.length);
             // Set Scrolling to true to stop insertion into the _ConsoleBuffer
-            _Scrolling = true;
+            _ConsoleScrolling = true;
             // Redraw the _ConsoleBuffer into the Console
             for (var j = 0; j < _ConsoleBuffer.length; j ++) {
                 this.putText(_ConsoleBuffer[j]);
             }
             // Set Scrolling to false to restart insertion into the _ConsoleBuffer
-            _Scrolling = false;
+            _ConsoleScrolling = false;
         }
         Console.prototype.handleBackSpace = function () {
             if (this.currentXPosition <= 0) {
@@ -199,8 +200,6 @@ var TSOS;
                 this.currentYPosition = _WrappedPosition[_WrappedPosition.length - 1].Y;
                 _WrappedPosition.pop();
             }
-            if (_ConsoleBuffer.length !== 0)
-                _ConsoleBuffer.pop();
             var lastChar = this.buffer[this.buffer.length - 1];
             var xOffSet = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
             this.currentXPosition = this.currentXPosition - xOffSet;
@@ -223,7 +222,7 @@ var TSOS;
         }
         Console.prototype.advanceLine = function () {
             // Signify line break in console buffer
-            if (!_Scrolling)
+            if (!_ConsoleScrolling)
                 _ConsoleBuffer.push("\n");
             // Reset currentXPosition to the start of the console
             this.currentXPosition = 0;
