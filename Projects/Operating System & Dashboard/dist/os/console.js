@@ -37,7 +37,7 @@ var TSOS;
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
                 var chr = _KernelInputQueue.dequeue();
-                console.log(chr);
+                // console.log(chr);
                 // Check to see if it's "special" (enter or ctrl-c) or "normal" (anything else that the keyboard device driver gave us).
 
                 /* ------------------- Start Key Handling Section ------------------- */
@@ -53,7 +53,7 @@ var TSOS;
                     _CommandIndex = _CommandList.length;
                     // ... and reset our buffer.
                     this.buffer = "";
-                    console.log(_CommandList);
+                    // console.log(_CommandList);
                 }
                 // Process Tab
                 else if (chr === "tab") {
@@ -116,10 +116,11 @@ var TSOS;
                     this.putText(chr);
                     // ... and add it to our buffer.
                     this.buffer += chr;
+                    console.log(this.buffer);
                     // Generate the _TabCompleteList && Reset _TabCompleteIndex
                     _TabCompleteList = this.tabComplete(this.buffer, _ShellCommandList);
                     _TabCompleteIndex = -1;
-                    console.log(_TabCompleteList);
+                    // console.log(_TabCompleteList);
                 }
             }
         };
@@ -143,22 +144,28 @@ var TSOS;
             // UPDATE: Even though we are now working in TypeScript, char and string remain undistinguished.
             //         Consider fixing that.
             if (text !== "") {
-                // Draw the text at the current X and Y coordinates.
-                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
-                // Move the current X position.
-                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
-                if (this.currentXPosition >= 533) {
+                if (this.currentXPosition >= 537) {
                     _WrappedPosition.push({ X: this.currentXPosition, Y: this.currentYPosition });
                     this.advanceLine();
                     this.currentXPosition = 0;
                     console.log(_WrappedPosition);
                 }
-                else {
-                    this.currentXPosition = this.currentXPosition + offset;
-                }
+                // Draw the text at the current X and Y coordinates.
+                _DrawingContext.drawText(this.currentFont, this.currentFontSize, this.currentXPosition, this.currentYPosition, text);
+                // Move the current X position.
+                var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
+                this.currentXPosition = this.currentXPosition + offset;
+
+                console.log("currentXPosition: " + this.currentXPosition);
+                console.log("currentYPosition: " + this.currentYPosition);
             }
         };
         Console.prototype.handleBackSpace = function () {
+            if (this.currentXPosition <= 0) {
+                this.currentXPosition = _WrappedPosition[_WrappedPosition.length - 1].X;
+                this.currentYPosition = _WrappedPosition[_WrappedPosition.length - 1].Y;
+                _WrappedPosition.pop();
+            }
             var lastChar = this.buffer[this.buffer.length - 1];
             var xOffSet = _DrawingContext.measureText(this.currentFont, this.currentFontSize, lastChar);
             this.currentXPosition = this.currentXPosition - xOffSet;
@@ -167,6 +174,8 @@ var TSOS;
             // Delete the last character from the buffer
             this.buffer = this.buffer.slice(0, -1);
             console.log(this.buffer);
+            console.log("currentXPosition: " + this.currentXPosition);
+            console.log("currentYPosition: " + this.currentYPosition);
         };
         Console.prototype.clearLine = function () {
             var bufferLength = 0;
@@ -184,10 +193,18 @@ var TSOS;
              * Font descent measures from the baseline to the lowest point in the font.
              * Font height margin is extra spacing between the lines.
              */
-            this.currentYPosition += _DefaultFontSize +
-                _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) +
-                _FontHeightMargin;
+            this.currentYPosition += _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
+            if (this.currentYPosition > _MaxYPosition) {
+                // Redraw the screen accept for the top line
+                var tempBuffer = this.consoleBuffer.substring(this.consoleBuffer.indexOf("\n") + 1);
+                this.clearScreen();
+                this.resetXY();
+                for (let i = 0; i < tempBuffer.length; i++) {
+                    this.putText(tempBuffer.charAt(i));
+                }
+                this.consoleBuffer = tempBuffer;
+            }
         };
         return Console;
     })();

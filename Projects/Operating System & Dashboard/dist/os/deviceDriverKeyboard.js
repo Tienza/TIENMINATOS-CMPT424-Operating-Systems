@@ -31,8 +31,8 @@ var TSOS;
             // Parse the params.    TODO: Check that the params are valid and osTrapError if not.
             var keyCode = params[0];
             var isShifted = params[1];
-            console.log("Key Code: " + keyCode);
-            console.log("Shifted: " + isShifted);
+            // console.log("Key Code: " + keyCode);
+            // console.log("Shifted: " + isShifted);
             _Kernel.krnTrace("Key code:" + keyCode + " shifted:" + isShifted);
             var chr = "";
             // Check to see if we even want to deal with the key that was pressed. - Letters

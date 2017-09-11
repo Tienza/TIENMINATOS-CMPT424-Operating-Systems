@@ -48,8 +48,10 @@ var _CommandIndex = 0;
 var _ShellCommandList = ["ver","load","date","time","datetime","latlong","whereami","help","shutdown","shiwohoshii","cls","man","trace","rot13","prompt","status"];
 var _TabCompleteList = _ShellCommandList;
 var _TabCompleteIndex = -1;
-// Variables for Text Wrap
+// Variable for Text Wrap
 var _WrappedPosition = [];
+// Variable for Console Scrolling
+var _MaxYPosition = 405.16
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12
