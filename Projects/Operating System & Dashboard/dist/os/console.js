@@ -86,7 +86,7 @@ var TSOS;
                     // Generate the _TabCompleteList && Reset _TabCompleteIndex
                     _TabCompleteList = this.tabComplete(this.buffer, _ShellCommandList);
                     _TabCompleteIndex = -1;
-                    console.log(_TabCompleteList);
+                    // console.log(_TabCompleteList);
                 }
                 // Process Up_Key && Down_Key
                 else if (chr === "up_key" || chr === "down_key") {
@@ -102,7 +102,7 @@ var TSOS;
                             _CommandIndex++;
 
                     }
-                    console.log("_CommandIndex: " + _CommandIndex);
+                    // console.log("_CommandIndex: " + _CommandIndex);
                     // Enter the command into the console and set the buffer to the command
                     var _ConsoleBufferInput = "";
                     if (_CommandIndex < _CommandList.length) {
@@ -121,13 +121,13 @@ var TSOS;
                     this.putText(chr);
                     // ... and add it to our buffer.
                     this.buffer += chr;
-                    console.log(this.buffer);
+                    // console.log(this.buffer);
                     // Generate the _TabCompleteList && Reset _TabCompleteIndex
                     _TabCompleteList = this.tabComplete(this.buffer, _ShellCommandList);
                     _TabCompleteIndex = -1;
                     // console.log(_TabCompleteList);
                 }
-                console.log(_ConsoleBuffer);
+                // console.log(_ConsoleBuffer);
             }
         };
         Console.prototype.tabComplete = function (key, array) {
@@ -161,8 +161,8 @@ var TSOS;
                 // Push text to _ConsoleBuffer
                 if (_FromShell && !_ConsoleScrolling)
                     _ConsoleBuffer.push(text);
-                console.log("currentXPosition: " + this.currentXPosition);
-                console.log("currentYPosition: " + this.currentYPosition);
+                // console.log("currentXPosition: " + this.currentXPosition);
+                // console.log("currentYPosition: " + this.currentYPosition);
             }
             else if (text !== "" && text === "\n") {
                 this.advanceLine();
@@ -172,7 +172,7 @@ var TSOS;
             _WrappedPosition.push({ X: this.currentXPosition, Y: this.currentYPosition });
             this.advanceLine();
             this.currentXPosition = 0;
-            console.log(_WrappedPosition);
+            // console.log(_WrappedPosition);
         }
         Console.prototype.handleScrolling = function () {
             // Clear the screen and reset the XY positions
@@ -183,8 +183,8 @@ var TSOS;
             for (var i = 0; i <= firstLineBreak; i++) {
                 _ConsoleBuffer.shift();
             }
-            console.log(_ConsoleBuffer);
-            console.log(_ConsoleBuffer.length);
+            //console.log(_ConsoleBuffer);
+            // console.log(_ConsoleBuffer.length);
             // Set Scrolling to true to stop insertion into the _ConsoleBuffer
             _ConsoleScrolling = true;
             // Redraw the _ConsoleBuffer into the Console
@@ -207,9 +207,9 @@ var TSOS;
             _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, this.currentXPosition + xOffSet, this.currentYPosition + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
             // Delete the last character from the buffer
             this.buffer = this.buffer.slice(0, -1);
-            console.log(this.buffer);
-            console.log("currentXPosition: " + this.currentXPosition);
-            console.log("currentYPosition: " + this.currentYPosition);
+            // console.log(this.buffer);
+            // console.log("currentXPosition: " + this.currentXPosition);
+            // console.log("currentYPosition: " + this.currentYPosition);
         };
         Console.prototype.clearLine = function () {
             var bufferLength = 0;
