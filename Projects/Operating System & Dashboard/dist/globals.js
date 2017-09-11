@@ -41,6 +41,9 @@ var _StdOut;
 // UI
 var _Console;
 var _OsShell;
+// Console Resolution
+var _MaxYPosition = 405.16;
+var _MaxXPosition = 537;
 // Variables for up_down key press - Console History
 var _CommandList = [];
 var _CommandIndex = 0;
@@ -51,7 +54,9 @@ var _TabCompleteIndex = -1;
 // Variable for Text Wrap
 var _WrappedPosition = [];
 // Variable for Console Scrolling
-var _MaxYPosition = 405.16
+var _ConsoleBuffer = [];
+var _Scrolling = false;
+var _ConsoleSuggestion = false;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12

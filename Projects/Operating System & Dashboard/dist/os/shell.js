@@ -198,7 +198,11 @@ var TSOS;
             }
         };
         Shell.prototype.shellVer = function (args) {
-            _StdOut.putText(APP_NAME + " version " + APP_VERSION + ": " + USER_AGENT);
+            var version = APP_NAME + " version " + APP_VERSION + ": " + USER_AGENT;
+            version = version.split("");
+            for (var i = 0; i < version.length; i++) {
+                _StdOut.putText(version[i]);
+            }
         };
         Shell.prototype.shellLoad = function (args) {
             var userInput = $('#taProgramInput').val();
@@ -230,7 +234,10 @@ var TSOS;
             _StdOut.putText("Commands:");
             for (var i in _OsShell.commandList) {
                 _StdOut.advanceLine();
-                _StdOut.putText("  " + _OsShell.commandList[i].command + " " + _OsShell.commandList[i].description);
+                var command = "  " + _OsShell.commandList[i].command + " " + _OsShell.commandList[i].description;
+                var commandDetails = command.split("");
+                for (var j in commandDetails)
+                    _StdOut.putText(commandDetails[j]);
             }
         };
         Shell.prototype.shellShutdown = function (args) {
