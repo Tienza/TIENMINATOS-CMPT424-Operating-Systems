@@ -43,10 +43,6 @@ var TSOS;
                 /* ------------------- Start Key Handling Section ------------------- */
                 // Process Enter
                 if (chr === "enter") {
-                    // Update _ConsoleBuffer
-                    var _ConsoleBufferInput = this.buffer.split("");
-                    for (i in _ConsoleBufferInput)
-                        _ConsoleBuffer.push(_ConsoleBufferInput[i]);
                     // The enter key marks the end of a console command, so ...
                     // ... tell the shell ...
                     _OsShell.handleInput(this.buffer);
@@ -104,11 +100,9 @@ var TSOS;
                     }
                     // console.log("_CommandIndex: " + _CommandIndex);
                     // Enter the command into the console and set the buffer to the command
-                    var _ConsoleBufferInput = "";
                     if (_CommandIndex < _CommandList.length) {
                         this.putText(_CommandList[_CommandIndex]);
                         this.buffer = _CommandList[_CommandIndex];
-                        _ConsoleBufferInput = _CommandList[_CommandIndex];
                     }
                     else {
                         this.putText("");
@@ -127,7 +121,6 @@ var TSOS;
                     _TabCompleteIndex = -1;
                     // console.log(_TabCompleteList);
                 }
-                // console.log(_ConsoleBuffer);
             }
         };
         Console.prototype.tabComplete = function (key, array) {
@@ -158,9 +151,6 @@ var TSOS;
                 // Move the current X position.
                 var offset = _DrawingContext.measureText(this.currentFont, this.currentFontSize, text);
                 this.currentXPosition = this.currentXPosition + offset;
-                // Push text to _ConsoleBuffer
-                if (_FromShell && !_ConsoleScrolling)
-                    _ConsoleBuffer.push(text);
                 // console.log("currentXPosition: " + this.currentXPosition);
                 // console.log("currentYPosition: " + this.currentYPosition);
             }
@@ -176,7 +166,15 @@ var TSOS;
         }
         Console.prototype.handleScrolling = function () {
             // Clear the screen and reset the XY positions
+            var scrollBy = this.currentYPosition - _MaxYPosition;
+            // console.log(scrollBy);
+            var img = _DrawingContext.getImageData(0, 21, _MaxXPosition, _MaxYPosition);
+            this.currentYPosition -= scrollBy;
             this.clearScreen();
+            // console.log(this.currentYPosition);
+            _DrawingContext.putImageData(img, 0, 0);
+
+            /*this.clearScreen();
             this.resetXY();
             // Calculate where the first line break was and remove all elements before it
             var firstLineBreak = _ConsoleBuffer.indexOf("\n");
@@ -192,7 +190,8 @@ var TSOS;
                 this.putText(_ConsoleBuffer[j]);
             }
             // Set Scrolling to false to restart insertion into the _ConsoleBuffer
-            _ConsoleScrolling = false;
+            _ConsoleScrolling = false;*/
+
         }
         Console.prototype.handleBackSpace = function () {
             if (this.currentXPosition <= 0) {
@@ -221,9 +220,6 @@ var TSOS;
             }
         }
         Console.prototype.advanceLine = function () {
-            // Signify line break in console buffer
-            if (!_ConsoleScrolling)
-                _ConsoleBuffer.push("\n");
             // Reset currentXPosition to the start of the console
             this.currentXPosition = 0;
             /*

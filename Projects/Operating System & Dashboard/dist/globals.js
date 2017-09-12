@@ -55,7 +55,7 @@ var _TabCompleteIndex = -1;
 // Variable for Text Wrap
 var _WrappedPosition = [];
 // Variable for Console Scrolling
-var _ConsoleBuffer = [];
+// var _ConsoleBuffer = [];
 var _ConsoleScrolling = false;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;

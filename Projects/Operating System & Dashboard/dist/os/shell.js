@@ -81,7 +81,6 @@ var TSOS;
         };
         Shell.prototype.putPrompt = function () {
             _StdOut.putText(this.promptStr);
-            _ConsoleBuffer.push(this.promptStr);
         };
         Shell.prototype.handleInput = function (buffer) {
             _Kernel.krnTrace("Shell Command~" + buffer);
