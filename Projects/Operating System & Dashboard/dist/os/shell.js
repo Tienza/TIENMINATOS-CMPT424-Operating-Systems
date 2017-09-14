@@ -13,7 +13,7 @@
 // TODO: Write a base class / prototype for system services and let Shell inherit from it.
 var TSOS;
 (function (TSOS) {
-    var Shell = (function () {
+    var Shell = /** @class */ (function () {
         function Shell() {
             // Properties
             this.promptStr = "TienminatOS$~";
@@ -119,23 +119,17 @@ var TSOS;
                 else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {
                     this.execute(this.shellApology);
                 }
-                else if (buffer === "") {
-                    _StdOut.advanceLine();
-                    this.putPrompt();
-                }
                 else {
                     this.execute(this.shellInvalidCommand);
                 }
             }
         };
         // Note: args is an option parameter, ergo the ? which allows TypeScript to understand that.
-        Shell.prototype.execute = function (fn, args) {         
+        Shell.prototype.execute = function (fn, args) {
             // We just got a command, so advance the line...
             _StdOut.advanceLine();
             // ... call the command function passing in the args with some über-cool functional programming ...
-            _FromShell = true;
             fn(args);
-            _FromShell = false;
             // Check to see if we need to advance the line again
             if (_StdOut.currentXPosition > 0) {
                 _StdOut.advanceLine();
@@ -166,6 +160,7 @@ var TSOS;
                 }
             }
             return retVal;
+            ;
         };
         //
         // Shell Command Functions.  Kinda not part of Shell() class exactly, but
@@ -201,30 +196,27 @@ var TSOS;
         };
         Shell.prototype.shellVer = function (args) {
             var version = APP_NAME + " version " + APP_VERSION + ": " + USER_AGENT;
-            version = version.split("");
-            for (var i = 0; i < version.length; i++) {
-                _StdOut.putText(version[i]);
+            var messageArray = version.split("");
+            for (var i = 0; i < messageArray.length; i++) {
+                _StdOut.putText(messageArray[i]);
             }
         };
-        Shell.prototype.shellLoad = function (args) {
+        Shell.prototype.shellLoad = function (arg) {
             var userInput = $('#taProgramInput').val();
-            var isHex = isHex(userInput).isHex;
+            var isHexValid = isHex(userInput).isHex;
             var message = "";
-
-            if (isHex && userInput !== "")
+            if (isHexValid && userInput !== "")
                 message = "Program is valid HEX, and will be loaded soon.";
             else
-                message = "Please enter valid HEX and try again."
-
+                message = "Please enter valid HEX and try again.";
             _StdOut.putText(message);
-
             function isHex(userInput) {
                 var testInput = userInput.replace(/ /g, "");
-                testInput = testInput.split("");
+                var testInputArray = testInput.split("");
                 var isHex = true;
-                for (var i = 0; i < testInput.length; i++) {
-                    var processedString = parseInt(testInput[i], 16);
-                    if ((processedString.toString(16) === testInput[i].toLowerCase()) === false) {
+                for (var i = 0; i < testInputArray.length; i++) {
+                    var processedString = parseInt(testInputArray[i], 16);
+                    if ((processedString.toString(16) === testInputArray[i].toLowerCase()) === false) {
                         isHex = false;
                         break;
                     }
@@ -251,7 +243,7 @@ var TSOS;
         Shell.prototype.shellShiWoHoShii = function (args) {
             _StdOut.putText("Initializing Death of Operating System");
             // Call Kernel traperror routine.
-            _Kernel.krnTrapError();
+            _Kernel.krnTrapError("In death we are all equal...");
         };
         Shell.prototype.shellCls = function (args) {
             _StdOut.clearScreen();
@@ -326,48 +318,44 @@ var TSOS;
             else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
             }
-
-            function encodeHTML(s) {
-                return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+            function encodeHTML(string) {
+                return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
             }
         };
         Shell.prototype.shellDate = function (args) {
             var today = new Date();
             var dd = today.getDate();
             var mm = today.getMonth() + 1; //January is 0!
-            var yyyy = today.getFullYear();
-
+            var year = today.getFullYear();
+            var month = "" + mm;
+            var day = "" + dd;
             if (dd < 10) {
-                dd = '0' + dd
+                day = "0" + dd;
             }
-
             if (mm < 10) {
-                mm = '0' + mm
+                month = "0" + mm;
             }
-
-            today = yyyy + '-' + mm + '-' + dd;
-            _StdOut.putText(today);
-        }
+            var todayDate = year + "-" + month + "-" + day;
+            _StdOut.putText(todayDate);
+        };
         Shell.prototype.shellTime = function (args) {
             var d = new Date();
-
             var hh = (d.getHours() < 10 ? "0" : "") + d.getHours();
             var mm = (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
             var ss = (d.getSeconds() < 10 ? "0" : "") + d.getSeconds();
-
             var time = hh + ":" + mm + ":" + ss;
-
             _StdOut.putText(time);
-        }
+        };
         Shell.prototype.shellDateTime = function (args) {
             _StdOut.putText(Date());
-        }
+        };
         Shell.prototype.shellLatLong = function (args) {
             getLocation();
             function getLocation() {
                 if (navigator.geolocation) {
                     navigator.geolocation.getCurrentPosition(showPosition);
-                } else {
+                }
+                else {
                     _StdOut.putText("Geolocation is not supported by this browser.");
                 }
                 function showPosition(position) {
@@ -377,7 +365,7 @@ var TSOS;
                         _StdOut.putText("User apparently does not want to be stalked... :(");
                 }
             }
-        }
+        };
         Shell.prototype.shellWhereAmI = function (args) {
             var existentialCrisis = "Where are any of us really? Is there even a point to contemplate such a moot point? We are here, we are there, we can be anywhere we want if we change our point of reference. So the question becomes - Should you ask where you are to the rest of the world or where the rest of the world is to you? For the real answer type 'latlong'";
             var message = existentialCrisis.split("");
@@ -385,12 +373,8 @@ var TSOS;
             for (var i = 0; i < message.length; i++) {
                 _StdOut.putText(message[i]);
             }
-        }
+        };
         return Shell;
-    })();
+    }());
     TSOS.Shell = Shell;
-    function isHex(h) {
-        var a = parseInt(h, 16);
-        return (a.toString(16) === h.toLowerCase())
-    }
 })(TSOS || (TSOS = {}));

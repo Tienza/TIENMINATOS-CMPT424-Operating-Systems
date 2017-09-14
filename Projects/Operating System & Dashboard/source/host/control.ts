@@ -79,6 +79,9 @@ module TSOS {
         // Host Events
         //
         public static hostBtnStartOS_click(btn): void {
+            // Activate DateTime Clock
+            setInterval(updateClock, 1000);
+
             // Disable the (passed-in) start button...
             btn.disabled = true;
 
@@ -98,6 +101,12 @@ module TSOS {
             // .. and call the OS Kernel Bootstrap routine.
             _Kernel = new Kernel();
             _Kernel.krnBootstrap();  // _GLaDOS.afterStartup() will get called in there, if configured.
+
+            // Start System Clock
+            function updateClock(): void {
+                var dateTime = Date().match(/(.*)\(/);
+                $('#dateTime').html(dateTime[1]);
+            }
         }
 
         public static hostBtnHaltOS_click(btn): void {

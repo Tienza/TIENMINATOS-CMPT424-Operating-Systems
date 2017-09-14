@@ -134,7 +134,10 @@ module TSOS {
 
         public static measure(font, size, str) {
             var total = 0;
-            var len = str.length;
+            var len = 0;
+
+            if (str !== undefined)
+                len = str.length;
 
             for (var i = 0; i < len; i++) {
                 var c = CanvasTextFunctions.letter(str.charAt(i));

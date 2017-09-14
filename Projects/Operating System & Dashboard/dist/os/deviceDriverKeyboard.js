@@ -1,11 +1,15 @@
 ///<reference path="../globals.ts" />
 ///<reference path="deviceDriver.ts" />
-var __extends = (this && this.__extends) || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
+var __extends = (this && this.__extends) || (function () {
+    var extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return function (d, b) {
+        extendStatics(d, b);
+        function __() { this.constructor = d; }
+        d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+    };
+})();
 /* ----------------------------------
    DeviceDriverKeyboard.ts
 
@@ -16,11 +20,18 @@ var __extends = (this && this.__extends) || function (d, b) {
 var TSOS;
 (function (TSOS) {
     // Extends DeviceDriver
-    var DeviceDriverKeyboard = (function (_super) {
+    var DeviceDriverKeyboard = /** @class */ (function (_super) {
         __extends(DeviceDriverKeyboard, _super);
         function DeviceDriverKeyboard() {
             // Override the base method pointers.
-            _super.call(this, this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
+            var _this = 
+            // The code below cannot run because "this" can only be
+            // accessed after calling super.
+            //super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
+            _super.call(this) || this;
+            _this.driverEntry = _this.krnKbdDriverEntry;
+            _this.isr = _this.krnKbdDispatchKeyPress;
+            return _this;
         }
         DeviceDriverKeyboard.prototype.krnKbdDriverEntry = function () {
             // Initialization routine for this, the kernel-mode Keyboard Device Driver.
@@ -47,7 +58,6 @@ var TSOS;
                 // TODO: Check for caps-lock and handle as shifted if so.
                 _KernelInputQueue.enqueue(chr);
             }
-            // Numbers and Their Shifted Equivalents
             else if (((keyCode >= 48) && (keyCode <= 57)) || (keyCode >= 186) && (keyCode <= 222) || (keyCode == 32)) {
                 // Literal Symbols
                 if ((keyCode >= 186) && (keyCode <= 222) && !isShifted) {
@@ -74,7 +84,6 @@ var TSOS;
                     else if (keyCode === 222)
                         chr = "'";
                 }
-                // Check the shift key and re-adjust
                 else if (isShifted) {
                     // Number Row Symbols - Shifted
                     if (keyCode === 48)
@@ -97,7 +106,6 @@ var TSOS;
                         chr = "*";
                     else if (keyCode === 57)
                         chr = "(";
-                    // Literal Symbols - Shifted
                     else if (keyCode === 186)
                         chr = ":";
                     else if (keyCode === 187)
@@ -123,37 +131,31 @@ var TSOS;
                 }
                 else
                     chr = String.fromCharCode(keyCode);
-
                 // Send to Kernel Input
                 _KernelInputQueue.enqueue(chr);
             }
-            // Process Backspace
             else if (keyCode === 8) {
                 chr = "backspace";
                 _KernelInputQueue.enqueue(chr);
             }
-            // Process Tab
             else if (keyCode === 9) {
                 chr = "tab";
                 _KernelInputQueue.enqueue(chr);
             }
-            // Process Enter
             else if (keyCode === 13) {
                 chr = "enter";
                 _KernelInputQueue.enqueue(chr);
             }
-            // Process Up_Key
             else if (keyCode === 38) {
                 chr = "up_key";
                 _KernelInputQueue.enqueue(chr);
             }
-            // Process Down_Key
             else if (keyCode === 40) {
                 chr = "down_key";
                 _KernelInputQueue.enqueue(chr);
             }
         };
         return DeviceDriverKeyboard;
-    })(TSOS.DeviceDriver);
+    }(TSOS.DeviceDriver));
     TSOS.DeviceDriverKeyboard = DeviceDriverKeyboard;
 })(TSOS || (TSOS = {}));

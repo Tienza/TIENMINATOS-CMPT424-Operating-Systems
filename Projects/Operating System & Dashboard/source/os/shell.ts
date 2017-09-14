@@ -18,7 +18,7 @@
 module TSOS {
     export class Shell {
         // Properties
-        public promptStr = ">";
+        public promptStr = "TienminatOS$~";
         public commandList = [];
         public curses = "[fuvg],[cvff],[shpx],[phag],[pbpxfhpxre],[zbgureshpxre],[gvgf]";
         public apologies = "[sorry]";
@@ -30,58 +30,56 @@ module TSOS {
             var sc;
             //
             // Load the command list.
-
             // ver
-            sc = new ShellCommand(this.shellVer,
-                                  "ver",
-                                  "- Displays the current version data.");
+            sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
-
+            // load
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Verify user input and load into memory.");
+            this.commandList[this.commandList.length] = sc;
+            // date
+            sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
+            this.commandList[this.commandList.length] = sc;
+            // time
+            sc = new TSOS.ShellCommand(this.shellTime, "time", "- Displays the current time.");
+            this.commandList[this.commandList.length] = sc;
+            // datetime
+            sc = new TSOS.ShellCommand(this.shellDateTime, "datetime", "- Displays the current datetime.");
+            this.commandList[this.commandList.length] = sc;
+            // latlong
+            sc = new TSOS.ShellCommand(this.shellLatLong, "latlong", "- Displays user's current latlong.");
+            this.commandList[this.commandList.length] = sc;
+            // whereami
+            sc = new TSOS.ShellCommand(this.shellWhereAmI, "whereami", "- Where are you?");
+            this.commandList[this.commandList.length] = sc;
             // help
-            sc = new ShellCommand(this.shellHelp,
-                                  "help",
-                                  "- This is the help command. Seek help.");
+            sc = new TSOS.ShellCommand(this.shellHelp, "help", "- This is the help command. Seek help.");
             this.commandList[this.commandList.length] = sc;
-
             // shutdown
-            sc = new ShellCommand(this.shellShutdown,
-                                  "shutdown",
-                                  "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
+            sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
-
+            // 死を欲しい - death - shiohoshii
+            sc = new TSOS.ShellCommand(this.shellShiWoHoShii, "shiwohoshii", "- End It All.");
+            this.commandList[this.commandList.length] = sc;
             // cls
-            sc = new ShellCommand(this.shellCls,
-                                  "cls",
-                                  "- Clears the screen and resets the cursor position.");
+            sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
             this.commandList[this.commandList.length] = sc;
-
             // man <topic>
-            sc = new ShellCommand(this.shellMan,
-                                  "man",
-                                  "<topic> - Displays the MANual page for <topic>.");
+            sc = new TSOS.ShellCommand(this.shellMan, "man", "<topic> - Displays the MANual page for <topic>.");
             this.commandList[this.commandList.length] = sc;
-
             // trace <on | off>
-            sc = new ShellCommand(this.shellTrace,
-                                  "trace",
-                                  "<on | off> - Turns the OS trace on or off.");
+            sc = new TSOS.ShellCommand(this.shellTrace, "trace", "<on | off> - Turns the OS trace on or off.");
             this.commandList[this.commandList.length] = sc;
-
             // rot13 <string>
-            sc = new ShellCommand(this.shellRot13,
-                                  "rot13",
-                                  "<string> - Does rot13 obfuscation on <string>.");
+            sc = new TSOS.ShellCommand(this.shellRot13, "rot13", "<string> - Does rot13 obfuscation on <string>.");
             this.commandList[this.commandList.length] = sc;
-
             // prompt <string>
-            sc = new ShellCommand(this.shellPrompt,
-                                  "prompt",
-                                  "<string> - Sets the prompt.");
+            sc = new TSOS.ShellCommand(this.shellPrompt, "prompt", "<string> - Sets the prompt.");
             this.commandList[this.commandList.length] = sc;
-
+            // status <string>
+            sc = new TSOS.ShellCommand(this.shellStatus, "status", "<string> - Sets the status.");
+            this.commandList[this.commandList.length] = sc;
             // ps  - list the running processes and their IDs
             // kill <id> - kills the specified process id.
-
             //
             // Display the initial prompt.
             this.putPrompt();
@@ -145,32 +143,35 @@ module TSOS {
         }
 
         public parseInput(buffer): UserCommand {
-            var retVal = new UserCommand();
-
+            var retVal = new TSOS.UserCommand();
             // 1. Remove leading and trailing spaces.
-            buffer = Utils.trim(buffer);
+            buffer = TSOS.Utils.trim(buffer);
 
-            // 2. Lower-case it.
-            buffer = buffer.toLowerCase();
+            // 2. Lower-case it. - Unless it is the 'status' command
+            if (!/^status/.test(buffer))
+                buffer = buffer.toLowerCase();
 
             // 3. Separate on spaces so we can determine the command and command-line args, if any.
             var tempList = buffer.split(" ");
 
             // 4. Take the first (zeroth) element and use that as the command.
-            var cmd = tempList.shift();  // Yes, you can do that to an array in JavaScript.  See the Queue class.
+            var cmd = tempList.shift(); // Yes, you can do that to an array in JavaScript.  See the Queue class.
+
             // 4.1 Remove any left-over spaces.
-            cmd = Utils.trim(cmd);
+            cmd = TSOS.Utils.trim(cmd);
+
             // 4.2 Record it in the return value.
             retVal.command = cmd;
 
             // 5. Now create the args array from what's left.
             for (var i in tempList) {
-                var arg = Utils.trim(tempList[i]);
+                var arg = TSOS.Utils.trim(tempList[i]);
                 if (arg != "") {
                     retVal.args[retVal.args.length] = tempList[i];
                 }
             }
-            return retVal;
+
+            return retVal;;
         }
 
         //
@@ -207,14 +208,48 @@ module TSOS {
         }
 
         public shellVer(args) {
-            _StdOut.putText(APP_NAME + " version " + APP_VERSION);
+            var version: string = APP_NAME + " version " + APP_VERSION + ": " + USER_AGENT;
+            var messageArray: string[] = version.split("");
+            for (var i = 0; i < messageArray.length; i++) {
+                _StdOut.putText(messageArray[i]);
+            }
+        }
+
+        public shellLoad(arg) {
+            var userInput = $('#taProgramInput').val();
+            var isHexValid: boolean = isHex(userInput).isHex;
+            var message: string = "";
+
+            if (isHexValid && userInput !== "")
+                message = "Program is valid HEX, and will be loaded soon.";
+            else
+                message = "Please enter valid HEX and try again."
+
+            _StdOut.putText(message);
+
+            function isHex(userInput): { [key: string]: any} {
+                var testInput: string = userInput.replace(/ /g, "");
+                var testInputArray: string[] = testInput.split("");
+                var isHex: boolean = true;
+                for (var i = 0; i < testInputArray.length; i++) {
+                    var processedString = parseInt(testInputArray[i], 16);
+                    if ((processedString.toString(16) === testInputArray[i].toLowerCase()) === false) {
+                        isHex = false;
+                        break;
+                    }
+                }
+                return { isHex: isHex, userInput: userInput };
+            }
         }
 
         public shellHelp(args) {
             _StdOut.putText("Commands:");
             for (var i in _OsShell.commandList) {
                 _StdOut.advanceLine();
-                _StdOut.putText("  " + _OsShell.commandList[i].command + " " + _OsShell.commandList[i].description);
+                var command: string = "  " + _OsShell.commandList[i].command + " " + _OsShell.commandList[i].description;
+                var commandDetails: string[] = command.split("");
+                for (var j in commandDetails)
+                    _StdOut.putText(commandDetails[j]);
             }
         }
 
@@ -223,6 +258,12 @@ module TSOS {
              // Call Kernel shutdown routine.
             _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
+        }
+
+        public shellShiWoHoShii(args) {
+            _StdOut.putText("Initializing Death of Operating System");
+            // Call Kernel traperror routine.
+            _Kernel.krnTrapError("In death we are all equal...");
         }
 
         public shellCls(args) {
@@ -287,5 +328,84 @@ module TSOS {
             }
         }
 
+        public shellStatus(args) {
+            if (args.length > 0) {
+                var status = "";
+                for (var i = 0; i < args.length; i++) {
+                    status += (i !== args.length - 1) ? args[i] + " " : args[i];
+                }
+                $('#status').html(encodeHTML(status));
+            }
+            else {
+                _StdOut.putText("Usage: status <string>  Please supply a string.");
+            }
+
+            function encodeHTML(string: string) {
+                return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+            }
+        }
+
+        public shellDate(args) {
+            var today: Date = new Date();
+            var dd: number = today.getDate();
+            var mm: number = today.getMonth() + 1; //January is 0!
+            var year = today.getFullYear();
+            var month: string = "" + mm;
+            var day: string = "" + dd;
+
+            if (dd < 10) {
+                day = "0" + dd
+            }
+
+            if (mm < 10) {
+                month = "0" + mm
+            }
+
+            var todayDate: string = year + "-" + month + "-" + day;
+            _StdOut.putText(todayDate);
+        }
+
+        public shellTime(args) {
+            var d = new Date();
+            
+            var hh = (d.getHours() < 10 ? "0" : "") + d.getHours();
+            var mm = (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
+            var ss = (d.getSeconds() < 10 ? "0" : "") + d.getSeconds();
+
+            var time = hh + ":" + mm + ":" + ss;
+
+            _StdOut.putText(time);
+        }
+
+        public shellDateTime(args) {
+            _StdOut.putText(Date());
+        }
+
+        public shellLatLong(args) {
+            getLocation();
+
+            function getLocation(): void {
+                if (navigator.geolocation) {
+                    navigator.geolocation.getCurrentPosition(showPosition);
+                } else {
+                    _StdOut.putText("Geolocation is not supported by this browser.");
+                }
+                function showPosition(position) {
+                    if (position.coords.latitude && position.coords.longitude)
+                        _StdOut.putText("Latitude: " + position.coords.latitude + " / Longitude: " + position.coords.longitude);
+                    else
+                        _StdOut.putText("User apparently does not want to be stalked... :(");
+                }
+            }
+        }
+
+        public shellWhereAmI(args) {
+            var existentialCrisis: string = "Where are any of us really? Is there even a point to contemplate such a moot point? We are here, we are there, we can be anywhere we want if we change our point of reference. So the question becomes - Should you ask where you are to the rest of the world or where the rest of the world is to you? For the real answer type 'latlong'";
+            var message: string[] = existentialCrisis.split("");
+            // Sends the message to the console
+            for (var i = 0; i < message.length; i++) {
+                _StdOut.putText(message[i]);
+            }
+        }
     }
 }

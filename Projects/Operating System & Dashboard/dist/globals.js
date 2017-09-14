@@ -26,7 +26,7 @@ var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 var _Canvas; // Initialized in Control.hostInit().
 var _DrawingContext; // = _Canvas.getContext("2d");  // Assigned here for type safety, but re-initialized in Control.hostInit() for OCD and logic.
-var _DefaultFontFamily = "monospace"; // Ignored, I think. The was just a place-holder in 2008, but the HTML canvas may have use for it.
+var _DefaultFontFamily = "sans"; // Ignored, I think. The was just a place-holder in 2008, but the HTML canvas may have use for it.
 var _DefaultFontSize = 13;
 var _FontHeightMargin = 4; // Additional space added to font size when advancing a line.
 var _Trace = true; // Default the OS trace to be on.
@@ -38,7 +38,6 @@ var _KernelBuffers = null; // when clearly 'any' is not what we want. There is l
 // Standard input and output
 var _StdIn; // Same "to null or not to null" issue as above.
 var _StdOut;
-var _FromShell = false;
 // UI
 var _Console;
 var _OsShell;
@@ -49,13 +48,12 @@ var _MaxXPosition = 537;
 var _CommandList = [];
 var _CommandIndex = 0;
 // Variables for Tab Complete
-var _ShellCommandList = ["ver","load","date","time","datetime","latlong","whereami","help","shutdown","shiwohoshii","cls","man","trace","rot13","prompt","status"];
+var _ShellCommandList = ["ver", "load", "date", "time", "datetime", "latlong", "whereami", "help", "shutdown", "shiwohoshii", "cls", "man", "trace", "rot13", "prompt", "status"];
 var _TabCompleteList = _ShellCommandList;
 var _TabCompleteIndex = -1;
 // Variable for Text Wrap
 var _WrappedPosition = [];
 // Variable for Console Scrolling
-// var _ConsoleBuffer = [];
 var _ConsoleScrolling = false;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;

@@ -11,8 +11,9 @@
 //
 // Global CONSTANTS (TypeScript 1.5 introduced const. Very cool.)
 //
-const APP_NAME: string    = "TSOS";   // 'cause Bob and I were at a loss for a better name.
-const APP_VERSION: string = "0.07";   // What did you expect?
+const APP_NAME: string    = "TienminatOS";   // 'cause Bob and I were at a loss for a better name.
+const APP_VERSION: string = "0.01";   // What did you expect?
+const USER_AGENT = navigator.userAgent; // Extraneous Information about current environment.
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
@@ -52,6 +53,25 @@ var _StdOut;
 // UI
 var _Console: TSOS.Console;
 var _OsShell: TSOS.Shell;
+
+// Console Resolution
+var _MaxYPosition: number = 405.16;
+var _MaxXPosition: number = 537;
+
+// Variables for up_down key press - Console History
+var _CommandList = [];
+var _CommandIndex: number = 0;
+
+// Variables for Tab Complete
+var _ShellCommandList: string[] = ["ver","load","date","time","datetime","latlong","whereami","help","shutdown","shiwohoshii","cls","man","trace","rot13","prompt","status"];
+var _TabCompleteList: string[] = _ShellCommandList;
+var _TabCompleteIndex: number = -1;
+
+// Variable for Text Wrap
+var _WrappedPosition = [];
+
+// Variable for Console Scrolling
+var _ConsoleScrolling: boolean = false;
 
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;
