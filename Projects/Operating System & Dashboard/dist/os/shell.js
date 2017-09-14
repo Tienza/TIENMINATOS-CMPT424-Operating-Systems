@@ -25,6 +25,9 @@ var TSOS;
             var sc;
             //
             // Load the command list.
+            // alan
+            sc = new TSOS.ShellCommand(this.shellAlan, "alan", "- A place of wonders!");
+            this.commandList[this.commandList.length] = sc;
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
@@ -194,6 +197,22 @@ var TSOS;
                 _StdOut.putText("For what?");
             }
         };
+        Shell.prototype.shellAlan = function (args) {
+            _StdOut.putText("I apologies...It had to be done");
+            _StdOut.advanceLine();
+            var win = window.open('http://www-03.ibm.com/software/products/en/ibmnotes', '_blank');
+            if (win) {
+                _StdOut.putText("My Gift To Thee :D");
+                _StdOut.advanceLine();
+                //Browser has allowed it to be opened
+                win.focus();
+            }
+            else {
+                //Browser has blocked it
+                _StdOut.putText("Damn it! Please allow popups for this feature.");
+                _StdOut.advanceLine();
+            }
+        };
         Shell.prototype.shellVer = function (args) {
             var version = APP_NAME + " version " + APP_VERSION + ": " + USER_AGENT;
             var messageArray = version.split("");
@@ -241,6 +260,7 @@ var TSOS;
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         };
         Shell.prototype.shellShiWoHoShii = function (args) {
+            _StdOut.clearScreen();
             _StdOut.putText("Initializing Death of Operating System");
             // Call Kernel traperror routine.
             _Kernel.krnTrapError("In death we are all equal...");

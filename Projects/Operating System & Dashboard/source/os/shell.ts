@@ -30,6 +30,9 @@ module TSOS {
             var sc;
             //
             // Load the command list.
+            // alan
+            sc = new TSOS.ShellCommand(this.shellAlan, "alan", "- A place of wonders!");
+            this.commandList[this.commandList.length] = sc;
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
@@ -207,6 +210,24 @@ module TSOS {
            }
         }
 
+        public shellAlan(args) {
+            _StdOut.putText("I apologies...It had to be done");
+            _StdOut.advanceLine();
+
+            var win = window.open('http://www-03.ibm.com/software/products/en/ibmnotes', '_blank');
+            if (win) {
+                _StdOut.putText("My Gift To Thee :D");
+                _StdOut.advanceLine();
+                //Browser has allowed it to be opened
+                win.focus();
+            } 
+            else {
+                //Browser has blocked it
+                _StdOut.putText("Damn it! Please allow popups for this feature.");
+                _StdOut.advanceLine();
+            }
+        }
+
         public shellVer(args) {
             var version: string = APP_NAME + " version " + APP_VERSION + ": " + USER_AGENT;
             var messageArray: string[] = version.split("");
@@ -261,6 +282,7 @@ module TSOS {
         }
 
         public shellShiWoHoShii(args) {
+            _StdOut.clearScreen();
             _StdOut.putText("Initializing Death of Operating System");
             // Call Kernel traperror routine.
             _Kernel.krnTrapError("In death we are all equal...");
