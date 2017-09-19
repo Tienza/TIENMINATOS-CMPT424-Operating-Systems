@@ -61,7 +61,7 @@ module TSOS {
             sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
             // 死を欲しい - death - shiohoshii
-            sc = new TSOS.ShellCommand(this.shellShiWoHoShii, "shiwohoshii", "- End It All.");
+            sc = new TSOS.ShellCommand(this.shellShiWoHoShii, "shiwohoshii", "- End It All (Soft Audio Warning).");
             this.commandList[this.commandList.length] = sc;
             // cls
             sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
@@ -200,14 +200,14 @@ module TSOS {
         }
 
         public shellApology() {
-           if (_SarcasticMode) {
-              _StdOut.putText("I think we can put our differences behind us.");
-              _StdOut.advanceLine();
-              _StdOut.putText("For science . . . You monster.");
-              _SarcasticMode = false;
-           } else {
-              _StdOut.putText("For what?");
-           }
+            if (_SarcasticMode) {
+                _StdOut.putText("I think we can put our differences behind us.");
+                _StdOut.advanceLine();
+                _StdOut.putText("For science . . . You monster.");
+                _SarcasticMode = false;
+            } else {
+                _StdOut.putText("For what?");
+            }
         }
 
         public shellAlan(args) {
@@ -220,7 +220,7 @@ module TSOS {
                 _StdOut.advanceLine();
                 //Browser has allowed it to be opened
                 win.focus();
-            } 
+            }
             else {
                 //Browser has blocked it
                 _StdOut.putText("Damn it! Please allow popups for this feature.");
@@ -248,7 +248,7 @@ module TSOS {
 
             _StdOut.putText(message);
 
-            function isHex(userInput): { [key: string]: any} {
+            function isHex(userInput): { [key: string]: any } {
                 var testInput: string = userInput.replace(/ /g, "");
                 var testInputArray: string[] = testInput.split("");
                 var isHex: boolean = true;
@@ -275,16 +275,24 @@ module TSOS {
         }
 
         public shellShutdown(args) {
-             _StdOut.putText("Shutting down...");
-             // Call Kernel shutdown routine.
+            _StdOut.putText("Shutting down...");
+            // Call Kernel shutdown routine.
             _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         }
 
         public shellShiWoHoShii(args) {
-            _StdOut.clearScreen();
-            _StdOut.putText("Initializing Death of Operating System");
-            // Call Kernel traperror routine.
+            // Declare variables for seal and sound
+            var heresy = document.getElementById("heresy");
+            var fetchAudio = document.getElementById("fetch");
+
+            // Black out the Canvas
+            _DrawingContext.fillStyle = "#000000";
+            _DrawingContext.fillRect(0, 0, _Canvas.width, _Canvas.height);
+            _DrawingContext.drawImage(heresy, 100, 30);
+
+            fetchAudio.play();
+
             _Kernel.krnTrapError("In death we are all equal...");
         }
 
@@ -336,7 +344,7 @@ module TSOS {
         public shellRot13(args) {
             if (args.length > 0) {
                 // Requires Utils.ts for rot13() function.
-                _StdOut.putText(args.join(' ') + " = '" + Utils.rot13(args.join(' ')) +"'");
+                _StdOut.putText(args.join(' ') + " = '" + Utils.rot13(args.join(' ')) + "'");
             } else {
                 _StdOut.putText("Usage: rot13 <string>  Please supply a string.");
             }
@@ -389,7 +397,7 @@ module TSOS {
 
         public shellTime(args) {
             var d = new Date();
-            
+
             var hh = (d.getHours() < 10 ? "0" : "") + d.getHours();
             var mm = (d.getMinutes() < 10 ? "0" : "") + d.getMinutes();
             var ss = (d.getSeconds() < 10 ? "0" : "") + d.getSeconds();

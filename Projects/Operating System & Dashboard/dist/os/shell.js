@@ -56,7 +56,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellShutdown, "shutdown", "- Shuts down the virtual OS but leaves the underlying host / hardware simulation running.");
             this.commandList[this.commandList.length] = sc;
             // 死を欲しい - death - shiohoshii
-            sc = new TSOS.ShellCommand(this.shellShiWoHoShii, "shiwohoshii", "- End It All.");
+            sc = new TSOS.ShellCommand(this.shellShiWoHoShii, "shiwohoshii", "- End It All (Soft Audio Warning).");
             this.commandList[this.commandList.length] = sc;
             // cls
             sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
@@ -260,9 +260,14 @@ var TSOS;
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         };
         Shell.prototype.shellShiWoHoShii = function (args) {
-            _StdOut.clearScreen();
-            _StdOut.putText("Initializing Death of Operating System");
-            // Call Kernel traperror routine.
+            // Declare variables for seal and sound
+            var heresy = document.getElementById("heresy");
+            var fetchAudio = document.getElementById("fetch");
+            // Black out the Canvas
+            _DrawingContext.fillStyle = "#000000";
+            _DrawingContext.fillRect(0, 0, _Canvas.width, _Canvas.height);
+            _DrawingContext.drawImage(heresy, 100, 30);
+            fetchAudio.play();
             _Kernel.krnTrapError("In death we are all equal...");
         };
         Shell.prototype.shellCls = function (args) {
