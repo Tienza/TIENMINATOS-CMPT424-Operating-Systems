@@ -34,6 +34,12 @@ var TSOS;
             this.currentYPosition = this.currentFontSize;
         };
         Console.prototype.handleInput = function () {
+            if (this.buffer !== "") {
+                var xOffSet = _DrawingContext.measureText(this.currentFont, this.currentFontSize, "_");
+                this.currentXPosition = this.currentXPosition - xOffSet;
+                // Redraw the input in the console
+                _DrawingContext.clearRect(this.currentXPosition, this.currentYPosition - _DefaultFontSize, this.currentXPosition + xOffSet, this.currentYPosition + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize));
+            }
             while (_KernelInputQueue.getSize() > 0) {
                 // Get the next character from the kernel input queue.
                 var chr = _KernelInputQueue.dequeue();
@@ -116,6 +122,8 @@ var TSOS;
                     // console.log(_TabCompleteList);
                 }
             }
+            if (this.buffer !== "")
+                this.putText("_");
         };
         Console.prototype.tabComplete = function (key, array) {
             // The variable results needs var in this case (without 'var' a global variable is created)
@@ -157,15 +165,17 @@ var TSOS;
             this.advanceLine();
             this.currentXPosition = 0;
         };
-        Console.prototype.handleScrolling = function () {
+        Console.prototype.handleScrolling = function (prevYPosition) {
             // Clear the screen and reset the XY positions
-            var scrollBy = this.currentYPosition - _MaxYPosition;
+            //var scrollBy: number = this.currentYPosition - _MaxYPosition;
             // console.log(scrollBy);
-            var img = _DrawingContext.getImageData(0, 21, _MaxXPosition, _MaxYPosition);
-            this.currentYPosition -= scrollBy;
+            var img = _DrawingContext.getImageData(0, 0, _MaxXPosition + 10, prevYPosition + 4);
             this.clearScreen();
+            $('#display').attr('height', this.currentYPosition + 6);
+            //this.currentYPosition -= scrollBy;
             // console.log(this.currentYPosition);
             _DrawingContext.putImageData(img, 0, 0);
+            $('#canvasScroll').scrollTop($('#canvasScroll')[0].scrollHeight);
         };
         Console.prototype.handleBackSpace = function () {
             if (this.currentXPosition <= 0) {
@@ -197,10 +207,11 @@ var TSOS;
              * Font descent measures from the baseline to the lowest point in the font.
              * Font height margin is extra spacing between the lines.
              */
+            var prevYPosition = this.currentYPosition;
             this.currentYPosition += _DefaultFontSize + _DrawingContext.fontDescent(this.currentFont, this.currentFontSize) + _FontHeightMargin;
             // TODO: Handle scrolling. (iProject 1)
             if (this.currentYPosition > _MaxYPosition) {
-                this.handleScrolling();
+                this.handleScrolling(prevYPosition);
             }
         };
         return Console;

@@ -34,11 +34,17 @@ textarea {
   resize: none;
 }
 
-#display {
-  background-color:#FFFFFF;
+#canvasScroll {
   border: 1px solid #CCCCCC;
   border-radius: 5px;
+  padding-top: 3px;
+  padding-left: 3px;
+}
+
+#display {
+  background-color:#FFFFFF;
   cursor: default;
+  outline: none;
 }
 
 #taProgramInput {

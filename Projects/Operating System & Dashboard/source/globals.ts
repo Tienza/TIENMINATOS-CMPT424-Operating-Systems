@@ -55,7 +55,7 @@ var _Console: TSOS.Console;
 var _OsShell: TSOS.Shell;
 
 // Console Resolution
-var _MaxYPosition: number = 405.16;
+var _MaxYPosition: number = 405;
 var _MaxXPosition: number = 537;
 
 // Variables for up_down key press - Console History
@@ -63,7 +63,7 @@ var _CommandList = [];
 var _CommandIndex: number = 0;
 
 // Variables for Tab Complete
-var _ShellCommandList: string[] = ["ver","load","date","time","datetime","latlong","whereami","help","shutdown","shiwohoshii","cls","man","trace","rot13","prompt","status"];
+var _ShellCommandList: string[] = ["ver","load", "run","date","time","datetime","latlong","whereami","help","shutdown","shiwohoshii","cls","man","trace","rot13","prompt","status"];
 var _TabCompleteList: string[] = _ShellCommandList;
 var _TabCompleteIndex: number = -1;
 
@@ -72,6 +72,9 @@ var _WrappedPosition = [];
 
 // Variable for Console Scrolling
 var _ConsoleScrolling: boolean = false;
+
+// Variable for Program Storage
+var _ProgramList = [];
 
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;

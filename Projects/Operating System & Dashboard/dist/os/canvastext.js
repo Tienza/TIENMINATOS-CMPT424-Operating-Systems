@@ -41,6 +41,8 @@ var TSOS;
                     total += c.width * size / 25.0;
                 }
             }
+            if (str === "_")
+                total += 1;
             return total;
         };
         CanvasTextFunctions.draw = function (ctx, font, size, x, y, str) {

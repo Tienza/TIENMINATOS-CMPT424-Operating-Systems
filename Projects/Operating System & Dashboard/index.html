@@ -60,9 +60,11 @@
                 <!-- /.row -->
                 <br/>
                 <div class="row">
-                        <div id="divConsole" class="col-lg-6" width="553px" height="414px">
+                        <div id="divConsole" class="col-lg-6" width="553px" height="421px" style="overflow-x: hidden;">
                                 <label>Console</label>
-                                <canvas id="display" tabindex="3" width="553px" height="414px"></canvas>
+                                <div id="canvasScroll" style="height: 421px; overflow-x: hidden; overflow-y: scroll; overflow-x: hidden; width: 570px;">
+                                        <canvas id="display" tabindex="3" width="553px" height="414px" style="overflow-x: hidden;"></canvas>
+                                </div>
                         </div>
                         <div class="col-lg-6">
                                 <label>Host Log</label>
@@ -154,7 +156,7 @@
         <!-- Other Routines -->
         <script type="text/javascript" src="dist/utils.js"></script>
         <!-- Uncomment the line below to enable GLaDOS testing. -->
-        <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
+        <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script> -->
 </body>
 
 </html>

@@ -39,6 +39,9 @@ module TSOS {
             // load
             sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Verify user input and load into memory.");
             this.commandList[this.commandList.length] = sc;
+            // run
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "<PID> - Run the designated program.");
+            this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
             this.commandList[this.commandList.length] = sc;
@@ -237,14 +240,26 @@ module TSOS {
         }
 
         public shellLoad(arg) {
+            // Declare Program Class
+            class Program {
+                constructor(index: number, hexVal: string) {
+                    this.index = index;
+                    this.hexVal = hexVal;
+                }
+            }
+
             var userInput = $('#taProgramInput').val();
-            var isHexValid: boolean = isHex(userInput).isHex;
+            var hexObj: { [key: string]: any } = isHex(userInput);
+            var isHexValid: boolean = hexObj.isHex;
             var message: string = "";
 
-            if (isHexValid && userInput !== "")
-                message = "Program is valid HEX, and will be loaded soon.";
+            if (isHexValid && userInput !== "") {
+                var program: Program = new Program(_ProgramList.length, hexObj.hexVal);
+                _ProgramList.push(program);
+                message = "Program Loaded Successfully. PID: " + program.index;
+            }
             else
-                message = "Please enter valid HEX and try again."
+                message = "Please enter valid HEX and try again.";
 
             _StdOut.putText(message);
 
@@ -259,8 +274,20 @@ module TSOS {
                         break;
                     }
                 }
-                return { isHex: isHex, userInput: userInput };
+                return { isHex: isHex, hexVal: userInput };
             }
+        }
+
+        public shellRun(arg: number) {
+            if (arg <= _ProgramList.length - 1) {
+                var hexVal: string = _ProgramList[arg[0]].hexVal;
+                var hexArray = hexVal.split("");
+                for (var i = 0; i < hexArray.length; i++) {
+                    _StdOut.putText(hexArray[i]);
+                }
+            }
+            else 
+                _StdOut.putText("Invalid PID. Please try again");
         }
 
         public shellHelp(args) {
@@ -282,6 +309,9 @@ module TSOS {
         }
 
         public shellShiWoHoShii(args) {
+            // Trunkate the Canvas
+            $('#display').attr('height', 414);
+            $('#canvasScroll').css('background-color', '#000000');
             // Declare variables for seal and sound
             var heresy = document.getElementById("heresy");
             var fetchAudio = document.getElementById("fetch");
@@ -297,6 +327,7 @@ module TSOS {
         }
 
         public shellCls(args) {
+            $('#display').attr('height', 414);
             _StdOut.clearScreen();
             _StdOut.resetXY();
         }
