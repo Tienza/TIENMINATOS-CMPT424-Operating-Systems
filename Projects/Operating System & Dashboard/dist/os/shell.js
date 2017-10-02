@@ -224,22 +224,18 @@ var TSOS;
             }
         };
         Shell.prototype.shellLoad = function (arg) {
-            // Declare Program Class
-            var Program = /** @class */ (function () {
-                function Program(index, hexVal) {
-                    this.index = index;
-                    this.hexVal = hexVal;
-                }
-                return Program;
-            }());
             var userInput = $('#taProgramInput').val();
+            userInput = cleanInput(userInput);
             var hexObj = isHex(userInput);
             var isHexValid = hexObj.isHex;
             var message = "";
             if (isHexValid && userInput !== "") {
-                var program = new Program(_ProgramList.length, hexObj.hexVal);
-                _ProgramList.push(program);
-                message = "Program Loaded Successfully. PID: " + program.index;
+                hexObj.hexVal = hexObj.hexVal.split(" ");
+                var pcb = new TSOS.PCB();
+                _ProgramCount++;
+                pcb.opCodes = hexObj.hexVal;
+                _MemoryManager.loadProgram(hexObj.hexVal, pcb);
+                message = "Program Loaded Successfully. PID: " + pcb.programId;
             }
             else
                 message = "Please enter valid HEX and try again.";
@@ -257,14 +253,24 @@ var TSOS;
                 }
                 return { isHex: isHex, hexVal: userInput };
             }
+            function cleanInput(string) {
+                var workingString = string.replace(new RegExp(" ", 'g'), "");
+                var workingArray = workingString.match(/.{1,2}/g);
+                // Append 00 to end of code for standardization
+                for (var i = workingArray.length; i < _SegmentSize; i++) {
+                    workingArray.push("00");
+                }
+                workingString = workingArray.join(" ");
+                return workingString;
+            }
         };
         Shell.prototype.shellRun = function (arg) {
-            if (arg <= _ProgramList.length - 1) {
-                var hexVal = _ProgramList[arg[0]].hexVal;
-                var hexArray = hexVal.split("");
-                for (var i = 0; i < hexArray.length; i++) {
-                    _StdOut.putText(hexArray[i]);
-                }
+            console.log(arg);
+            if (arg.length > 1) {
+                /*var hexVal: string[] = _ProgramList[arg[0]].hexVal;
+                for (var i = 0; i < hexVal.length; i++) {
+                    _StdOut.putText(hexVal[i]);
+                }*/
             }
             else
                 _StdOut.putText("Invalid PID. Please try again");

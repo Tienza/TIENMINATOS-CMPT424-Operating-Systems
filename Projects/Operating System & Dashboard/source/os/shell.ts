@@ -240,30 +240,26 @@ module TSOS {
         }
 
         public shellLoad(arg) {
-            // Declare Program Class
-            class Program {
-                constructor(index: number, hexVal: string) {
-                    this.index = index;
-                    this.hexVal = hexVal;
-                }
-            }
-
-            var userInput = $('#taProgramInput').val();
+            var userInput: string = $('#taProgramInput').val();
+            userInput = cleanInput(userInput);
             var hexObj: { [key: string]: any } = isHex(userInput);
             var isHexValid: boolean = hexObj.isHex;
             var message: string = "";
 
             if (isHexValid && userInput !== "") {
-                var program: Program = new Program(_ProgramList.length, hexObj.hexVal);
-                _ProgramList.push(program);
-                message = "Program Loaded Successfully. PID: " + program.index;
+                hexObj.hexVal = hexObj.hexVal.split(" ");
+                var pcb = new PCB();
+                _ProgramCount++;
+                pcb.opCodes = hexObj.hexVal;
+                _MemoryManager.loadProgram(hexObj.hexVal, pcb);
+                message = "Program Loaded Successfully. PID: " + pcb.programId;
             }
             else
                 message = "Please enter valid HEX and try again.";
 
             _StdOut.putText(message);
 
-            function isHex(userInput): { [key: string]: any } {
+            function isHex(userInput): {[key: string]: any} {
                 var testInput: string = userInput.replace(/ /g, "");
                 var testInputArray: string[] = testInput.split("");
                 var isHex: boolean = true;
@@ -276,15 +272,26 @@ module TSOS {
                 }
                 return { isHex: isHex, hexVal: userInput };
             }
+
+            function cleanInput(string: string): string {
+                var workingString: string = string.replace(new RegExp(" ", 'g'), "");
+                var workingArray: string[] = workingString.match(/.{1,2}/g);
+                // Append 00 to end of code for standardization
+                for (var i: number = workingArray.length; i < _SegmentSize; i++) {
+                    workingArray.push("00");
+                }
+                workingString = workingArray.join(" ");
+                return workingString;
+            }
         }
 
-        public shellRun(arg: number) {
-            if (arg <= _ProgramList.length - 1) {
-                var hexVal: string = _ProgramList[arg[0]].hexVal;
-                var hexArray = hexVal.split("");
-                for (var i = 0; i < hexArray.length; i++) {
-                    _StdOut.putText(hexArray[i]);
-                }
+        public shellRun(arg) {
+            console.log(arg);
+            if (arg.length > 1) {
+                /*var hexVal: string[] = _ProgramList[arg[0]].hexVal;
+                for (var i = 0; i < hexVal.length; i++) {
+                    _StdOut.putText(hexVal[i]);
+                }*/
             }
             else 
                 _StdOut.putText("Invalid PID. Please try again");
