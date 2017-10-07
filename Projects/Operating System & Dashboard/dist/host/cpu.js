@@ -60,8 +60,14 @@ var TSOS;
                 case "8D":
                     this.storeAccInMemo();
                     break;
+                case "6D":
+                    this.addWithCarry();
+                    break;
                 case "A2":
                     this.loadXWithConst();
+                    break;
+                case "AE":
+                    this.loadXFromMemo();
                     break;
                 case "A0":
                     this.loadYWithConst();
@@ -69,14 +75,26 @@ var TSOS;
                 case "AC":
                     this.loadYFromMemo();
                     break;
+                case "EA":
+                    this.noOperation();
+                    break;
                 case "00":
                     this.breakProgram();
+                    break;
+                case "EC":
+                    this.compareMemoToX();
+                    break;
+                case "D0":
+                    this.branchNBytes();
+                    break;
+                case "EE":
+                    this.incrementByte();
                     break;
                 case "FF":
                     this.systemCall();
                     break;
                 default:
-                    this.PC++;
+                    this.consumeInstruction();
                     break;
             }
             this.updatePCB(_ProcessManager.currentPCB);
@@ -100,7 +118,7 @@ var TSOS;
         Cpu.prototype.consumeInstruction = function () {
             this.PC++;
         };
-        /* 6502a Op Codes Functions */
+        /****************************** 6502a Op Codes Functions ******************************/
         Cpu.prototype.loadAccWithConst = function () {
             // Pass over current Op Code
             this.consumeInstruction();
@@ -114,9 +132,9 @@ var TSOS;
             this.consumeInstruction();
             // Fetch the memory location where we want to load the Accumulator with
             var address = _ProcessManager.fetchInstruction(_ProcessManager.currentPCB, this.PC);
-            // Pass over current OP Code
+            // Pass over current Op Code
             this.consumeInstruction();
-            // Convert the memory location to an index in the memory partition
+            // Convert the memory location to an index on the memory partition
             var memoryloc = parseInt(address, 16);
             // Assign the value at the memory location to the Accumulator
             this.Acc = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc));
@@ -135,8 +153,22 @@ var TSOS;
             var val = this.Acc.toString(16).toUpperCase();
             if (val.length < 2)
                 val = "0" + val;
-            // Wrtie the value to memory
+            // Write the value to memory
             _ProcessManager.writeInstruction(_ProcessManager.currentPCB, memoryloc, val);
+            // Pass over current Op Code
+            this.consumeInstruction();
+        };
+        Cpu.prototype.addWithCarry = function () {
+            // Pass over current Op Code
+            this.consumeInstruction();
+            // Fetch the memory location where we want to add to the Accumulator
+            var address = _ProcessManager.fetchInstruction(_ProcessManager.currentPCB, this.PC);
+            // Pass over current Op Code
+            this.consumeInstruction();
+            // Convert the memory address to an index in the memory partition
+            var memoryloc = parseInt(address, 16);
+            // Add the value returned from the memory location to the Accumulator
+            this.Acc += parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc), 16);
             // Pass over current Op Code
             this.consumeInstruction();
         };
@@ -148,29 +180,48 @@ var TSOS;
             // Pass over current Op Code
             this.consumeInstruction();
         };
+        Cpu.prototype.loadXFromMemo = function () {
+            // Pass over current Op Code
+            this.consumeInstruction();
+            // Fetch the memory location that we want to load the X Register with
+            var address = _ProcessManager.fetchInstruction(_ProcessManager.currentPCB, this.PC);
+            // Pass over current Op Code
+            this.consumeInstruction();
+            // Convert the memory location to an index on the memory partition
+            var memoryloc = parseInt(address, 16);
+            // Assign the value at the memory location to the X Register
+            this.Xreg = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc), 16);
+            // Pass over current Op Code
+            this.consumeInstruction();
+        };
         Cpu.prototype.loadYWithConst = function () {
-            // Pass over current OP Code
+            // Pass over current Op Code
             this.consumeInstruction();
             // Decode the current Op Code and assign it to the Y Register
             this.Yreg = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, this.PC), 16);
-            // Pass over current OP Code
+            // Pass over current Op Code
             this.consumeInstruction();
         };
         Cpu.prototype.loadYFromMemo = function () {
-            // Pass over current OP Code
+            // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location that we want to load the Y Register with
             var address = _ProcessManager.fetchInstruction(_ProcessManager.currentPCB, this.PC);
-            // Pass over current OP Code
+            // Pass over current Op Code
             this.consumeInstruction();
-            // Convert the memory location to an index in the memory partition
+            // Convert the memory location to an index on the memory partition
             var memoryloc = parseInt(address, 16);
             // Assign the value at the memory location to the Y Register
-            this.Yreg = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc));
+            this.Yreg = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc), 16);
+            // Pass over current Op Code
+            this.consumeInstruction();
+        };
+        Cpu.prototype.noOperation = function () {
+            // Pass over current Op Code
             this.consumeInstruction();
         };
         Cpu.prototype.breakProgram = function () {
-            // Pass over current OP Code
+            // Pass over current Op Code
             this.consumeInstruction();
             // Break Line
             _StdOut.advanceLine();
@@ -179,8 +230,66 @@ var TSOS;
             // Insert the prompt
             _OsShell.putPrompt();
         };
+        Cpu.prototype.compareMemoToX = function () {
+            // Pass over current Op Code
+            this.consumeInstruction();
+            // Fetch the memory location that we want to compare with the X Register
+            var address = _ProcessManager.fetchInstruction(_ProcessManager.currentPCB, this.PC);
+            // Pass over current Op Code
+            this.consumeInstruction();
+            // Convert the memory location to an index on the memory partition
+            var memoryloc = parseInt(address, 16);
+            // Compare the value returned from the memory location with the value stored in the X Register
+            this.Zflag = (parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc), 16) === this.Xreg) ? 1 : 0;
+            // Pass over current Op Code
+            this.consumeInstruction();
+        };
+        Cpu.prototype.branchNBytes = function () {
+            // Pass over current Op Code
+            this.consumeInstruction();
+            if (this.Zflag === 0) {
+                var numBytes = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, this.PC), 16);
+                // Pass over current Op Code
+                this.consumeInstruction();
+                // Calculate the jump disctance
+                var workingPC = this.PC + numBytes;
+                // If the jump distance is larger than the segment size, then loop to the beginning and jump the difference
+                if (workingPC > _SegmentSize - 1) {
+                    this.PC = workingPC - _SegmentSize;
+                }
+                else {
+                    this.PC = workingPC;
+                }
+            }
+            else {
+                // Pass over current Op code
+                this.consumeInstruction();
+            }
+        };
+        Cpu.prototype.incrementByte = function () {
+            // Pass over current Op code
+            this.consumeInstruction();
+            // Fetch the memory location that we want to increment
+            var address = _ProcessManager.fetchInstruction(_ProcessManager.currentPCB, this.PC);
+            // Pass over current Op Code
+            this.consumeInstruction();
+            // Convert the memory location to an index on the memory partition
+            var memoryloc = parseInt(address, 16);
+            // Assign the value at the memory location locally to be manipulated
+            var val = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc), 16);
+            // Increment the local value
+            val++;
+            // Convert the value back to hex
+            var hex = val.toString().toUpperCase();
+            if (hex.length < 2)
+                hex = "0" + hex;
+            // Write the value to memory
+            _ProcessManager.writeInstruction(_ProcessManager.currentPCB, memoryloc, hex);
+            // Pass over current Op code
+            this.consumeInstruction();
+        };
         Cpu.prototype.systemCall = function () {
-            // Pass over current OP Code
+            // Pass over current Op Code
             this.consumeInstruction();
             // If the X Register is 1 then print the constant in the Y Register
             if (this.Xreg === 1) {

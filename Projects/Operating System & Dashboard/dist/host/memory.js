@@ -21,9 +21,9 @@ var TSOS;
             this.memoryArray = [this.memory0, this.memory1, this.memory2];
         }
         Memory.prototype.init = function () {
-            this.wipeMemoryAll();
+            this.wipeAllMemory();
         };
-        Memory.prototype.wipeMemoryAll = function () {
+        Memory.prototype.wipeAllMemory = function () {
             for (var i = 0; i < this.singleMemSize; i++) {
                 this.memory0[i] = "00";
                 this.memory1[i] = "00";
