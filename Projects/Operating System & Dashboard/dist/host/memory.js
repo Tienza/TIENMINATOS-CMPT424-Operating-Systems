@@ -21,13 +21,18 @@ var TSOS;
             this.memoryArray = [this.memory0, this.memory1, this.memory2];
         }
         Memory.prototype.init = function () {
-            this.wipeMemory();
+            this.wipeMemoryAll();
         };
-        Memory.prototype.wipeMemory = function () {
+        Memory.prototype.wipeMemoryAll = function () {
             for (var i = 0; i < this.singleMemSize; i++) {
                 this.memory0[i] = "00";
                 this.memory1[i] = "00";
                 this.memory2[i] = "00";
+            }
+        };
+        Memory.prototype.wipeMemory = function (memoryIndex) {
+            for (var i = 0; i < this.singleMemSize; i++) {
+                this.memoryArray[memoryIndex][i] = "00";
             }
         };
         Memory.prototype.showAllPartitions = function () {

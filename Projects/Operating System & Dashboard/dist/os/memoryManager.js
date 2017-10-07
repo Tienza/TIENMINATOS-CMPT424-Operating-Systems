@@ -14,20 +14,42 @@ var TSOS;
         MemoryManager.prototype.loadProgram = function (userProgram, pcb) {
             var freePartition = this.checkFreePartition();
             if (freePartition.isFree !== undefined) {
-                // Operate on the parition returned
+                // Operate on the partition returned
                 freePartition.isFree = false;
-                freePartition.memory = userProgram;
+                // Load the process in to the memory partition returned
                 _Memory.memoryArray[freePartition.memoryIndex] = userProgram;
-                _PCBList.push(pcb);
+                // Record which memory index the process was loaded into
+                pcb.memoryIndex = freePartition.memoryIndex;
+                // Update the current instruction to the first instruction available for that memeory block
+                pcb.instruction = _MemoryManager.readFromMemory(pcb.memoryIndex, pcb.PC);
+                // Store in the process list
+                _ProcessManager.processList.push(pcb);
                 // Print updated memory status
                 console.log("_Memory Partition: " + freePartition.memoryIndex);
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree);
                 _Memory.showAllPartitions();
-                console.log("PCBList", _PCBList);
+                // console.log("PCBList", _ProcessManager.processList);
+                // Output PID to canvas
+                _StdOut.putText("Program Loaded Successfully. PID: " + pcb.programId);
             }
             else {
-                console.log("Memory partitions are full");
+                _StdOut.putText("Memory partitions are full");
             }
+        };
+        MemoryManager.prototype.readFromMemory = function (memoryIndex, PC) {
+            return _Memory.memoryArray[memoryIndex][PC];
+        };
+        MemoryManager.prototype.writeToMemory = function (memoryIndex, memoryLoc, val) {
+            _Memory.memoryArray[memoryIndex][memoryLoc] = val;
+        };
+        MemoryManager.prototype.wipeParition = function (memoryIndex) {
+            _Memory.wipeMemory(memoryIndex);
+        };
+        MemoryManager.prototype.freePartition = function (memoryIndex) {
+            this.partition[memoryIndex].isFree = true;
+        };
+        MemoryManager.prototype.showAllPartitions = function () {
+            _Memory.showAllPartitions();
         };
         MemoryManager.prototype.checkFreePartition = function () {
             var freePartition = {};

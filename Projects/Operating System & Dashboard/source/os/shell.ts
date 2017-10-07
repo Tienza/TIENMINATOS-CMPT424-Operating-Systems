@@ -240,24 +240,24 @@ module TSOS {
         }
 
         public shellLoad(arg) {
-            var userInput: string = $('#taProgramInput').val();
+            var userInput = $('#taProgramInput').val();
             userInput = cleanInput(userInput);
             var hexObj: { [key: string]: any } = isHex(userInput);
             var isHexValid: boolean = hexObj.isHex;
-            var message: string = "";
-
-            if (isHexValid && userInput !== "") {
-                hexObj.hexVal = hexObj.hexVal.split(" ");
-                var pcb = new PCB();
-                _ProgramCount++;
-                pcb.opCodes = hexObj.hexVal;
-                _MemoryManager.loadProgram(hexObj.hexVal, pcb);
-                message = "Program Loaded Successfully. PID: " + pcb.programId;
+            
+            if (userInput !== "Overflow") {
+                if (isHexValid && userInput !== "") {
+                    hexObj.hexVal = hexObj.hexVal.split(" ");
+                    var pcb = new PCB();
+                    _ProcessCount++;
+                    _MemoryManager.loadProgram(hexObj.hexVal, pcb);
+                }
+                else
+                    _StdOut.putText("Please enter valid HEX and try again.");
             }
-            else
-                message = "Please enter valid HEX and try again.";
-
-            _StdOut.putText(message);
+            else {
+                _StdOut.putText("User input is too large, please reduce size and try again");
+            }
 
             function isHex(userInput): {[key: string]: any} {
                 var testInput: string = userInput.replace(/ /g, "");
@@ -273,25 +273,33 @@ module TSOS {
                 return { isHex: isHex, hexVal: userInput };
             }
 
-            function cleanInput(string: string): string {
+            function cleanInput(string): string {
                 var workingString: string = string.replace(new RegExp(" ", 'g'), "");
                 var workingArray: string[] = workingString.match(/.{1,2}/g);
-                // Append 00 to end of code for standardization
-                for (var i: number = workingArray.length; i < _SegmentSize; i++) {
-                    workingArray.push("00");
+                if (workingArray.length <= _SegmentSize) {
+                    // Append 00 to end of code for standardization
+                    for (var i: number = workingArray.length; i < _SegmentSize; i++) {
+                        workingArray.push("00");
+                    }
+                    workingString = workingArray.join(" ");
                 }
-                workingString = workingArray.join(" ");
+                else {
+                    workingString = "Overflow";
+                }
+
                 return workingString;
             }
         }
 
-        public shellRun(arg) {
-            console.log(arg);
-            if (arg.length > 1) {
-                /*var hexVal: string[] = _ProgramList[arg[0]].hexVal;
-                for (var i = 0; i < hexVal.length; i++) {
-                    _StdOut.putText(hexVal[i]);
-                }*/
+        public shellRun(args) {
+            if (args.length > 0) {
+                var pcb = _ProcessManager.getPCB(parseInt(args[0]));
+                if (pcb) {
+                    _ProcessManager.runProcess(pcb);
+                }
+                else {
+                    _StdOut.putText("Specified PID does not exist.");
+                }
             }
             else 
                 _StdOut.putText("Invalid PID. Please try again");

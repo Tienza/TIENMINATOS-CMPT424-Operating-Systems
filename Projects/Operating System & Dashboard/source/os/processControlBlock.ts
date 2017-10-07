@@ -15,9 +15,10 @@ module TSOS {
                     public Xreg: number = 0,
                     public Yreg: number = 0,
                     public Zflag: number = 0,
+                    public instruction: string = "",
                     public isExecuting: boolean = false,
-                    public opCodes: string[] = [],
-                    public programId = _ProgramCount) {
+                    public memoryIndex: any = null,
+                    public programId: number = _ProcessCount) {
         }
     }
 }        

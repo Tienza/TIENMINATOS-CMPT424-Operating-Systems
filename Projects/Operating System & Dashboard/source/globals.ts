@@ -78,9 +78,13 @@ var _WrappedPosition = [];
 // Variable for Console Scrolling
 var _ConsoleScrolling: boolean = false;
 
-// Variable for Program Storage
-var _ProgramCount: number = 0;
+// Variable for Process Storage
+var _CurrentPCB: TSOS.PCB;
+var _ProcessCount: number = 0;
 var _PCBList: TSOS.PCB[] = [];
+
+// Variable for Process Manager
+var _ProcessManager: TSOS.ProcessManager;
 
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;

@@ -228,18 +228,19 @@ var TSOS;
             userInput = cleanInput(userInput);
             var hexObj = isHex(userInput);
             var isHexValid = hexObj.isHex;
-            var message = "";
-            if (isHexValid && userInput !== "") {
-                hexObj.hexVal = hexObj.hexVal.split(" ");
-                var pcb = new TSOS.PCB();
-                _ProgramCount++;
-                pcb.opCodes = hexObj.hexVal;
-                _MemoryManager.loadProgram(hexObj.hexVal, pcb);
-                message = "Program Loaded Successfully. PID: " + pcb.programId;
+            if (userInput !== "Overflow") {
+                if (isHexValid && userInput !== "") {
+                    hexObj.hexVal = hexObj.hexVal.split(" ");
+                    var pcb = new TSOS.PCB();
+                    _ProcessCount++;
+                    _MemoryManager.loadProgram(hexObj.hexVal, pcb);
+                }
+                else
+                    _StdOut.putText("Please enter valid HEX and try again.");
             }
-            else
-                message = "Please enter valid HEX and try again.";
-            _StdOut.putText(message);
+            else {
+                _StdOut.putText("User input is too large, please reduce size and try again");
+            }
             function isHex(userInput) {
                 var testInput = userInput.replace(/ /g, "");
                 var testInputArray = testInput.split("");
@@ -256,21 +257,28 @@ var TSOS;
             function cleanInput(string) {
                 var workingString = string.replace(new RegExp(" ", 'g'), "");
                 var workingArray = workingString.match(/.{1,2}/g);
-                // Append 00 to end of code for standardization
-                for (var i = workingArray.length; i < _SegmentSize; i++) {
-                    workingArray.push("00");
+                if (workingArray.length <= _SegmentSize) {
+                    // Append 00 to end of code for standardization
+                    for (var i = workingArray.length; i < _SegmentSize; i++) {
+                        workingArray.push("00");
+                    }
+                    workingString = workingArray.join(" ");
                 }
-                workingString = workingArray.join(" ");
+                else {
+                    workingString = "Overflow";
+                }
                 return workingString;
             }
         };
-        Shell.prototype.shellRun = function (arg) {
-            console.log(arg);
-            if (arg.length > 1) {
-                /*var hexVal: string[] = _ProgramList[arg[0]].hexVal;
-                for (var i = 0; i < hexVal.length; i++) {
-                    _StdOut.putText(hexVal[i]);
-                }*/
+        Shell.prototype.shellRun = function (args) {
+            if (args.length > 0) {
+                var pcb = _ProcessManager.getPCB(parseInt(args[0]));
+                if (pcb) {
+                    _ProcessManager.runProcess(pcb);
+                }
+                else {
+                    _StdOut.putText("Specified PID does not exist.");
+                }
             }
             else
                 _StdOut.putText("Invalid PID. Please try again");

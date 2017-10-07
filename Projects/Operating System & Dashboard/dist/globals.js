@@ -59,9 +59,12 @@ var _TabCompleteIndex = -1;
 var _WrappedPosition = [];
 // Variable for Console Scrolling
 var _ConsoleScrolling = false;
-// Variable for Program Storage
-var _ProgramCount = 0;
+// Variable for Process Storage
+var _CurrentPCB;
+var _ProcessCount = 0;
 var _PCBList = [];
+// Variable for Process Manager
+var _ProcessManager;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12

@@ -33,6 +33,8 @@ var TSOS;
             _StdOut = _Console;
             // Initialize MemoryManager
             _MemoryManager = new TSOS.MemoryManager();
+            // Initialize Process Manager
+            _ProcessManager = new TSOS.ProcessManager();
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
