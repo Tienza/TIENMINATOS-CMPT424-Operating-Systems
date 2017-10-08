@@ -29,7 +29,6 @@ var TSOS;
             _MemoryManager.freePartition(pcb.memoryIndex);
             // Toggle CPU execution off
             _CPU.isExecuting = false;
-            _MemoryManager.showAllPartitions();
         };
         ProcessManager.prototype.getPCB = function (programId) {
             var pcb;
