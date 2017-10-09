@@ -125,6 +125,10 @@ var TSOS;
                 else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {
                     this.execute(this.shellApology);
                 }
+                else if (buffer === "") {
+                    _StdOut.advanceLine();
+                    this.putPrompt();
+                }
                 else {
                     this.execute(this.shellInvalidCommand);
                 }

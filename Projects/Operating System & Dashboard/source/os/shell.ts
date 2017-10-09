@@ -122,13 +122,20 @@ module TSOS {
             }
             if (found) {
                 this.execute(fn, args);
-            } else {
+            } 
+            else {
                 // It's not found, so check for curses and apologies before declaring the command invalid.
                 if (this.curses.indexOf("[" + Utils.rot13(cmd) + "]") >= 0) {     // Check for curses.
                     this.execute(this.shellCurse);
-                } else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {        // Check for apologies.
+                } 
+                else if (this.apologies.indexOf("[" + cmd + "]") >= 0) {        // Check for apologies.
                     this.execute(this.shellApology);
-                } else { // It's just a bad command. {
+                }
+                else if (buffer === "") {
+                    _StdOut.advanceLine();
+                    this.putPrompt();
+                } 
+                else { // It's just a bad command. {
                     this.execute(this.shellInvalidCommand);
                 }
             }

@@ -37,6 +37,7 @@ module TSOS {
 
             // Initialize MemoryManager
             _MemoryManager = new MemoryManager();
+            _MemoryManager.initializeMemoryDisplay();
 
             // Initialize Process Manager
             _ProcessManager = new ProcessManager();

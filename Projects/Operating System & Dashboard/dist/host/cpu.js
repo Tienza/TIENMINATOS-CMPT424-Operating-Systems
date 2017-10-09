@@ -223,12 +223,8 @@ var TSOS;
         Cpu.prototype.breakProgram = function () {
             // Pass over current Op Code
             this.consumeInstruction();
-            // Break Line
-            _StdOut.advanceLine();
             // Terminate the process
             _ProcessManager.terminateProcess(_ProcessManager.currentPCB);
-            // Insert the prompt
-            _OsShell.putPrompt();
         };
         Cpu.prototype.compareMemoToX = function () {
             // Pass over current Op Code
