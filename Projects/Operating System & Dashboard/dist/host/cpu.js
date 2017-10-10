@@ -48,6 +48,15 @@ var TSOS;
             // Execute instructions
             this.executeProgram(_ProcessManager.currentPCB);
         };
+        Cpu.prototype.resetCPU = function () {
+            this.PC = 0;
+            this.Acc = 0;
+            this.Xreg = 0;
+            this.Yreg = 0;
+            this.Zflag = 0;
+            this.isExecuting = false;
+            this.instruction = "";
+        };
         Cpu.prototype.executeProgram = function (pcb) {
             this.instruction = _ProcessManager.fetchInstruction(pcb, this.PC);
             switch (this.instruction) {
@@ -98,6 +107,7 @@ var TSOS;
                     break;
             }
             this.updatePCB(_ProcessManager.currentPCB);
+            _ProcessManager.hilightMemory(_ProcessManager.currentPCB, this.PC);
         };
         Cpu.prototype.updatePCB = function (pcb) {
             pcb.instruction = this.instruction;
@@ -225,6 +235,8 @@ var TSOS;
             this.consumeInstruction();
             // Terminate the process
             _ProcessManager.terminateProcess(_ProcessManager.currentPCB);
+            // Reset the CPU
+            this.resetCPU();
         };
         Cpu.prototype.compareMemoToX = function () {
             // Pass over current Op Code

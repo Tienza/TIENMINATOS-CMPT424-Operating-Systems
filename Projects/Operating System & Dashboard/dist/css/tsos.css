@@ -69,3 +69,11 @@ textarea {
   font-size: 8pt;
   text-align: center;
 }
+
+.currentOp {
+  color: #D9534F;
+}
+
+.currentOpNext {
+  color: #5CB85C;
+}

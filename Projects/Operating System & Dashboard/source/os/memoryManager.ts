@@ -11,12 +11,12 @@ module TSOS {
     export class MemoryManager {
 
         constructor(public partition: {[key: string]: any}[] = [
-            {isFree: true, memory: _Memory.memory0, memoryIndex: 0, displayId: "#memory0Display", startIndex: 0}, 
-            {isFree: true, memory: _Memory.memory1, memoryIndex: 1, displayId: "#memory1Display", startIndex: 256}, 
-            {isFree: true, memory: _Memory.memory2, memoryIndex: 2, displayId: "#memory2Display", startIndex: 512}]) {
+            {isFree: true, memoryIndex: 0, displayId: "#memory0Display", startIndex: 0}, 
+            {isFree: true, memoryIndex: 1, displayId: "#memory1Display", startIndex: 256}, 
+            {isFree: true, memoryIndex: 2, displayId: "#memory2Display", startIndex: 512}]) {
         }
 
-        public loadProgram(userProgram: string[], pcb: PCB) {
+        public loadProgram(userProgram: string[], pcb: PCB): void {
             var freePartition: {[key: string]: any} = this.checkFreePartition();
             
             if (freePartition.isFree !== undefined) {
@@ -30,6 +30,8 @@ module TSOS {
                 pcb.instruction = _MemoryManager.readFromMemory(pcb.memoryIndex, pcb.PC);
                 // Store in the process list
                 _ProcessManager.processList.push(pcb);
+                // Update the Memory Display
+                this.updateMemoryDisplay(freePartition.memoryIndex);
                 // Print updated memory status
                 console.log("_Memory Partition: " + freePartition.memoryIndex);
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree)
@@ -84,17 +86,17 @@ module TSOS {
             return freePartition;
         }
 
-        public initializeMemoryDisplay() {
+        public initializeMemoryDisplay(): void {
             for (var par: number = 0; par < this.partition.length; par++) {
                 var workingPartition = this.partition[par];
-                var memoryPartition = chunkArray(workingPartition.memory, 8);
+                var memoryPartition = this.chunkPartition(_Memory.memoryArray[workingPartition.memoryIndex], 8);
                 var memory0Display: string = "";
                 var subPartitionCounter: number = -1;
-                var memoryIndex: number = workingPartition.startIndex;
+                var workingSegment: number = workingPartition.startIndex;
                 for (var i: number = 0; i < _SegmentSize; i++) {
                     if (i % 8 === 0) {
                         subPartitionCounter++;
-                        var memoryLoc = memoryIndex.toString(16);
+                        var memoryLoc = workingSegment.toString(16);
                         if (memoryLoc.length < 3) {
                             for (var j: number = memoryLoc.length; j < 3; j++) {
                                 memoryLoc = "0" + memoryLoc;
@@ -107,25 +109,69 @@ module TSOS {
                             memory0Display += "<td>" + memoryPartition[subPartitionCounter][k] + "</td>";
                         }
                         memory0Display += "</tr>";
-                        memoryIndex += 8;
+                        workingSegment += 8;
                     }
                 }
                 $(workingPartition.displayId).html(memory0Display);
             }
+        }
 
-            // Function to break array into equal chunks
-            function chunkArray(myArray, chunk_size){
-                var index = 0;
-                var arrayLength = myArray.length;
-                var tempArray = [];
-                
-                for (index = 0; index < arrayLength; index += chunk_size) {
-                    var myChunk = myArray.slice(index, index+chunk_size);
-                    // Do something if you want with the group
-                    tempArray.push(myChunk);
+        public updateMemoryDisplay(memoryIndex: number): void {
+            var workingPartition = this.partition[memoryIndex];
+            var memoryPartition = this.chunkPartition(_Memory.memoryArray[memoryIndex], 8);
+            var memory0Display: string = "";
+            var subPartitionCounter: number = -1;
+            var workingSegment: number = workingPartition.startIndex;
+            var workingIndex: number = workingPartition.startIndex;
+            for (var i: number = 0; i < _SegmentSize; i++) {
+                if (i % 8 === 0) {
+                    subPartitionCounter++;
+                    var memoryLoc = workingSegment.toString(16);
+                    if (memoryLoc.length < 3) {
+                        for (var j: number = memoryLoc.length; j < 3; j++) {
+                            memoryLoc = "0" + memoryLoc;
+                        }
+                    }
+                    memoryLoc = "0x" + memoryLoc.toUpperCase();
+                    memory0Display += "<tr id=\"memory-row-" + workingSegment + "\">";
+                    memory0Display += "<td>" + memoryLoc + "</td>";
+                    for (var k: number = 0; k < memoryPartition[subPartitionCounter].length; k++) {
+                        memory0Display += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k] + "</td>";
+                        workingIndex++;
+                    }
+                    memory0Display += "</tr>";
+                    workingSegment += 8;
                 }
+            }
+            $(workingPartition.displayId).html(memory0Display);
+        }
+
+        public chunkPartition(myArray, chunk_size): any[] {
+            var index: number = 0;
+            var arrayLength: number = myArray.length;
+            var tempArray: any[] = [];
             
-                return tempArray;
+            for (index = 0; index < arrayLength; index += chunk_size) {
+                var myChunk: any = myArray.slice(index, index+chunk_size);
+                // Do something if you want with the group
+                tempArray.push(myChunk);
+            }
+        
+            return tempArray;
+        }
+
+        public highlightMemory(memoryIndex: number, PC: number) {
+            var id: string = "#memory-cell-" + PC;
+            var id2: string = "#memory-cell-" + (PC + 1);
+
+            $(id).attr('class', 'currentOp');
+            $(id2).attr('class', 'currentOpNext');
+        }
+
+        public unhighlightAll(): void {
+            for (var i: number = 0; i < _MemorySize; i++) {
+                var id: string = "#memory-cell-" + i;
+                $(id).attr('class', '""');
             }
         }
     }

@@ -27,6 +27,12 @@ var TSOS;
                 this.terminateProcess(pcb);
             }
         };
+        ProcessManager.prototype.hilightMemory = function (pcb, PC) {
+            // Unhighlight all Op Codes
+            _MemoryManager.unhighlightAll();
+            // Highlight the current Op Code and working Memory Code
+            _MemoryManager.highlightMemory(pcb.memoryIndex, PC);
+        };
         ProcessManager.prototype.terminateProcess = function (pcb) {
             // Wipe the associated memory partition
             _MemoryManager.wipeParition(pcb.memoryIndex);
@@ -36,6 +42,8 @@ var TSOS;
             this.removePCB(pcb.programId);
             // Toggle CPU execution off
             _CPU.isExecuting = false;
+            // Update the Memory Display
+            _MemoryManager.updateMemoryDisplay(pcb.memoryIndex);
             // Show Memory Partitions
             _MemoryManager.showAllPartitions();
             // Break Line

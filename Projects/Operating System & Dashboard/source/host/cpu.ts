@@ -48,6 +48,16 @@ module TSOS {
             this.executeProgram(_ProcessManager.currentPCB);
         }
 
+        public resetCPU(): void {
+            this.PC = 0;
+            this.Acc = 0;
+            this.Xreg = 0;
+            this.Yreg = 0;
+            this.Zflag = 0;
+            this.isExecuting = false;
+            this.instruction = "";
+        }
+
         public executeProgram(pcb: PCB) {
             this.instruction = _ProcessManager.fetchInstruction(pcb, this.PC);
 
@@ -99,6 +109,7 @@ module TSOS {
                     break;
             }
             this.updatePCB(_ProcessManager.currentPCB);
+            _ProcessManager.hilightMemory(_ProcessManager.currentPCB, this.PC);
         }
 
         public updatePCB(pcb: PCB) {
@@ -240,6 +251,8 @@ module TSOS {
             this.consumeInstruction();
             // Terminate the process
             _ProcessManager.terminateProcess(_ProcessManager.currentPCB);
+            // Reset the CPU
+            this.resetCPU();
         }
 
         public compareMemoToX() {

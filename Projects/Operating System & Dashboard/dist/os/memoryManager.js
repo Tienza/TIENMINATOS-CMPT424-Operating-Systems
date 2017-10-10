@@ -9,9 +9,9 @@ var TSOS;
     var MemoryManager = /** @class */ (function () {
         function MemoryManager(partition) {
             if (partition === void 0) { partition = [
-                { isFree: true, memory: _Memory.memory0, memoryIndex: 0, displayId: "#memory0Display", startIndex: 0 },
-                { isFree: true, memory: _Memory.memory1, memoryIndex: 1, displayId: "#memory1Display", startIndex: 256 },
-                { isFree: true, memory: _Memory.memory2, memoryIndex: 2, displayId: "#memory2Display", startIndex: 512 }
+                { isFree: true, memoryIndex: 0, displayId: "#memory0Display", startIndex: 0 },
+                { isFree: true, memoryIndex: 1, displayId: "#memory1Display", startIndex: 256 },
+                { isFree: true, memoryIndex: 2, displayId: "#memory2Display", startIndex: 512 }
             ]; }
             this.partition = partition;
         }
@@ -28,6 +28,8 @@ var TSOS;
                 pcb.instruction = _MemoryManager.readFromMemory(pcb.memoryIndex, pcb.PC);
                 // Store in the process list
                 _ProcessManager.processList.push(pcb);
+                // Update the Memory Display
+                this.updateMemoryDisplay(freePartition.memoryIndex);
                 // Print updated memory status
                 console.log("_Memory Partition: " + freePartition.memoryIndex);
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree);
@@ -74,14 +76,14 @@ var TSOS;
         MemoryManager.prototype.initializeMemoryDisplay = function () {
             for (var par = 0; par < this.partition.length; par++) {
                 var workingPartition = this.partition[par];
-                var memoryPartition = chunkArray(workingPartition.memory, 8);
+                var memoryPartition = this.chunkPartition(_Memory.memoryArray[workingPartition.memoryIndex], 8);
                 var memory0Display = "";
                 var subPartitionCounter = -1;
-                var memoryIndex = workingPartition.startIndex;
+                var workingSegment = workingPartition.startIndex;
                 for (var i = 0; i < _SegmentSize; i++) {
                     if (i % 8 === 0) {
                         subPartitionCounter++;
-                        var memoryLoc = memoryIndex.toString(16);
+                        var memoryLoc = workingSegment.toString(16);
                         if (memoryLoc.length < 3) {
                             for (var j = memoryLoc.length; j < 3; j++) {
                                 memoryLoc = "0" + memoryLoc;
@@ -94,22 +96,62 @@ var TSOS;
                             memory0Display += "<td>" + memoryPartition[subPartitionCounter][k] + "</td>";
                         }
                         memory0Display += "</tr>";
-                        memoryIndex += 8;
+                        workingSegment += 8;
                     }
                 }
                 $(workingPartition.displayId).html(memory0Display);
             }
-            // Function to break array into equal chunks
-            function chunkArray(myArray, chunk_size) {
-                var index = 0;
-                var arrayLength = myArray.length;
-                var tempArray = [];
-                for (index = 0; index < arrayLength; index += chunk_size) {
-                    var myChunk = myArray.slice(index, index + chunk_size);
-                    // Do something if you want with the group
-                    tempArray.push(myChunk);
+        };
+        MemoryManager.prototype.updateMemoryDisplay = function (memoryIndex) {
+            var workingPartition = this.partition[memoryIndex];
+            var memoryPartition = this.chunkPartition(_Memory.memoryArray[memoryIndex], 8);
+            var memory0Display = "";
+            var subPartitionCounter = -1;
+            var workingSegment = workingPartition.startIndex;
+            var workingIndex = workingPartition.startIndex;
+            for (var i = 0; i < _SegmentSize; i++) {
+                if (i % 8 === 0) {
+                    subPartitionCounter++;
+                    var memoryLoc = workingSegment.toString(16);
+                    if (memoryLoc.length < 3) {
+                        for (var j = memoryLoc.length; j < 3; j++) {
+                            memoryLoc = "0" + memoryLoc;
+                        }
+                    }
+                    memoryLoc = "0x" + memoryLoc.toUpperCase();
+                    memory0Display += "<tr id=\"memory-row-" + workingSegment + "\">";
+                    memory0Display += "<td>" + memoryLoc + "</td>";
+                    for (var k = 0; k < memoryPartition[subPartitionCounter].length; k++) {
+                        memory0Display += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k] + "</td>";
+                        workingIndex++;
+                    }
+                    memory0Display += "</tr>";
+                    workingSegment += 8;
                 }
-                return tempArray;
+            }
+            $(workingPartition.displayId).html(memory0Display);
+        };
+        MemoryManager.prototype.chunkPartition = function (myArray, chunk_size) {
+            var index = 0;
+            var arrayLength = myArray.length;
+            var tempArray = [];
+            for (index = 0; index < arrayLength; index += chunk_size) {
+                var myChunk = myArray.slice(index, index + chunk_size);
+                // Do something if you want with the group
+                tempArray.push(myChunk);
+            }
+            return tempArray;
+        };
+        MemoryManager.prototype.highlightMemory = function (memoryIndex, PC) {
+            var id = "#memory-cell-" + PC;
+            var id2 = "#memory-cell-" + (PC + 1);
+            $(id).attr('class', 'currentOp');
+            $(id2).attr('class', 'currentOpNext');
+        };
+        MemoryManager.prototype.unhighlightAll = function () {
+            for (var i = 0; i < _MemorySize; i++) {
+                var id = "#memory-cell-" + i;
+                $(id).attr('class', '""');
             }
         };
         return MemoryManager;
