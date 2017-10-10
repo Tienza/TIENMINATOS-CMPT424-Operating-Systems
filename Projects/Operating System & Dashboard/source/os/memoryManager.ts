@@ -51,9 +51,8 @@ module TSOS {
 
         public writeToMemory(memoryIndex: number, memoryLoc: number, val: string): boolean {
             var status: boolean = false;
-
             // Check to see if memory location is still in scope, if not terminate the process
-            if (memoryLoc < _SegmentSize - 1) {
+            if (memoryLoc <= _SegmentSize - 1) {
                 _Memory.memoryArray[memoryIndex][memoryLoc] = val;
                 status = true;
             }
@@ -161,6 +160,12 @@ module TSOS {
         }
 
         public highlightMemory(memoryIndex: number, PC: number) {
+            // Check to see what offset we need for highlighting
+            if (memoryIndex === 1)
+                PC += 256;
+            else if (memoryIndex === 2)
+                PC += 512
+
             var id: string = "#memory-cell-" + PC;
             var id2: string = "#memory-cell-" + (PC + 1);
 
@@ -171,8 +176,13 @@ module TSOS {
         public unhighlightAll(): void {
             for (var i: number = 0; i < _MemorySize; i++) {
                 var id: string = "#memory-cell-" + i;
-                $(id).attr('class', '""');
+                $(id).attr('class', '');
             }
+        }
+
+        public switchMemoryTab(memoryIndex: number): void {
+            var id: string = "#memory-" + memoryIndex + "-tab";
+            $(id).click();
         }
     }
 } 

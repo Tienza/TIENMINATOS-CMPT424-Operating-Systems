@@ -42,6 +42,10 @@ module TSOS {
             _MemoryManager.highlightMemory(pcb.memoryIndex, PC);
         }
 
+        public switchMemoryTab(pcb: PCB): void {
+            _MemoryManager.switchMemoryTab(pcb.memoryIndex);
+        }
+
         public terminateProcess(pcb: PCB): void {
             // Wipe the associated memory partition
             _MemoryManager.wipeParition(pcb.memoryIndex);

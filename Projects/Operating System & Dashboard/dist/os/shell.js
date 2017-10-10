@@ -278,6 +278,7 @@ var TSOS;
             if (args.length > 0) {
                 var pcb = _ProcessManager.getPCB(parseInt(args[0]));
                 if (pcb) {
+                    _ProcessManager.switchMemoryTab(pcb);
                     _ProcessManager.runProcess(pcb);
                 }
                 else {

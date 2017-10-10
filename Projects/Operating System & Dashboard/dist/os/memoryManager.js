@@ -48,7 +48,7 @@ var TSOS;
         MemoryManager.prototype.writeToMemory = function (memoryIndex, memoryLoc, val) {
             var status = false;
             // Check to see if memory location is still in scope, if not terminate the process
-            if (memoryLoc < _SegmentSize - 1) {
+            if (memoryLoc <= _SegmentSize - 1) {
                 _Memory.memoryArray[memoryIndex][memoryLoc] = val;
                 status = true;
             }
@@ -143,6 +143,11 @@ var TSOS;
             return tempArray;
         };
         MemoryManager.prototype.highlightMemory = function (memoryIndex, PC) {
+            // Check to see what offset we need for highlighting
+            if (memoryIndex === 1)
+                PC += 256;
+            else if (memoryIndex === 2)
+                PC += 512;
             var id = "#memory-cell-" + PC;
             var id2 = "#memory-cell-" + (PC + 1);
             $(id).attr('class', 'currentOp');
@@ -151,8 +156,12 @@ var TSOS;
         MemoryManager.prototype.unhighlightAll = function () {
             for (var i = 0; i < _MemorySize; i++) {
                 var id = "#memory-cell-" + i;
-                $(id).attr('class', '""');
+                $(id).attr('class', '');
             }
+        };
+        MemoryManager.prototype.switchMemoryTab = function (memoryIndex) {
+            var id = "#memory-" + memoryIndex + "-tab";
+            $(id).click();
         };
         return MemoryManager;
     }());

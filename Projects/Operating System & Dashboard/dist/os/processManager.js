@@ -33,6 +33,9 @@ var TSOS;
             // Highlight the current Op Code and working Memory Code
             _MemoryManager.highlightMemory(pcb.memoryIndex, PC);
         };
+        ProcessManager.prototype.switchMemoryTab = function (pcb) {
+            _MemoryManager.switchMemoryTab(pcb.memoryIndex);
+        };
         ProcessManager.prototype.terminateProcess = function (pcb) {
             // Wipe the associated memory partition
             _MemoryManager.wipeParition(pcb.memoryIndex);
