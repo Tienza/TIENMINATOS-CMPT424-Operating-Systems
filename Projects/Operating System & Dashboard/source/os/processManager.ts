@@ -35,17 +35,6 @@ module TSOS {
             }
         }
 
-        public hilightMemory(pcb: PCB, PC: number): void {
-            // Unhighlight all Op Codes
-            _MemoryManager.unhighlightAll();
-            // Highlight the current Op Code and working Memory Code
-            _MemoryManager.highlightMemory(pcb.memoryIndex, PC);
-        }
-
-        public switchMemoryTab(pcb: PCB): void {
-            _MemoryManager.switchMemoryTab(pcb.memoryIndex);
-        }
-
         public terminateProcess(pcb: PCB): void {
             // Wipe the associated memory partition
             _MemoryManager.wipeParition(pcb.memoryIndex);
@@ -56,7 +45,7 @@ module TSOS {
             // Toggle CPU execution off
             _CPU.isExecuting = false;
             // Update the Memory Display
-            _MemoryManager.updateMemoryDisplay(pcb.memoryIndex);
+            Control.updateMemoryDisplay(pcb.memoryIndex);
             // Show Memory Partitions
             _MemoryManager.showAllPartitions();
             // Break Line

@@ -20,26 +20,6 @@ var TSOS;
             this.memory2 = memory2;
             this.memoryArray = [this.memory0, this.memory1, this.memory2];
         }
-        Memory.prototype.init = function () {
-            this.wipeAllMemory();
-        };
-        Memory.prototype.wipeAllMemory = function () {
-            for (var i = 0; i < this.singleMemSize; i++) {
-                this.memory0[i] = "00";
-                this.memory1[i] = "00";
-                this.memory2[i] = "00";
-            }
-        };
-        Memory.prototype.wipeMemory = function (memoryIndex) {
-            for (var i = 0; i < this.singleMemSize; i++) {
-                this.memoryArray[memoryIndex][i] = "00";
-            }
-        };
-        Memory.prototype.showAllPartitions = function () {
-            console.log("Memory0", this.memoryArray[0]);
-            console.log("Memory1", this.memoryArray[1]);
-            console.log("Memory2", this.memoryArray[2]);
-        };
         return Memory;
     }());
     TSOS.Memory = Memory;

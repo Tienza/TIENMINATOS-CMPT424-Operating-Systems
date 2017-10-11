@@ -15,6 +15,9 @@ var TSOS;
             ]; }
             this.partition = partition;
         }
+        MemoryManager.prototype.init = function () {
+            this.wipeAllPartitions();
+        };
         MemoryManager.prototype.loadProgram = function (userProgram, pcb) {
             var freePartition = this.checkFreePartition();
             if (freePartition.isFree !== undefined) {
@@ -29,11 +32,11 @@ var TSOS;
                 // Store in the process list
                 _ProcessManager.processList.push(pcb);
                 // Update the Memory Display
-                this.updateMemoryDisplay(freePartition.memoryIndex);
+                TSOS.Control.updateMemoryDisplay(freePartition.memoryIndex);
                 // Print updated memory status
                 console.log("_Memory Partition: " + freePartition.memoryIndex);
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree);
-                _Memory.showAllPartitions();
+                this.showAllPartitions();
                 // console.log("PCBList", _ProcessManager.processList);
                 // Output PID to canvas
                 _StdOut.putText("Program Loaded Successfully. PID: " + pcb.programId);
@@ -49,19 +52,35 @@ var TSOS;
             var status = false;
             // Check to see if memory location is still in scope, if not terminate the process
             if (memoryLoc <= _SegmentSize - 1) {
+                // Write to Memory
                 _Memory.memoryArray[memoryIndex][memoryLoc] = val;
+                // Update the Memory Display
+                var id = "#memory-cell-" + (memoryLoc + this.partition[memoryIndex].startIndex);
+                $(id).html(val);
+                // Set status of write success to true
                 status = true;
             }
             return status;
         };
         MemoryManager.prototype.wipeParition = function (memoryIndex) {
-            _Memory.wipeMemory(memoryIndex);
+            for (var i = 0; i < _Memory.singleMemSize; i++) {
+                _Memory.memoryArray[memoryIndex][i] = "00";
+            }
+        };
+        MemoryManager.prototype.wipeAllPartitions = function () {
+            for (var i = 0; i < _Memory.singleMemSize; i++) {
+                _Memory.memory0[i] = "00";
+                _Memory.memory1[i] = "00";
+                _Memory.memory2[i] = "00";
+            }
         };
         MemoryManager.prototype.freePartition = function (memoryIndex) {
             this.partition[memoryIndex].isFree = true;
         };
         MemoryManager.prototype.showAllPartitions = function () {
-            _Memory.showAllPartitions();
+            console.log("Memory0", _Memory.memoryArray[0]);
+            console.log("Memory1", _Memory.memoryArray[1]);
+            console.log("Memory2", _Memory.memoryArray[2]);
         };
         MemoryManager.prototype.checkFreePartition = function () {
             var freePartition = {};
@@ -72,96 +91,6 @@ var TSOS;
                 }
             }
             return freePartition;
-        };
-        MemoryManager.prototype.initializeMemoryDisplay = function () {
-            for (var par = 0; par < this.partition.length; par++) {
-                var workingPartition = this.partition[par];
-                var memoryPartition = this.chunkPartition(_Memory.memoryArray[workingPartition.memoryIndex], 8);
-                var memory0Display = "";
-                var subPartitionCounter = -1;
-                var workingSegment = workingPartition.startIndex;
-                for (var i = 0; i < _SegmentSize; i++) {
-                    if (i % 8 === 0) {
-                        subPartitionCounter++;
-                        var memoryLoc = workingSegment.toString(16);
-                        if (memoryLoc.length < 3) {
-                            for (var j = memoryLoc.length; j < 3; j++) {
-                                memoryLoc = "0" + memoryLoc;
-                            }
-                        }
-                        memoryLoc = "0x" + memoryLoc.toUpperCase();
-                        memory0Display += "<tr>";
-                        memory0Display += "<td>" + memoryLoc + "</td>";
-                        for (var k = 0; k < memoryPartition[subPartitionCounter].length; k++) {
-                            memory0Display += "<td>" + memoryPartition[subPartitionCounter][k] + "</td>";
-                        }
-                        memory0Display += "</tr>";
-                        workingSegment += 8;
-                    }
-                }
-                $(workingPartition.displayId).html(memory0Display);
-            }
-        };
-        MemoryManager.prototype.updateMemoryDisplay = function (memoryIndex) {
-            var workingPartition = this.partition[memoryIndex];
-            var memoryPartition = this.chunkPartition(_Memory.memoryArray[memoryIndex], 8);
-            var memory0Display = "";
-            var subPartitionCounter = -1;
-            var workingSegment = workingPartition.startIndex;
-            var workingIndex = workingPartition.startIndex;
-            for (var i = 0; i < _SegmentSize; i++) {
-                if (i % 8 === 0) {
-                    subPartitionCounter++;
-                    var memoryLoc = workingSegment.toString(16);
-                    if (memoryLoc.length < 3) {
-                        for (var j = memoryLoc.length; j < 3; j++) {
-                            memoryLoc = "0" + memoryLoc;
-                        }
-                    }
-                    memoryLoc = "0x" + memoryLoc.toUpperCase();
-                    memory0Display += "<tr id=\"memory-row-" + workingSegment + "\">";
-                    memory0Display += "<td>" + memoryLoc + "</td>";
-                    for (var k = 0; k < memoryPartition[subPartitionCounter].length; k++) {
-                        memory0Display += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k] + "</td>";
-                        workingIndex++;
-                    }
-                    memory0Display += "</tr>";
-                    workingSegment += 8;
-                }
-            }
-            $(workingPartition.displayId).html(memory0Display);
-        };
-        MemoryManager.prototype.chunkPartition = function (myArray, chunk_size) {
-            var index = 0;
-            var arrayLength = myArray.length;
-            var tempArray = [];
-            for (index = 0; index < arrayLength; index += chunk_size) {
-                var myChunk = myArray.slice(index, index + chunk_size);
-                // Do something if you want with the group
-                tempArray.push(myChunk);
-            }
-            return tempArray;
-        };
-        MemoryManager.prototype.highlightMemory = function (memoryIndex, PC) {
-            // Check to see what offset we need for highlighting
-            if (memoryIndex === 1)
-                PC += 256;
-            else if (memoryIndex === 2)
-                PC += 512;
-            var id = "#memory-cell-" + PC;
-            var id2 = "#memory-cell-" + (PC + 1);
-            $(id).attr('class', 'currentOp');
-            $(id2).attr('class', 'currentOpNext');
-        };
-        MemoryManager.prototype.unhighlightAll = function () {
-            for (var i = 0; i < _MemorySize; i++) {
-                var id = "#memory-cell-" + i;
-                $(id).attr('class', '');
-            }
-        };
-        MemoryManager.prototype.switchMemoryTab = function (memoryIndex) {
-            var id = "#memory-" + memoryIndex + "-tab";
-            $(id).click();
         };
         return MemoryManager;
     }());

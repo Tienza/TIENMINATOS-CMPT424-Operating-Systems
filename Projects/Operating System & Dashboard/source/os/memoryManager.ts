@@ -16,6 +16,10 @@ module TSOS {
             {isFree: true, memoryIndex: 2, displayId: "#memory2Display", startIndex: 512}]) {
         }
 
+        public init(): void {
+            this.wipeAllPartitions();
+        }
+
         public loadProgram(userProgram: string[], pcb: PCB): void {
             var freePartition: {[key: string]: any} = this.checkFreePartition();
             
@@ -31,11 +35,11 @@ module TSOS {
                 // Store in the process list
                 _ProcessManager.processList.push(pcb);
                 // Update the Memory Display
-                this.updateMemoryDisplay(freePartition.memoryIndex);
+                Control.updateMemoryDisplay(freePartition.memoryIndex);
                 // Print updated memory status
                 console.log("_Memory Partition: " + freePartition.memoryIndex);
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree)
-                _Memory.showAllPartitions();
+                this.showAllPartitions();
                 // console.log("PCBList", _ProcessManager.processList);
                 // Output PID to canvas
                 _StdOut.putText("Program Loaded Successfully. PID: " + pcb.programId);
@@ -53,7 +57,12 @@ module TSOS {
             var status: boolean = false;
             // Check to see if memory location is still in scope, if not terminate the process
             if (memoryLoc <= _SegmentSize - 1) {
+                // Write to Memory
                 _Memory.memoryArray[memoryIndex][memoryLoc] = val;
+                // Update the Memory Display
+                var id = "#memory-cell-" + (memoryLoc + this.partition[memoryIndex].startIndex);
+                $(id).html(val);
+                // Set status of write success to true
                 status = true;
             }
 
@@ -61,7 +70,17 @@ module TSOS {
         }
 
         public wipeParition(memoryIndex: number): void {
-            _Memory.wipeMemory(memoryIndex);
+            for (var i: number = 0; i < _Memory.singleMemSize; i++) {
+                _Memory.memoryArray[memoryIndex][i] = "00";
+            }
+        }
+
+        public wipeAllPartitions(): void {
+            for (var i: number = 0; i < _Memory.singleMemSize; i++) {
+                _Memory.memory0[i] = "00";
+                _Memory.memory1[i] = "00";
+                _Memory.memory2[i] = "00";
+            }
         }
 
         public freePartition(memoryIndex: number): void {
@@ -69,7 +88,9 @@ module TSOS {
         }
 
         public showAllPartitions(): void {
-            _Memory.showAllPartitions();
+            console.log("Memory0", _Memory.memoryArray[0]);
+            console.log("Memory1", _Memory.memoryArray[1]);
+            console.log("Memory2", _Memory.memoryArray[2]);
         }
 
         public checkFreePartition(): {[key: string]: any} {
@@ -83,106 +104,6 @@ module TSOS {
             }
 
             return freePartition;
-        }
-
-        public initializeMemoryDisplay(): void {
-            for (var par: number = 0; par < this.partition.length; par++) {
-                var workingPartition = this.partition[par];
-                var memoryPartition = this.chunkPartition(_Memory.memoryArray[workingPartition.memoryIndex], 8);
-                var memory0Display: string = "";
-                var subPartitionCounter: number = -1;
-                var workingSegment: number = workingPartition.startIndex;
-                for (var i: number = 0; i < _SegmentSize; i++) {
-                    if (i % 8 === 0) {
-                        subPartitionCounter++;
-                        var memoryLoc = workingSegment.toString(16);
-                        if (memoryLoc.length < 3) {
-                            for (var j: number = memoryLoc.length; j < 3; j++) {
-                                memoryLoc = "0" + memoryLoc;
-                            }
-                        }
-                        memoryLoc = "0x" + memoryLoc.toUpperCase();
-                        memory0Display += "<tr>";
-                        memory0Display += "<td>" + memoryLoc + "</td>";
-                        for (var k: number = 0; k < memoryPartition[subPartitionCounter].length; k++) {
-                            memory0Display += "<td>" + memoryPartition[subPartitionCounter][k] + "</td>";
-                        }
-                        memory0Display += "</tr>";
-                        workingSegment += 8;
-                    }
-                }
-                $(workingPartition.displayId).html(memory0Display);
-            }
-        }
-
-        public updateMemoryDisplay(memoryIndex: number): void {
-            var workingPartition = this.partition[memoryIndex];
-            var memoryPartition = this.chunkPartition(_Memory.memoryArray[memoryIndex], 8);
-            var memory0Display: string = "";
-            var subPartitionCounter: number = -1;
-            var workingSegment: number = workingPartition.startIndex;
-            var workingIndex: number = workingPartition.startIndex;
-            for (var i: number = 0; i < _SegmentSize; i++) {
-                if (i % 8 === 0) {
-                    subPartitionCounter++;
-                    var memoryLoc = workingSegment.toString(16);
-                    if (memoryLoc.length < 3) {
-                        for (var j: number = memoryLoc.length; j < 3; j++) {
-                            memoryLoc = "0" + memoryLoc;
-                        }
-                    }
-                    memoryLoc = "0x" + memoryLoc.toUpperCase();
-                    memory0Display += "<tr id=\"memory-row-" + workingSegment + "\">";
-                    memory0Display += "<td>" + memoryLoc + "</td>";
-                    for (var k: number = 0; k < memoryPartition[subPartitionCounter].length; k++) {
-                        memory0Display += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k] + "</td>";
-                        workingIndex++;
-                    }
-                    memory0Display += "</tr>";
-                    workingSegment += 8;
-                }
-            }
-            $(workingPartition.displayId).html(memory0Display);
-        }
-
-        public chunkPartition(myArray, chunk_size): any[] {
-            var index: number = 0;
-            var arrayLength: number = myArray.length;
-            var tempArray: any[] = [];
-            
-            for (index = 0; index < arrayLength; index += chunk_size) {
-                var myChunk: any = myArray.slice(index, index+chunk_size);
-                // Do something if you want with the group
-                tempArray.push(myChunk);
-            }
-        
-            return tempArray;
-        }
-
-        public highlightMemory(memoryIndex: number, PC: number) {
-            // Check to see what offset we need for highlighting
-            if (memoryIndex === 1)
-                PC += 256;
-            else if (memoryIndex === 2)
-                PC += 512
-
-            var id: string = "#memory-cell-" + PC;
-            var id2: string = "#memory-cell-" + (PC + 1);
-
-            $(id).attr('class', 'currentOp');
-            $(id2).attr('class', 'currentOpNext');
-        }
-
-        public unhighlightAll(): void {
-            for (var i: number = 0; i < _MemorySize; i++) {
-                var id: string = "#memory-cell-" + i;
-                $(id).attr('class', '');
-            }
-        }
-
-        public switchMemoryTab(memoryIndex: number): void {
-            var id: string = "#memory-" + memoryIndex + "-tab";
-            $(id).click();
         }
     }
 } 

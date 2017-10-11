@@ -43,9 +43,12 @@ module TSOS {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
-
+            Control.highlightMemory(_ProcessManager.currentPCB, this.PC);
             // Execute instructions
             this.executeProgram(_ProcessManager.currentPCB);
+            // Stop after one instruction if Single Step Mode is enabled
+            if (_SingleStep)
+                this.isExecuting = false;
         }
 
         public resetCPU(): void {
@@ -109,7 +112,6 @@ module TSOS {
                     break;
             }
             this.updatePCB(_ProcessManager.currentPCB);
-            _ProcessManager.hilightMemory(_ProcessManager.currentPCB, this.PC);
         }
 
         public updatePCB(pcb: PCB) {

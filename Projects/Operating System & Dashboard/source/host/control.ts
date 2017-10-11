@@ -74,6 +74,139 @@ module TSOS {
             // TODO in the future: Optionally update a log database or some streaming service.
         }
 
+        /* Memory Display Functions */
+
+        public static highlightMemory(pcb: PCB, PC: number) {
+            // Unhighlight all Op Codes
+            Control.unhighlightAll();
+            // Get the instruction to see how many characters we need to highlight
+            var instruction: string = _ProcessManager.fetchInstruction(pcb, PC);
+            // Check to see what offset we need for highlighting
+            PC += _MemoryManager.partition[pcb.memoryIndex].startIndex;
+
+            var id: string = "#memory-cell-" + PC;
+            var id2: string = "#memory-cell-" + (PC + 1);
+            var id3: string = "#memory-cell-" + (PC + 2);
+
+            $(id).attr('class', 'currentOp');
+
+            // Determines how many more Op Codes we need to highlight
+            if (instruction !== "EA" && instruction !== "FF" && instruction !== "00")
+                $(id2).attr('class', 'currentOpNext');
+            if (instruction !== "A9" && instruction !== "A2" && instruction !== "A0" && instruction !== "D0" && instruction !== "EA" && instruction !== "FF" && instruction !== "00")
+                $(id3).attr('class', 'currentOpNext');
+        }
+
+        public static unhighlightAll(): void {
+            for (var i: number = 0; i < _MemorySize; i++) {
+                var id: string = "#memory-cell-" + i;
+                $(id).attr('class', '');
+            }
+        }
+
+        public static switchMemoryTab(pcb: PCB): void {
+            var id: string = "#memory-" + pcb.memoryIndex + "-tab";
+            $(id).click();
+        }
+
+        public static updateMemoryDisplay(memoryIndex: number): void {
+            // See initializeMemoryDisplay() similar but for a specific partition
+            var workingPartition: {[key: string]: any} = _MemoryManager.partition[memoryIndex];
+            // Break the array into collection of 8 instructions
+            var memoryPartition: string[] = Control.chunkPartition(_Memory.memoryArray[memoryIndex], 8);
+            // Initialize the display string
+            var memoryDisplay: string = "";
+            // For looping over the collection of 8 instructions
+            var subPartitionCounter: number = -1;
+            // The index of the beginning of each collection of 8 instructions
+            var workingSegment: number = workingPartition.startIndex;
+            // For keeping track of every instruction in this partition of memory
+            var workingIndex: number = workingPartition.startIndex;
+            // Repeat this actions for all the indices a partitions of memory
+            for (var i: number = 0; i < _SegmentSize; i++) {
+                if (i % 8 === 0) {
+                    subPartitionCounter++;
+                    // Format index into hexadecimal
+                    var memoryLoc: string = workingSegment.toString(16);
+                    // If not long enough add '0'
+                    if (memoryLoc.length < 3) {
+                        for (var j: number = memoryLoc.length; j < 3; j++) {
+                            memoryLoc = "0" + memoryLoc;
+                        }
+                    }
+                    // Format final segment address string
+                    memoryLoc = "0x" + memoryLoc.toUpperCase();
+                    // Display the segment address string
+                    memoryDisplay += "<tr id=\"memory-row-" + workingSegment + "\">";
+                    memoryDisplay += "<td>" + memoryLoc + "</td>";
+                    // Print all the values in the current collection of 8 instructions
+                    for (var k: number = 0; k < memoryPartition[subPartitionCounter].length; k++) {
+                        memoryDisplay += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k] + "</td>";
+                        workingIndex++;
+                    }
+                    memoryDisplay += "</tr>";
+                    // Increment to the next segment
+                    workingSegment += 8;
+                }
+            }
+            $(workingPartition.displayId).html(memoryDisplay);
+        }
+
+        public static initializeMemoryDisplay(): void {
+            // For all three partitions, fill the display with zeros and the 8 bit addresses
+            for (var par: number = 0; par < _MemoryManager.partition.length; par++) {
+                var workingPartition: {[key: string]: any} = _MemoryManager.partition[par];
+                // Break the array into collection of 8 instructions
+                var memoryPartition: string[] = Control.chunkPartition(_Memory.memoryArray[workingPartition.memoryIndex], 8);
+                // Initialize the display string
+                var memoryDisplay: string = "";
+                // For looping over the collection of 8 instructions
+                var subPartitionCounter: number = -1;
+                // The index of the beginning of each collection of 8 instructions
+                var workingSegment: number = workingPartition.startIndex;
+                // Repeat this actions for all the indices a partitions of memory
+                for (var i: number = 0; i < _SegmentSize; i++) {
+                    if (i % 8 === 0) {
+                        subPartitionCounter++;
+                        // Format index into hexadecimal
+                        var memoryLoc: string = workingSegment.toString(16);
+                        // If not long enough add '0'
+                        if (memoryLoc.length < 3) {
+                            for (var j: number = memoryLoc.length; j < 3; j++) {
+                                memoryLoc = "0" + memoryLoc;
+                            }
+                        }
+                        // Format final segment address string
+                        memoryLoc = "0x" + memoryLoc.toUpperCase();
+                        // Dispaly the segment address string
+                        memoryDisplay += "<tr>";
+                        memoryDisplay += "<td>" + memoryLoc + "</td>";
+                        // Print all the values in the current collection of 8 instructions
+                        for (var k: number = 0; k < memoryPartition[subPartitionCounter].length; k++) {
+                            memoryDisplay += "<td>" + memoryPartition[subPartitionCounter][k] + "</td>";
+                        }
+                        memoryDisplay += "</tr>";
+                        // Increment to the next segment
+                        workingSegment += 8;
+                    }
+                }
+                $(workingPartition.displayId).html(memoryDisplay);
+            }
+        }
+
+        public static chunkPartition(myArray, chunk_size): any[] {
+            var index: number = 0;
+            var arrayLength: number = myArray.length;
+            var tempArray: any[] = [];
+            
+            for (index = 0; index < arrayLength; index += chunk_size) {
+                var myChunk: any = myArray.slice(index, index+chunk_size);
+                // Do something if you want with the group
+                tempArray.push(myChunk);
+            }
+        
+            return tempArray;
+        }
 
         //
         // Host Events
@@ -85,9 +218,10 @@ module TSOS {
             // Disable the (passed-in) start button...
             btn.disabled = true;
 
-            // .. enable the Halt and Reset buttons ...
+            // .. enable the Halt and Reset buttons ...and other buttons
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
+            (<HTMLButtonElement>document.getElementById("singleStepBtn")).disabled = false;
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
@@ -98,7 +232,6 @@ module TSOS {
 
             // Initialize Memory Simulation
             _Memory = new Memory();
-            _Memory.init();
 
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
@@ -129,6 +262,30 @@ module TSOS {
             // That boolean parameter is the 'forceget' flag. When it is true it causes the page to always
             // be reloaded from the server. If it is false or not specified the browser may reload the
             // page from its cache, which is not what we want.
+        }
+
+        public static hostBtnEnableStep_click(btn): void {
+            // Enable and Disable Single Step Mode
+            _SingleStep = !_SingleStep;
+
+            if (_SingleStep) {
+                $('#singleStepBtn').attr('class', 'btn btn-danger');
+                $('#singleStepBtn').html("Single Step Mode: ON");
+                (<HTMLButtonElement>document.getElementById("stepOver")).disabled = false;
+            }
+            else {
+                $('#singleStepBtn').attr('class', 'btn btn-success');
+                $('#singleStepBtn').html("Single Step Mode: OFF");
+                (<HTMLButtonElement>document.getElementById("stepOver")).disabled = true;
+                if (!_CPU.isExecuting)
+                    _CPU.isExecuting = true;
+            }
+        }
+
+        public static hostBtnStep_click(btn): void {
+            // Enable execution for one more instruction set
+            _CPU.isExecuting = true;
+            console.log("This Ran");
         }
     }
 }

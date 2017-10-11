@@ -33,7 +33,9 @@ var TSOS;
             _StdOut = _Console;
             // Initialize MemoryManager
             _MemoryManager = new TSOS.MemoryManager();
-            _MemoryManager.initializeMemoryDisplay();
+            _MemoryManager.init();
+            // Initialize Memory Display
+            TSOS.Control.initializeMemoryDisplay();
             // Initialize Process Manager
             _ProcessManager = new TSOS.ProcessManager();
             // Load the Keyboard Device Driver
