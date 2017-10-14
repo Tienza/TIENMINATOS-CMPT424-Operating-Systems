@@ -33,6 +33,8 @@ var TSOS;
                 _ProcessManager.processList.push(pcb);
                 // Update the Memory Display
                 TSOS.Control.updateMemoryDisplay(freePartition.memoryIndex);
+                // Update the Process Display
+                TSOS.Control.initializeProcessDisplay(pcb);
                 // Print updated memory status
                 console.log("_Memory Partition: " + freePartition.memoryIndex);
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree);

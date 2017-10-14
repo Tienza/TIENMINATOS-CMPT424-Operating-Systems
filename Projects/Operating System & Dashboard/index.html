@@ -78,6 +78,19 @@
                 <!-- row -->
                 <div class="row">
                         <div class="col-lg-6">
+                                <table width="100%">
+                                        <thead>
+                                                <tr>
+                                                        <th>
+                                                                <div class="btn-group" role="group" aria-label="...">
+                                                                        <button id="placeHolderButton" type="button" class="btn btn-default">
+                                                                                <i id="placeHolderIcon" class="fa fa-chevron-right" aria-hidden="true"></i>
+                                                                        </button>
+                                                                </div>
+                                                        </th>
+                                                </tr>
+                                        </thead>
+                                </table>
                                 <label>User Program Input</label>
                                 <textarea id="taProgramInput" class="form-control" name="taProgramInput">A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</textarea>
                         </div>
@@ -110,21 +123,21 @@
 				</ul>
 				<div class="tab-content" style="font-family: monospace;">
 					<div class="tab-pane active memory0" style="font-weight: bold;">
-						<div class="panel panel-default">
+						<div id="memoryScrolling0" class="panel panel-default memoryDisplay">
                                                         <table class="table table-striped">
                                                                 <tbody id="memory0Display"></tbody>
                                                         </table>
 						</div>
 					</div>
 					<div class="tab-pane memory1" style="font-weight: bold;">
-						<div class="panel panel-default">
+						<div id="memoryScrolling1" class="panel panel-default memoryDisplay">
 							<table class="table table-striped">
                                                                 <tbody id="memory1Display"></tbody>  
                                                         </table>
 						</div>
                                         </div>
                                         <div class="tab-pane memory2" style="font-weight: bold;">
-						<div class="panel panel-default">
+						<div id="memoryScrolling2" class="panel panel-default memoryDisplay">
 							<table class="table table-striped">
                                                                 <tbody id="memory2Display"></tbody>  
                                                         </table>
@@ -133,6 +146,70 @@
 				</div>
 			</div>
                         
+                </div>
+                <!-- row -->
+                <div class="row">
+                        <div class="col-lg-6 hidden">
+                                <img id="heresy" src="dist/img/heresy.png" alt="heresy">
+                        </div>
+                        <div class="col-lg-6">
+                                <table width="100%">
+                                        <thead>
+                                                <tr>
+                                                        <th>
+                                                                <div class="btn-group" role="group" aria-label="...">
+                                                                        <button id="placeHolderButton" type="button" class="btn btn-default">
+                                                                                <i id="placeHolderIcon" class="fa fa-chevron-right" aria-hidden="true"></i>
+                                                                        </button>
+                                                                </div>
+                                                        </th>
+                                                </tr>
+                                        </thead>
+                                </table>
+                        </div>
+                        <div class="col-lg-3">
+                                <label>CPU</label>
+                                <table class="table table-striped table-bordered cpuPcbDisplay">
+                                        <thead>
+                                                <tr>
+                                                        <th>PC</th>
+                                                        <th>IR</th>
+                                                        <th>ACC</th>
+                                                        <th>X</th>
+                                                        <th>Y</th>
+                                                        <th>Z</th>
+                                                </tr>
+                                        </thead>
+                                        <tbody id="cpuDisplay">
+                                                <tr>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                        <td>--</td>
+                                                </tr>
+                                        </tbody>
+                                </table>
+                        </div>
+                        <div class="col-lg-3">
+                                <label>PCB Display</label>
+                                <table class="table table-striped table-bordered cpuPcbDisplay">
+                                        <thead>
+                                                <tr>
+                                                        <th>PID</th>
+                                                        <th>PC</th>
+                                                        <th>IR</th>
+                                                        <th>ACC</th>
+                                                        <th>X</th>
+                                                        <th>Y</th>
+                                                        <th>Z</th>
+                                                </tr>
+                                        </thead>
+                                        <tbody id="processDisplay">
+                                        </tbody>
+                                </table>
+                        </div>
                 </div>
                 <!-- row -->
                 <div class="row hidden">

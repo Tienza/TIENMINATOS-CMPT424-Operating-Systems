@@ -46,6 +46,8 @@ module TSOS {
             _CPU.isExecuting = false;
             // Update the Memory Display
             Control.updateMemoryDisplay(pcb.memoryIndex);
+            // Remove the Process Display
+            Control.removeProcessDisplay(pcb.programId);
             // Show Memory Partitions
             _MemoryManager.showAllPartitions();
             // Break Line

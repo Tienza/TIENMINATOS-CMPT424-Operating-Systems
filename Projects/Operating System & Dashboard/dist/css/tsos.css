@@ -50,7 +50,7 @@ textarea {
 #taProgramInput {
   font-family: monospace;
   font-weight: bold;
-  height: 130px;
+  height: 189px;
   width: 100%;
 }
 
@@ -63,10 +63,30 @@ textarea {
   font-weight: bold;
 }
 
+#placeHolderButton {
+  border-color: #FFFFFF;
+}
+
+#placeHolderIcon {
+  color: #FFFFFF;
+}
+
 .footerText {
   color: black;
   font-family: Arial, Helvetica, sans-serif;
   font-size: 8pt;
+  text-align: center;
+}
+
+.memoryDisplay {
+  height: 153px;
+  overflow-x: hidden;
+  overflow-y: scroll;
+}
+
+.cpuPcbDisplay {
+  font-family: monospace;
+  font-weight: bold;
   text-align: center;
 }
 

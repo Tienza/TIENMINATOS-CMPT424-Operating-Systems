@@ -17,14 +17,14 @@
 
 module TSOS {
 
-    export class Cpu {
+    export class CPU {
 
         constructor(public PC: number = 0,
                     public Acc: number = 0,
                     public Xreg: number = 0,
                     public Yreg: number = 0,
                     public Zflag: number = 0,
-                    public instruction: string = "",
+                    public instruction: string = "--",
                     public isExecuting: boolean = false) {
 
         }
@@ -36,14 +36,19 @@ module TSOS {
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
-            this.instruction = "";
+            this.instruction = "--";
         }
 
         public cycle(): void {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            // Update Memory Display
             Control.highlightMemory(_ProcessManager.currentPCB, this.PC);
+            // Update Process Display
+            Control.updateProcessDisplay(_ProcessManager.currentPCB);
+            // Update CPU Display
+            Control.updateCPUDisplay(_CPU);
             // Execute instructions
             this.executeProgram(_ProcessManager.currentPCB);
             // Stop after one instruction if Single Step Mode is enabled

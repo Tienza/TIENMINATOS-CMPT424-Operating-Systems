@@ -15,14 +15,14 @@
      ------------ */
 var TSOS;
 (function (TSOS) {
-    var Cpu = /** @class */ (function () {
-        function Cpu(PC, Acc, Xreg, Yreg, Zflag, instruction, isExecuting) {
+    var CPU = /** @class */ (function () {
+        function CPU(PC, Acc, Xreg, Yreg, Zflag, instruction, isExecuting) {
             if (PC === void 0) { PC = 0; }
             if (Acc === void 0) { Acc = 0; }
             if (Xreg === void 0) { Xreg = 0; }
             if (Yreg === void 0) { Yreg = 0; }
             if (Zflag === void 0) { Zflag = 0; }
-            if (instruction === void 0) { instruction = ""; }
+            if (instruction === void 0) { instruction = "--"; }
             if (isExecuting === void 0) { isExecuting = false; }
             this.PC = PC;
             this.Acc = Acc;
@@ -32,27 +32,32 @@ var TSOS;
             this.instruction = instruction;
             this.isExecuting = isExecuting;
         }
-        Cpu.prototype.init = function () {
+        CPU.prototype.init = function () {
             this.PC = 0;
             this.Acc = 0;
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
             this.isExecuting = false;
-            this.instruction = "";
+            this.instruction = "--";
         };
-        Cpu.prototype.cycle = function () {
+        CPU.prototype.cycle = function () {
             _Kernel.krnTrace('CPU cycle');
             // TODO: Accumulate CPU usage and profiling statistics here.
             // Do the real work here. Be sure to set this.isExecuting appropriately.
+            // Update Memory Display
             TSOS.Control.highlightMemory(_ProcessManager.currentPCB, this.PC);
+            // Update Process Display
+            TSOS.Control.updateProcessDisplay(_ProcessManager.currentPCB);
+            // Update CPU Display
+            TSOS.Control.updateCPUDisplay(_CPU);
             // Execute instructions
             this.executeProgram(_ProcessManager.currentPCB);
             // Stop after one instruction if Single Step Mode is enabled
             if (_SingleStep)
                 this.isExecuting = false;
         };
-        Cpu.prototype.resetCPU = function () {
+        CPU.prototype.resetCPU = function () {
             this.PC = 0;
             this.Acc = 0;
             this.Xreg = 0;
@@ -61,7 +66,7 @@ var TSOS;
             this.isExecuting = false;
             this.instruction = "";
         };
-        Cpu.prototype.executeProgram = function (pcb) {
+        CPU.prototype.executeProgram = function (pcb) {
             this.instruction = _ProcessManager.fetchInstruction(pcb, this.PC);
             switch (this.instruction) {
                 case "A9":
@@ -112,7 +117,7 @@ var TSOS;
             }
             this.updatePCB(_ProcessManager.currentPCB);
         };
-        Cpu.prototype.updatePCB = function (pcb) {
+        CPU.prototype.updatePCB = function (pcb) {
             pcb.instruction = this.instruction;
             pcb.Acc = this.Acc;
             pcb.PC = this.PC;
@@ -120,7 +125,7 @@ var TSOS;
             pcb.Yreg = this.Yreg;
             pcb.Zflag = this.Zflag;
         };
-        Cpu.prototype.updateCPU = function () {
+        CPU.prototype.updateCPU = function () {
             this.instruction = _ProcessManager.currentPCB.instruction;
             this.Acc = _ProcessManager.currentPCB.Acc;
             this.PC = _ProcessManager.currentPCB.PC;
@@ -128,11 +133,11 @@ var TSOS;
             this.Yreg = _ProcessManager.currentPCB.Yreg;
             this.Zflag = _ProcessManager.currentPCB.Zflag;
         };
-        Cpu.prototype.consumeInstruction = function () {
+        CPU.prototype.consumeInstruction = function () {
             this.PC++;
         };
         /****************************** 6502a Op Codes Functions ******************************/
-        Cpu.prototype.loadAccWithConst = function () {
+        CPU.prototype.loadAccWithConst = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Assign the following constant to the Acc
@@ -140,7 +145,7 @@ var TSOS;
             // Pass over current Op Code
             this.consumeInstruction();
         };
-        Cpu.prototype.loadAccFromMemo = function () {
+        CPU.prototype.loadAccFromMemo = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location where we want to load the Accumulator with
@@ -153,7 +158,7 @@ var TSOS;
             this.Acc = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc));
             this.consumeInstruction();
         };
-        Cpu.prototype.storeAccInMemo = function () {
+        CPU.prototype.storeAccInMemo = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location where we want to store the Accumulator
@@ -171,7 +176,7 @@ var TSOS;
             // Pass over current Op Code
             this.consumeInstruction();
         };
-        Cpu.prototype.addWithCarry = function () {
+        CPU.prototype.addWithCarry = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location where we want to add to the Accumulator
@@ -185,7 +190,7 @@ var TSOS;
             // Pass over current Op Code
             this.consumeInstruction();
         };
-        Cpu.prototype.loadXWithConst = function () {
+        CPU.prototype.loadXWithConst = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Decode the current Op Code and assign it to the X Register
@@ -193,7 +198,7 @@ var TSOS;
             // Pass over current Op Code
             this.consumeInstruction();
         };
-        Cpu.prototype.loadXFromMemo = function () {
+        CPU.prototype.loadXFromMemo = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location that we want to load the X Register with
@@ -207,7 +212,7 @@ var TSOS;
             // Pass over current Op Code
             this.consumeInstruction();
         };
-        Cpu.prototype.loadYWithConst = function () {
+        CPU.prototype.loadYWithConst = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Decode the current Op Code and assign it to the Y Register
@@ -215,7 +220,7 @@ var TSOS;
             // Pass over current Op Code
             this.consumeInstruction();
         };
-        Cpu.prototype.loadYFromMemo = function () {
+        CPU.prototype.loadYFromMemo = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location that we want to load the Y Register with
@@ -229,11 +234,11 @@ var TSOS;
             // Pass over current Op Code
             this.consumeInstruction();
         };
-        Cpu.prototype.noOperation = function () {
+        CPU.prototype.noOperation = function () {
             // Pass over current Op Code
             this.consumeInstruction();
         };
-        Cpu.prototype.breakProgram = function () {
+        CPU.prototype.breakProgram = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Terminate the process
@@ -241,7 +246,7 @@ var TSOS;
             // Reset the CPU
             this.resetCPU();
         };
-        Cpu.prototype.compareMemoToX = function () {
+        CPU.prototype.compareMemoToX = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location that we want to compare with the X Register
@@ -255,7 +260,7 @@ var TSOS;
             // Pass over current Op Code
             this.consumeInstruction();
         };
-        Cpu.prototype.branchNBytes = function () {
+        CPU.prototype.branchNBytes = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             if (this.Zflag === 0) {
@@ -277,7 +282,7 @@ var TSOS;
                 this.consumeInstruction();
             }
         };
-        Cpu.prototype.incrementByte = function () {
+        CPU.prototype.incrementByte = function () {
             // Pass over current Op code
             this.consumeInstruction();
             // Fetch the memory location that we want to increment
@@ -299,7 +304,7 @@ var TSOS;
             // Pass over current Op code
             this.consumeInstruction();
         };
-        Cpu.prototype.systemCall = function () {
+        CPU.prototype.systemCall = function () {
             // Pass over current Op Code
             this.consumeInstruction();
             // If the X Register is 1 then print the constant in the Y Register
@@ -321,7 +326,7 @@ var TSOS;
                 }
             }
         };
-        return Cpu;
+        return CPU;
     }());
-    TSOS.Cpu = Cpu;
+    TSOS.CPU = CPU;
 })(TSOS || (TSOS = {}));

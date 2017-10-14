@@ -63,7 +63,21 @@ var TSOS;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
         /* Memory Display Functions */
+        Control.scrollToMemory = function (pcb, id) {
+            // Format Memory Cell Id
+            id = id.substr(1);
+            // Format scrolling div id
+            var scrollingId = "memoryScrolling" + pcb.memoryIndex;
+            // Get the position of the current memory cell
+            var position = document.getElementById(id).offsetTop;
+            // Scroll to position
+            document.getElementById(scrollingId).scrollTop = position;
+        };
         Control.highlightMemory = function (pcb, PC) {
+            // Single highlight Op Codes
+            var sh = ["FF", "00", "EA"];
+            // Double highlight Op Codes
+            var dh = ["A9", "A0", "A2", "D0"];
             // Unhighlight all Op Codes
             Control.unhighlightAll();
             // Get the instruction to see how many characters we need to highlight
@@ -73,12 +87,21 @@ var TSOS;
             var id = "#memory-cell-" + PC;
             var id2 = "#memory-cell-" + (PC + 1);
             var id3 = "#memory-cell-" + (PC + 2);
-            $(id).attr('class', 'currentOp');
             // Determines how many more Op Codes we need to highlight
-            if (instruction !== "EA" && instruction !== "FF" && instruction !== "00")
+            if (sh.indexOf(instruction) > -1) {
+                $(id).attr('class', 'currentOp');
+            }
+            else if (dh.indexOf(instruction) > -1) {
+                $(id).attr('class', 'currentOp');
                 $(id2).attr('class', 'currentOpNext');
-            if (instruction !== "A9" && instruction !== "A2" && instruction !== "A0" && instruction !== "D0" && instruction !== "EA" && instruction !== "FF" && instruction !== "00")
+            }
+            else {
+                $(id).attr('class', 'currentOp');
+                $(id2).attr('class', 'currentOpNext');
                 $(id3).attr('class', 'currentOpNext');
+            }
+            // Scoll to highlighted Op Code
+            Control.scrollToMemory(pcb, id);
         };
         Control.unhighlightAll = function () {
             for (var i = 0; i < _MemorySize; i++) {
@@ -184,6 +207,31 @@ var TSOS;
             }
             return tempArray;
         };
+        /* CPU && Process Display Functions */
+        Control.updateCPUDisplay = function (cpu) {
+            var cpuDisplay = "<tr><td>" + Control.formatHex(cpu.PC) + "</td><td>" + cpu.instruction + "</td><td>" + Control.formatHex(cpu.Acc) + "</td><td>" + Control.formatHex(cpu.Xreg) + "</td><td>" + Control.formatHex(cpu.Yreg) + "</td><td>" + Control.formatHex(cpu.Zflag) + "</td></tr>";
+            $("#cpuDisplay").html(cpuDisplay);
+        };
+        Control.initializeProcessDisplay = function (pcb) {
+            var rowId = "process-row-" + pcb.programId;
+            var processDisplay = "<tr id=\"" + rowId + "\"><td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
+            $('#processDisplay').append(processDisplay);
+        };
+        Control.updateProcessDisplay = function (pcb) {
+            var rowId = "#process-row-" + pcb.programId;
+            var processDisplay = "<td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
+            $(rowId).html(processDisplay);
+        };
+        Control.removeProcessDisplay = function (programId) {
+            var rowId = "#process-row-" + programId;
+            $(rowId).remove();
+        };
+        Control.formatHex = function (input) {
+            var hex = input.toString(16);
+            if (hex.length < 2)
+                hex = "0" + hex;
+            return hex.toUpperCase();
+        };
         //
         // Host Events
         //
@@ -199,8 +247,10 @@ var TSOS;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
-            _CPU = new TSOS.Cpu(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
+            _CPU = new TSOS.CPU(); // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.
             _CPU.init(); //       There's more to do, like dealing with scheduling and such, but this would be a start. Pretty cool.
+            // Initialize CPU Display
+            Control.updateCPUDisplay(_CPU);
             // Initialize Memory Simulation
             _Memory = new TSOS.Memory();
             // ... then set the host clock pulse ...
@@ -249,7 +299,6 @@ var TSOS;
         Control.hostBtnStep_click = function (btn) {
             // Enable execution for one more instruction set
             _CPU.isExecuting = true;
-            console.log("This Ran");
         };
         return Control;
     }());
