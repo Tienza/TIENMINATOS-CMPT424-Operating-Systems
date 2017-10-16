@@ -53,7 +53,7 @@ var TSOS;
         MemoryManager.prototype.writeToMemory = function (memoryIndex, memoryLoc, val) {
             var status = false;
             // Check to see if memory location is still in scope, if not terminate the process
-            if (memoryLoc <= _SegmentSize - 1) {
+            if (memoryLoc < _SegmentSize) {
                 // Write to Memory
                 _Memory.memoryArray[memoryIndex][memoryLoc] = val;
                 // Update the Memory Display

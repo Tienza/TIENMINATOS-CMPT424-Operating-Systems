@@ -58,7 +58,7 @@ module TSOS {
         public writeToMemory(memoryIndex: number, memoryLoc: number, val: string): boolean {
             var status: boolean = false;
             // Check to see if memory location is still in scope, if not terminate the process
-            if (memoryLoc <= _SegmentSize - 1) {
+            if (memoryLoc < _SegmentSize) {
                 // Write to Memory
                 _Memory.memoryArray[memoryIndex][memoryLoc] = val;
                 // Update the Memory Display
