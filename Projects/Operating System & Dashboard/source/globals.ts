@@ -17,9 +17,11 @@ const USER_AGENT = navigator.userAgent; // Extraneous Information about current 
 
 const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
+// Interrupt Constants
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ: number = 1;
+const  CONTEXT_SWITCH_IRQ: number = 2;
 
 
 //
@@ -33,6 +35,7 @@ var _OSclock: number = 0;  // Page 23.
 
 var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
 
+// Memory related global variables
 var _Memory: TSOS.Memory;
 var _MemoryManager: TSOS.MemoryManager;
 var _MemorySize = 768; // 768 bytes, 3 segments of 256 bytes
@@ -69,7 +72,7 @@ var _CommandList = [];
 var _CommandIndex: number = 0;
 
 // Variables for Tab Complete
-var _ShellCommandList: string[] = ["ver","load", "run","date","time","datetime","latlong","whereami","help","shutdown","shiwohoshii","cls","man","trace","rot13","prompt","status"];
+var _ShellCommandList: string[];
 var _TabCompleteList: string[] = _ShellCommandList;
 var _TabCompleteIndex: number = -1;
 
@@ -86,6 +89,9 @@ var _PCBList: TSOS.PCB[] = [];
 
 // Variable for Process Manager
 var _ProcessManager: TSOS.ProcessManager;
+
+// Variable for Scheduler
+var _Scheduler: TSOS.Scheduler;
 
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;

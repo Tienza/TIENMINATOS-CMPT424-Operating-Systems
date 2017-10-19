@@ -38,6 +38,8 @@ var TSOS;
             TSOS.Control.initializeMemoryDisplay();
             // Initialize Process Manager
             _ProcessManager = new TSOS.ProcessManager();
+            // Initialize Scheduler
+            _Scheduler = new TSOS.Scheduler();
             // Load the Keyboard Device Driver
             this.krnTrace("Loading the keyboard device driver.");
             _krnKeyboardDriver = new TSOS.DeviceDriverKeyboard(); // Construct it.
@@ -53,6 +55,7 @@ var TSOS;
             this.krnTrace("Creating and Launching the shell.");
             _OsShell = new TSOS.Shell();
             _OsShell.init();
+            _ShellCommandList = _OsShell.loadCommands();
             // Finally, initiate student testing protocol.
             if (_GLaDOS) {
                 _GLaDOS.afterStartup();
@@ -84,6 +87,7 @@ var TSOS;
             }
             else if (_CPU.isExecuting) {
                 _CPU.cycle();
+                _Scheduler.checkSchedule();
             }
             else {
                 this.krnTrace("Idle");
@@ -117,6 +121,9 @@ var TSOS;
                 case KEYBOARD_IRQ:
                     _krnKeyboardDriver.isr(params); // Kernel mode device driver
                     _StdIn.handleInput();
+                    break;
+                case CONTEXT_SWITCH_IRQ:
+                    _Scheduler.contextSwitch();
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

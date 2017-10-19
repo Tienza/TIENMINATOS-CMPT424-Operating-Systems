@@ -165,7 +165,7 @@ module TSOS {
                     memoryDisplay += "<td>" + memoryLoc + "</td>";
                     // Print all the values in the current collection of 8 instructions
                     for (var k: number = 0; k < memoryPartition[subPartitionCounter].length; k++) {
-                        memoryDisplay += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k] + "</td>";
+                        memoryDisplay += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k].toUpperCase() + "</td>";
                         workingIndex++;
                     }
                     memoryDisplay += "</tr>";
@@ -207,7 +207,7 @@ module TSOS {
                         memoryDisplay += "<td>" + memoryLoc + "</td>";
                         // Print all the values in the current collection of 8 instructions
                         for (var k: number = 0; k < memoryPartition[subPartitionCounter].length; k++) {
-                            memoryDisplay += "<td>" + memoryPartition[subPartitionCounter][k] + "</td>";
+                            memoryDisplay += "<td>" + memoryPartition[subPartitionCounter][k].toUpperCase() + "</td>";
                         }
                         memoryDisplay += "</tr>";
                         // Increment to the next segment
@@ -329,12 +329,12 @@ module TSOS {
 
             if (_SingleStep) {
                 $('#singleStepBtn').attr('class', 'btn btn-danger');
-                $('#singleStepBtn').html("Single Step Mode: ON");
+                $('#singleStepBtn').html("Single Step Mode: <b>ON</b>");
                 (<HTMLButtonElement>document.getElementById("stepOver")).disabled = false;
             }
             else {
                 $('#singleStepBtn').attr('class', 'btn btn-success');
-                $('#singleStepBtn').html("Single Step Mode: OFF");
+                $('#singleStepBtn').html("Single Step Mode: <b>OFF</b>");
                 (<HTMLButtonElement>document.getElementById("stepOver")).disabled = true;
                 if (!_CPU.isExecuting)
                     _CPU.isExecuting = true;

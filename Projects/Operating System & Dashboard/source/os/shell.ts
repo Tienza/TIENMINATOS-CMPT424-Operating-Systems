@@ -42,6 +42,9 @@ module TSOS {
             // run
             sc = new TSOS.ShellCommand(this.shellRun, "run", "<PID> - Run the designated program.");
             this.commandList[this.commandList.length] = sc;
+            // runall
+            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "Run all programs in memory.");
+            this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
             this.commandList[this.commandList.length] = sc;
@@ -89,6 +92,16 @@ module TSOS {
             //
             // Display the initial prompt.
             this.putPrompt();
+        }
+
+        public loadCommands(): string[] {
+            var ShellCommandList: string[] = []
+            // Add all the command strings to the global command list
+            for (var i: number = 0; i < this.commandList.length; i++) {
+                ShellCommandList.push(this.commandList[i].command);
+            }
+
+            return ShellCommandList;
         }
 
         public putPrompt() {
@@ -311,6 +324,14 @@ module TSOS {
             }
             else 
                 _StdOut.putText("Invalid PID. Please try again");
+        }
+
+        public shellRunAll(args) {
+            if (_ProcessManager.processList.length > 0) {
+                _ProcessManager.runAllProcess();
+            }
+            else
+                _StdOut.putText("Memory is empty! Please load processes and try again");
         }
 
         public shellHelp(args) {

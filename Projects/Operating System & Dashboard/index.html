@@ -91,6 +91,7 @@
                                                 </tr>
                                         </thead>
                                 </table>
+                                <br/>
                                 <label>User Program Input</label>
                                 <textarea id="taProgramInput" class="form-control" name="taProgramInput">A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</textarea>
                         </div>
@@ -100,7 +101,7 @@
                                                 <tr>
                                                         <th>
                                                                 <div class="btn-group" role="group" aria-label="...">
-                                                                        <button disabled="disabled" id="singleStepBtn" type="button" class="btn btn-success" onclick="TSOS.Control.hostBtnEnableStep_click(this);">Single Step Mode: OFF</button>
+                                                                        <button disabled="disabled" id="singleStepBtn" type="button" class="btn btn-success" onclick="TSOS.Control.hostBtnEnableStep_click(this);">Single Step Mode: <b>OFF</b></button>
                                                                         <button disabled="disabled" id="stepOver" type="button" class="btn btn-default" onclick="TSOS.Control.hostBtnStep_click(this);">
                                                                                 <i class="fa fa-chevron-right" aria-hidden="true"></i>
                                                                         </button>
@@ -110,15 +111,16 @@
                                         </thead>
                                 </table>
                                 <br/>
+                                <label>Memory Display</label>
 				<ul class="nav nav-tabs" role="tablist">
                                         <li class="active">
-                                                <a id="memory-0-tab" href=".memory0" role="tab" data-toggle="tab">Memory 0</a>
+                                                <a id="memory-0-tab" href=".memory0" role="tab" data-toggle="tab">Segment 0</a>
                                         </li>
 					<li>
-                                                <a id="memory-1-tab" href=".memory1" role="tab" data-toggle="tab">Memory 1</a>
+                                                <a id="memory-1-tab" href=".memory1" role="tab" data-toggle="tab">Segment 1</a>
                                         </li>
                                         <li>
-                                                <a id="memory-2-tab" href=".memory2" role="tab" data-toggle="tab">Memory 2</a>
+                                                <a id="memory-2-tab" href=".memory2" role="tab" data-toggle="tab">Segment 2</a>
                                         </li>
 				</ul>
 				<div class="tab-content" style="font-family: monospace;">
@@ -288,12 +290,14 @@
         <script type="text/javascript" src="dist/os/processControlBlock.js"></script>
         <script type="text/javascript" src="dist/os/memoryManager.js"></script>
         <script type="text/javascript" src="dist/os/processManager.js"></script>
+        <script type="text/javascript" src="dist/os/scheduler.js"></script>
         <!-- Other Routines -->
         <script type="text/javascript" src="dist/utils.js"></script>
         <!-- Uncomment the line below to enable GLaDOS testing. -->
-        <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
+        <!-- <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip0.js"></script>
         <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip1.js"></script>
-        <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip2.js"></script>
+        <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip2.js"></script> -->
+        <script type="text/javascript" src="http://alanclasses.github.io/TSOS/test/glados-ip3.js"></script>
 </body>
 
 </html>

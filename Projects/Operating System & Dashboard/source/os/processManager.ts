@@ -10,13 +10,34 @@ module TSOS {
     
     export class ProcessManager {
 
-        constructor(public processList: {[key: string]: any}[] = []) {
+        constructor(public processList: PCB[] = [],
+                    public readyQueue = new Queue()) {
         }
 
         public currentPCB: TSOS.PCB;
+
+        public processStates: {[key: string]: any} = {
+            "new": "New",
+            "ready": "Ready",
+            "running": "Running",
+            "terminated": "Terminated"
+        }
          
         public runProcess(pcb: PCB): void {
             this.currentPCB = pcb;
+            _CPU.updateCPU();
+            _CPU.isExecuting = true;
+        }
+
+        public runAllProcess(): void {
+            for (var i: number = 0; i < this.processList.length; i++) {
+                var pcb: PCB = this.processList[i];
+                if (pcb.state === this.processStates.new) {
+                    pcb.state = this.processStates.ready;
+                    this.readyQueue.enqueue(pcb);
+                }
+            }
+            this.currentPCB = this.readyQueue.dequeue();
             _CPU.updateCPU();
             _CPU.isExecuting = true;
         }
@@ -42,18 +63,25 @@ module TSOS {
             _MemoryManager.freePartition(pcb.memoryIndex);
             // Remove the process from the processList
             this.removePCB(pcb.programId);
-            // Toggle CPU execution off
-            _CPU.isExecuting = false;
             // Update the Memory Display
             Control.updateMemoryDisplay(pcb.memoryIndex);
             // Remove the Process Display
             Control.removeProcessDisplay(pcb.programId);
             // Show Memory Partitions
             _MemoryManager.showAllPartitions();
-            // Break Line
-            _StdOut.advanceLine();
-            // Insert the prompt
-            _OsShell.putPrompt();
+            // Toggle CPU execution off
+            console.log(_ProcessManager.readyQueue.toString());
+            if (this.readyQueue.isEmpty()) {
+                _CPU.isExecuting = false;
+                // Break Line
+                _StdOut.advanceLine();
+                // Insert the prompt
+                _OsShell.putPrompt();
+            }
+            else if (this.currentPCB.programId === pcb.programId) {
+                // Switch In New Process
+                _Scheduler.loadInNewProcess();
+            }
         }
 
         public getPCB(programId): PCB {

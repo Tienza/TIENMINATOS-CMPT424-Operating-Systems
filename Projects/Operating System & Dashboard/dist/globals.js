@@ -14,9 +14,11 @@ var APP_NAME = "TienminatOS"; // 'cause Bob and I were at a loss for a better na
 var APP_VERSION = "0.01"; // What did you expect?
 var USER_AGENT = navigator.userAgent; // Extraneous Information about current environment.
 var CPU_CLOCK_INTERVAL = 100; // This is in ms (milliseconds) so 1000 = 1 second.
+// Interrupt Constants
 var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
+var CONTEXT_SWITCH_IRQ = 2;
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -25,6 +27,7 @@ var _CPU; // Utilize TypeScript's type annotation system to ensure that _CPU is 
 var _SingleStep = false;
 var _OSclock = 0; // Page 23.
 var _Mode = 0; // (currently unused)  0 = Kernel Mode, 1 = User Mode.  See page 21.
+// Memory related global variables
 var _Memory;
 var _MemoryManager;
 var _MemorySize = 768; // 768 bytes, 3 segments of 256 bytes
@@ -53,7 +56,7 @@ var _MaxXPosition = 537;
 var _CommandList = [];
 var _CommandIndex = 0;
 // Variables for Tab Complete
-var _ShellCommandList = ["ver", "load", "run", "date", "time", "datetime", "latlong", "whereami", "help", "shutdown", "shiwohoshii", "cls", "man", "trace", "rot13", "prompt", "status"];
+var _ShellCommandList;
 var _TabCompleteList = _ShellCommandList;
 var _TabCompleteIndex = -1;
 // Variable for Text Wrap
@@ -66,6 +69,8 @@ var _ProcessCount = 0;
 var _PCBList = [];
 // Variable for Process Manager
 var _ProcessManager;
+// Variable for Scheduler
+var _Scheduler;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
 // Global Device Driver Objects - page 12

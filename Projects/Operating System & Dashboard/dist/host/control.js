@@ -145,7 +145,7 @@ var TSOS;
                     memoryDisplay += "<td>" + memoryLoc + "</td>";
                     // Print all the values in the current collection of 8 instructions
                     for (var k = 0; k < memoryPartition[subPartitionCounter].length; k++) {
-                        memoryDisplay += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k] + "</td>";
+                        memoryDisplay += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k].toUpperCase() + "</td>";
                         workingIndex++;
                     }
                     memoryDisplay += "</tr>";
@@ -186,7 +186,7 @@ var TSOS;
                         memoryDisplay += "<td>" + memoryLoc + "</td>";
                         // Print all the values in the current collection of 8 instructions
                         for (var k = 0; k < memoryPartition[subPartitionCounter].length; k++) {
-                            memoryDisplay += "<td>" + memoryPartition[subPartitionCounter][k] + "</td>";
+                            memoryDisplay += "<td>" + memoryPartition[subPartitionCounter][k].toUpperCase() + "</td>";
                         }
                         memoryDisplay += "</tr>";
                         // Increment to the next segment
@@ -285,12 +285,12 @@ var TSOS;
             _SingleStep = !_SingleStep;
             if (_SingleStep) {
                 $('#singleStepBtn').attr('class', 'btn btn-danger');
-                $('#singleStepBtn').html("Single Step Mode: ON");
+                $('#singleStepBtn').html("Single Step Mode: <b>ON</b>");
                 document.getElementById("stepOver").disabled = false;
             }
             else {
                 $('#singleStepBtn').attr('class', 'btn btn-success');
-                $('#singleStepBtn').html("Single Step Mode: OFF");
+                $('#singleStepBtn').html("Single Step Mode: <b>OFF</b>");
                 document.getElementById("stepOver").disabled = true;
                 if (!_CPU.isExecuting)
                     _CPU.isExecuting = true;

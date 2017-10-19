@@ -63,7 +63,6 @@ var TSOS;
             this.Xreg = 0;
             this.Yreg = 0;
             this.Zflag = 0;
-            this.isExecuting = false;
             this.instruction = "";
         };
         CPU.prototype.executeProgram = function (pcb) {
@@ -112,7 +111,8 @@ var TSOS;
                     this.systemCall();
                     break;
                 default:
-                    this.consumeInstruction();
+                    _StdOut.putText("Invalid Op Code '" + this.instruction + "', Terminating Process " + _ProcessManager.currentPCB.programId);
+                    _ProcessManager.terminateProcess(_ProcessManager.currentPCB);
                     break;
             }
             this.updatePCB(_ProcessManager.currentPCB);
@@ -243,8 +243,6 @@ var TSOS;
             this.consumeInstruction();
             // Terminate the process
             _ProcessManager.terminateProcess(_ProcessManager.currentPCB);
-            // Reset the CPU
-            this.resetCPU();
         };
         CPU.prototype.compareMemoToX = function () {
             // Pass over current Op Code

@@ -7,12 +7,32 @@
 var TSOS;
 (function (TSOS) {
     var ProcessManager = /** @class */ (function () {
-        function ProcessManager(processList) {
+        function ProcessManager(processList, readyQueue) {
             if (processList === void 0) { processList = []; }
+            if (readyQueue === void 0) { readyQueue = new TSOS.Queue(); }
             this.processList = processList;
+            this.readyQueue = readyQueue;
+            this.processStates = {
+                "new": "New",
+                "ready": "Ready",
+                "running": "Running",
+                "terminated": "Terminated"
+            };
         }
         ProcessManager.prototype.runProcess = function (pcb) {
             this.currentPCB = pcb;
+            _CPU.updateCPU();
+            _CPU.isExecuting = true;
+        };
+        ProcessManager.prototype.runAllProcess = function () {
+            for (var i = 0; i < this.processList.length; i++) {
+                var pcb = this.processList[i];
+                if (pcb.state === this.processStates["new"]) {
+                    pcb.state = this.processStates.ready;
+                    this.readyQueue.enqueue(pcb);
+                }
+            }
+            this.currentPCB = this.readyQueue.dequeue();
             _CPU.updateCPU();
             _CPU.isExecuting = true;
         };
@@ -34,18 +54,25 @@ var TSOS;
             _MemoryManager.freePartition(pcb.memoryIndex);
             // Remove the process from the processList
             this.removePCB(pcb.programId);
-            // Toggle CPU execution off
-            _CPU.isExecuting = false;
             // Update the Memory Display
             TSOS.Control.updateMemoryDisplay(pcb.memoryIndex);
             // Remove the Process Display
             TSOS.Control.removeProcessDisplay(pcb.programId);
             // Show Memory Partitions
             _MemoryManager.showAllPartitions();
-            // Break Line
-            _StdOut.advanceLine();
-            // Insert the prompt
-            _OsShell.putPrompt();
+            // Toggle CPU execution off
+            console.log(_ProcessManager.readyQueue.toString());
+            if (this.readyQueue.isEmpty()) {
+                _CPU.isExecuting = false;
+                // Break Line
+                _StdOut.advanceLine();
+                // Insert the prompt
+                _OsShell.putPrompt();
+            }
+            else if (this.currentPCB.programId === pcb.programId) {
+                // Switch In New Process
+                _Scheduler.loadInNewProcess();
+            }
         };
         ProcessManager.prototype.getPCB = function (programId) {
             var pcb;

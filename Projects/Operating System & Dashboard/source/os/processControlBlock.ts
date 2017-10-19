@@ -18,6 +18,7 @@ module TSOS {
                     public instruction: string = "",
                     public isExecuting: boolean = false,
                     public memoryIndex: any = null,
+                    public state: string = "New",
                     public programId: number = _ProcessCount) {
         }
     }

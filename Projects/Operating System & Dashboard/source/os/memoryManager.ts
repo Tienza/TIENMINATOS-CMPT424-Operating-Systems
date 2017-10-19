@@ -31,7 +31,7 @@ module TSOS {
                 // Record which memory index the process was loaded into
                 pcb.memoryIndex = freePartition.memoryIndex;
                 // Update the current instruction to the first instruction available for that memory block
-                pcb.instruction = _MemoryManager.readFromMemory(pcb.memoryIndex, pcb.PC);
+                pcb.instruction = _MemoryManager.readFromMemory(pcb.memoryIndex, pcb.PC).toUpperCase();
                 // Store in the process list
                 _ProcessManager.processList.push(pcb);
                 // Update the Memory Display
