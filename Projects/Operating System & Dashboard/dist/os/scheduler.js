@@ -31,12 +31,13 @@ var TSOS;
             _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();
             _ProcessManager.currentPCB.state = _ProcessManager.processStates.running;
             TSOS.Control.switchMemoryTab(_ProcessManager.currentPCB);
+            TSOS.Control.updateProcessDisplay(_ProcessManager.currentPCB);
             _CPU.updateCPU();
         };
         Scheduler.prototype.loadOutNewProcess = function () {
             _ProcessManager.currentPCB.state = _ProcessManager.processStates.ready;
+            TSOS.Control.updateProcessDisplay(_ProcessManager.currentPCB);
             _ProcessManager.readyQueue.enqueue(_ProcessManager.currentPCB);
-            console.log(_ProcessManager.readyQueue.toString());
         };
         Scheduler.prototype.contextSwitch = function () {
             this.loadOutNewProcess();

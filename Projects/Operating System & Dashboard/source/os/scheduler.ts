@@ -33,13 +33,14 @@ module TSOS {
                 _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();
                 _ProcessManager.currentPCB.state = _ProcessManager.processStates.running;
                 Control.switchMemoryTab(_ProcessManager.currentPCB);
+                Control.updateProcessDisplay(_ProcessManager.currentPCB);
                 _CPU.updateCPU();
             }
 
             public loadOutNewProcess(): void {
                 _ProcessManager.currentPCB.state = _ProcessManager.processStates.ready;
+                Control.updateProcessDisplay(_ProcessManager.currentPCB);
                 _ProcessManager.readyQueue.enqueue(_ProcessManager.currentPCB);
-                console.log(_ProcessManager.readyQueue.toString());
             }
 
             public contextSwitch(): void {

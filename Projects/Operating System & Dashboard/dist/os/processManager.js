@@ -61,7 +61,6 @@ var TSOS;
             // Show Memory Partitions
             _MemoryManager.showAllPartitions();
             // Toggle CPU execution off
-            console.log(_ProcessManager.readyQueue.toString());
             if (this.readyQueue.isEmpty()) {
                 _CPU.isExecuting = false;
                 // Break Line
