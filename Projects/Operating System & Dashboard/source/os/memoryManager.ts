@@ -10,10 +10,10 @@ module TSOS {
     
     export class MemoryManager {
 
-        constructor(public partition: {[key: string]: any}[] = [
-            {isFree: true, memoryIndex: 0, displayId: "#memory0Display", startIndex: 0}, 
-            {isFree: true, memoryIndex: 1, displayId: "#memory1Display", startIndex: 256}, 
-            {isFree: true, memoryIndex: 2, displayId: "#memory2Display", startIndex: 512}]) {
+        constructor(public partitions: {[key: string]: any}[] = [
+            {isFree: true, memoryIndex: 0, displayId: "#memory0Display", base: 0, limit: 255}, 
+            {isFree: true, memoryIndex: 1, displayId: "#memory1Display", base: 256, limit: 511}, 
+            {isFree: true, memoryIndex: 2, displayId: "#memory2Display", base: 512, limit: 767}]) {
         }
 
         public init(): void {
@@ -62,7 +62,7 @@ module TSOS {
                 // Write to Memory
                 _Memory.memoryArray[memoryIndex][memoryLoc] = val;
                 // Update the Memory Display
-                var id = "#memory-cell-" + (memoryLoc + this.partition[memoryIndex].startIndex);
+                var id = "#memory-cell-" + (memoryLoc + this.partitions[memoryIndex].base);
                 $(id).html(val);
                 // Set status of write success to true
                 status = true;
@@ -78,15 +78,31 @@ module TSOS {
         }
 
         public wipeAllPartitions(): void {
+            // Zero fill all partitions
             for (var i: number = 0; i < _Memory.singleMemSize; i++) {
-                _Memory.memory0[i] = "00";
-                _Memory.memory1[i] = "00";
-                _Memory.memory2[i] = "00";
+                _Memory.memoryArray[0][i] = "00";
+                _Memory.memoryArray[1][i] = "00";
+                _Memory.memoryArray[2][i] = "00";
             }
+            
+            // Remove all associated process displays
+            for (var i: number = 0; i < _ProcessManager.processList.length; i++) {
+                Control.removeProcessDisplay(_ProcessManager.processList[i].programId);
+            }
+            _ProcessManager.processList = [];
+
+            // Free all partitions
+            this.freeAllPartitions();
         }
 
         public freePartition(memoryIndex: number): void {
-            this.partition[memoryIndex].isFree = true;
+            this.partitions[memoryIndex].isFree = true;
+        }
+
+        public freeAllPartitions() {
+            this.freePartition(0);
+            this.freePartition(1);
+            this.freePartition(2);
         }
 
         public showAllPartitions(): void {
@@ -98,9 +114,9 @@ module TSOS {
         public checkFreePartition(): {[key: string]: any} {
             var freePartition: {[key: string]: any} = {};
 
-            for (var i: number = 0; i < this.partition.length; i++) {
-                if (this.partition[i].isFree === true) {
-                    freePartition = this.partition[i];
+            for (var i: number = 0; i < this.partitions.length; i++) {
+                if (this.partitions[i].isFree === true) {
+                    freePartition = this.partitions[i];
                     break;
                 }
             }

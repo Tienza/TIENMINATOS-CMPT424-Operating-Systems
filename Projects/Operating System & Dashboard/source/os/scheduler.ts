@@ -44,9 +44,12 @@ module TSOS {
             }
 
             public contextSwitch(): void {
+                var contextSwitchMessage: string = "Context Switch: ProgramId " + _ProcessManager.currentPCB.programId;
                 this.loadOutNewProcess();
                 this.resetCounter();
                 this.loadInNewProcess();
+                contextSwitchMessage += " to ProgramId " + _ProcessManager.currentPCB.programId;
+                _Kernel.krnTrace(contextSwitchMessage);
             }
 
             public resetCounter(): void {

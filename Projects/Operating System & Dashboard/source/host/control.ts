@@ -96,7 +96,7 @@ module TSOS {
             // Get the instruction to see how many characters we need to highlight
             var instruction: string = _ProcessManager.fetchInstruction(pcb, PC);
             // Check to see what offset we need for highlighting
-            PC += _MemoryManager.partition[pcb.memoryIndex].startIndex;
+            PC += _MemoryManager.partitions[pcb.memoryIndex].base;
 
             var id: string = "#memory-cell-" + PC;
             var id2: string = "#memory-cell-" + (PC + 1);
@@ -135,7 +135,7 @@ module TSOS {
 
         public static updateMemoryDisplay(memoryIndex: number): void {
             // See initializeMemoryDisplay() similar but for a specific partition
-            var workingPartition: {[key: string]: any} = _MemoryManager.partition[memoryIndex];
+            var workingPartition: {[key: string]: any} = _MemoryManager.partitions[memoryIndex];
             // Break the array into collection of 8 instructions
             var memoryPartition: string[] = Control.chunkPartition(_Memory.memoryArray[memoryIndex], 8);
             // Initialize the display string
@@ -143,9 +143,9 @@ module TSOS {
             // For looping over the collection of 8 instructions
             var subPartitionCounter: number = -1;
             // The index of the beginning of each collection of 8 instructions
-            var workingSegment: number = workingPartition.startIndex;
+            var workingSegment: number = workingPartition.base;
             // For keeping track of every instruction in this partition of memory
-            var workingIndex: number = workingPartition.startIndex;
+            var workingIndex: number = workingPartition.base;
             // Repeat this actions for all the indices a partitions of memory
             for (var i: number = 0; i < _SegmentSize; i++) {
                 if (i % 8 === 0) {
@@ -178,8 +178,8 @@ module TSOS {
 
         public static initializeMemoryDisplay(): void {
             // For all three partitions, fill the display with zeros and the 8 bit addresses
-            for (var par: number = 0; par < _MemoryManager.partition.length; par++) {
-                var workingPartition: {[key: string]: any} = _MemoryManager.partition[par];
+            for (var par: number = 0; par < _MemoryManager.partitions.length; par++) {
+                var workingPartition: {[key: string]: any} = _MemoryManager.partitions[par];
                 // Break the array into collection of 8 instructions
                 var memoryPartition: string[] = Control.chunkPartition(_Memory.memoryArray[workingPartition.memoryIndex], 8);
                 // Initialize the display string
@@ -187,7 +187,7 @@ module TSOS {
                 // For looping over the collection of 8 instructions
                 var subPartitionCounter: number = -1;
                 // The index of the beginning of each collection of 8 instructions
-                var workingSegment: number = workingPartition.startIndex;
+                var workingSegment: number = workingPartition.base;
                 // Repeat this actions for all the indices a partitions of memory
                 for (var i: number = 0; i < _SegmentSize; i++) {
                     if (i % 8 === 0) {

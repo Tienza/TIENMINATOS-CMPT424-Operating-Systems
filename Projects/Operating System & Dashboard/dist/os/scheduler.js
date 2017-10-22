@@ -40,9 +40,12 @@ var TSOS;
             _ProcessManager.readyQueue.enqueue(_ProcessManager.currentPCB);
         };
         Scheduler.prototype.contextSwitch = function () {
+            var contextSwitchMessage = "Context Switch: ProgramId " + _ProcessManager.currentPCB.programId;
             this.loadOutNewProcess();
             this.resetCounter();
             this.loadInNewProcess();
+            contextSwitchMessage += " to ProgramId " + _ProcessManager.currentPCB.programId;
+            _Kernel.krnTrace(contextSwitchMessage);
         };
         Scheduler.prototype.resetCounter = function () {
             this.counter = 0;

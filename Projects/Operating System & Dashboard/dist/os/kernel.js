@@ -31,13 +31,13 @@ var TSOS;
             // Initialize standard input and output to the _Console.
             _StdIn = _Console;
             _StdOut = _Console;
+            // Initialize Process Manager
+            _ProcessManager = new TSOS.ProcessManager();
             // Initialize MemoryManager
             _MemoryManager = new TSOS.MemoryManager();
             _MemoryManager.init();
             // Initialize Memory Display
             TSOS.Control.initializeMemoryDisplay();
-            // Initialize Process Manager
-            _ProcessManager = new TSOS.ProcessManager();
             // Initialize Scheduler
             _Scheduler = new TSOS.Scheduler();
             // Load the Keyboard Device Driver

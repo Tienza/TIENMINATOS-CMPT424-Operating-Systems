@@ -35,15 +35,15 @@ module TSOS {
             _StdIn  = _Console;
             _StdOut = _Console;
 
+            // Initialize Process Manager
+            _ProcessManager = new ProcessManager();
+
             // Initialize MemoryManager
             _MemoryManager = new MemoryManager();
             _MemoryManager.init();
 
             // Initialize Memory Display
             Control.initializeMemoryDisplay();
-
-            // Initialize Process Manager
-            _ProcessManager = new ProcessManager();
 
              // Initialize Scheduler
              _Scheduler = new Scheduler();

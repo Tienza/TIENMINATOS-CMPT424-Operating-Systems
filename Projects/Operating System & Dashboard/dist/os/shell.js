@@ -40,6 +40,9 @@ var TSOS;
             // runall
             sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "Run all programs in memory.");
             this.commandList[this.commandList.length] = sc;
+            // runall
+            sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "Clear all memory partitions.");
+            this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
             this.commandList[this.commandList.length] = sc;
@@ -249,6 +252,8 @@ var TSOS;
                     var pcb = new TSOS.PCB();
                     _ProcessCount++;
                     _MemoryManager.loadProgram(hexObj.hexVal, pcb);
+                    // Switch to active Memory Tab
+                    TSOS.Control.switchMemoryTab(pcb);
                 }
                 else
                     _StdOut.putText("Please enter valid HEX and try again.");
@@ -305,6 +310,12 @@ var TSOS;
             }
             else
                 _StdOut.putText("Memory is empty! Please load processes and try again");
+        };
+        Shell.prototype.shellClearmem = function (args) {
+            _MemoryManager.wipeAllPartitions();
+            _MemoryManager.showAllPartitions();
+            // Update Memory Display
+            TSOS.Control.initializeMemoryDisplay();
         };
         Shell.prototype.shellHelp = function (args) {
             _StdOut.putText("Commands:");

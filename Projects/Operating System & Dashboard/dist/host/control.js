@@ -83,7 +83,7 @@ var TSOS;
             // Get the instruction to see how many characters we need to highlight
             var instruction = _ProcessManager.fetchInstruction(pcb, PC);
             // Check to see what offset we need for highlighting
-            PC += _MemoryManager.partition[pcb.memoryIndex].startIndex;
+            PC += _MemoryManager.partitions[pcb.memoryIndex].base;
             var id = "#memory-cell-" + PC;
             var id2 = "#memory-cell-" + (PC + 1);
             var id3 = "#memory-cell-" + (PC + 2);
@@ -115,7 +115,7 @@ var TSOS;
         };
         Control.updateMemoryDisplay = function (memoryIndex) {
             // See initializeMemoryDisplay() similar but for a specific partition
-            var workingPartition = _MemoryManager.partition[memoryIndex];
+            var workingPartition = _MemoryManager.partitions[memoryIndex];
             // Break the array into collection of 8 instructions
             var memoryPartition = Control.chunkPartition(_Memory.memoryArray[memoryIndex], 8);
             // Initialize the display string
@@ -123,9 +123,9 @@ var TSOS;
             // For looping over the collection of 8 instructions
             var subPartitionCounter = -1;
             // The index of the beginning of each collection of 8 instructions
-            var workingSegment = workingPartition.startIndex;
+            var workingSegment = workingPartition.base;
             // For keeping track of every instruction in this partition of memory
-            var workingIndex = workingPartition.startIndex;
+            var workingIndex = workingPartition.base;
             // Repeat this actions for all the indices a partitions of memory
             for (var i = 0; i < _SegmentSize; i++) {
                 if (i % 8 === 0) {
@@ -157,8 +157,8 @@ var TSOS;
         };
         Control.initializeMemoryDisplay = function () {
             // For all three partitions, fill the display with zeros and the 8 bit addresses
-            for (var par = 0; par < _MemoryManager.partition.length; par++) {
-                var workingPartition = _MemoryManager.partition[par];
+            for (var par = 0; par < _MemoryManager.partitions.length; par++) {
+                var workingPartition = _MemoryManager.partitions[par];
                 // Break the array into collection of 8 instructions
                 var memoryPartition = Control.chunkPartition(_Memory.memoryArray[workingPartition.memoryIndex], 8);
                 // Initialize the display string
@@ -166,7 +166,7 @@ var TSOS;
                 // For looping over the collection of 8 instructions
                 var subPartitionCounter = -1;
                 // The index of the beginning of each collection of 8 instructions
-                var workingSegment = workingPartition.startIndex;
+                var workingSegment = workingPartition.base;
                 // Repeat this actions for all the indices a partitions of memory
                 for (var i = 0; i < _SegmentSize; i++) {
                     if (i % 8 === 0) {

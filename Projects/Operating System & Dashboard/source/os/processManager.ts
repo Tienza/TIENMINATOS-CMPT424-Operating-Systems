@@ -38,6 +38,9 @@ module TSOS {
                 }
             }
             this.currentPCB = this.readyQueue.dequeue();
+
+            Control.switchMemoryTab(this.currentPCB);
+
             _CPU.updateCPU();
             _CPU.isExecuting = true;
         }
@@ -51,7 +54,11 @@ module TSOS {
 
             // If the writing to memory failed then terminate the process
             if (!writeSuccess) {
-                _StdOut.putText("Memory Access Violation! Terminating Process " + pcb.programId);
+                var accessViolationMsg = "Memory Access Violation! Terminating Process " + pcb.programId;
+                // Break apart string to account for line wrapping
+                for (var i: number = 0; i < accessViolationMsg.length; i++) {
+                    _StdOut.putText(accessViolationMsg[i]);
+                }
                 this.terminateProcess(pcb);
             }
         }

@@ -33,6 +33,7 @@ var TSOS;
                 }
             }
             this.currentPCB = this.readyQueue.dequeue();
+            TSOS.Control.switchMemoryTab(this.currentPCB);
             _CPU.updateCPU();
             _CPU.isExecuting = true;
         };
@@ -43,7 +44,11 @@ var TSOS;
             var writeSuccess = _MemoryManager.writeToMemory(pcb.memoryIndex, memoryLoc, val);
             // If the writing to memory failed then terminate the process
             if (!writeSuccess) {
-                _StdOut.putText("Memory Access Violation! Terminating Process " + pcb.programId);
+                var accessViolationMsg = "Memory Access Violation! Terminating Process " + pcb.programId;
+                // Break apart string to account for line wrapping
+                for (var i = 0; i < accessViolationMsg.length; i++) {
+                    _StdOut.putText(accessViolationMsg[i]);
+                }
                 this.terminateProcess(pcb);
             }
         };

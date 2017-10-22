@@ -7,13 +7,13 @@
 var TSOS;
 (function (TSOS) {
     var MemoryManager = /** @class */ (function () {
-        function MemoryManager(partition) {
-            if (partition === void 0) { partition = [
-                { isFree: true, memoryIndex: 0, displayId: "#memory0Display", startIndex: 0 },
-                { isFree: true, memoryIndex: 1, displayId: "#memory1Display", startIndex: 256 },
-                { isFree: true, memoryIndex: 2, displayId: "#memory2Display", startIndex: 512 }
+        function MemoryManager(partitions) {
+            if (partitions === void 0) { partitions = [
+                { isFree: true, memoryIndex: 0, displayId: "#memory0Display", base: 0, limit: 255 },
+                { isFree: true, memoryIndex: 1, displayId: "#memory1Display", base: 256, limit: 511 },
+                { isFree: true, memoryIndex: 2, displayId: "#memory2Display", base: 512, limit: 767 }
             ]; }
-            this.partition = partition;
+            this.partitions = partitions;
         }
         MemoryManager.prototype.init = function () {
             this.wipeAllPartitions();
@@ -57,7 +57,7 @@ var TSOS;
                 // Write to Memory
                 _Memory.memoryArray[memoryIndex][memoryLoc] = val;
                 // Update the Memory Display
-                var id = "#memory-cell-" + (memoryLoc + this.partition[memoryIndex].startIndex);
+                var id = "#memory-cell-" + (memoryLoc + this.partitions[memoryIndex].base);
                 $(id).html(val);
                 // Set status of write success to true
                 status = true;
@@ -70,14 +70,27 @@ var TSOS;
             }
         };
         MemoryManager.prototype.wipeAllPartitions = function () {
+            // Zero fill all partitions
             for (var i = 0; i < _Memory.singleMemSize; i++) {
-                _Memory.memory0[i] = "00";
-                _Memory.memory1[i] = "00";
-                _Memory.memory2[i] = "00";
+                _Memory.memoryArray[0][i] = "00";
+                _Memory.memoryArray[1][i] = "00";
+                _Memory.memoryArray[2][i] = "00";
             }
+            // Remove all associated process displays
+            for (var i = 0; i < _ProcessManager.processList.length; i++) {
+                TSOS.Control.removeProcessDisplay(_ProcessManager.processList[i].programId);
+            }
+            _ProcessManager.processList = [];
+            // Free all partitions
+            this.freeAllPartitions();
         };
         MemoryManager.prototype.freePartition = function (memoryIndex) {
-            this.partition[memoryIndex].isFree = true;
+            this.partitions[memoryIndex].isFree = true;
+        };
+        MemoryManager.prototype.freeAllPartitions = function () {
+            this.freePartition(0);
+            this.freePartition(1);
+            this.freePartition(2);
         };
         MemoryManager.prototype.showAllPartitions = function () {
             console.log("Memory0", _Memory.memoryArray[0]);
@@ -86,9 +99,9 @@ var TSOS;
         };
         MemoryManager.prototype.checkFreePartition = function () {
             var freePartition = {};
-            for (var i = 0; i < this.partition.length; i++) {
-                if (this.partition[i].isFree === true) {
-                    freePartition = this.partition[i];
+            for (var i = 0; i < this.partitions.length; i++) {
+                if (this.partitions[i].isFree === true) {
+                    freePartition = this.partitions[i];
                     break;
                 }
             }
