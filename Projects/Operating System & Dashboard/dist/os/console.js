@@ -34,7 +34,7 @@ var TSOS;
             this.currentYPosition = this.currentFontSize;
         };
         Console.prototype.handleInput = function () {
-            if (this.buffer !== "") {
+            if (this.buffer !== "" && !_CPU.isExecuting) {
                 var xOffSet = _DrawingContext.measureText(this.currentFont, this.currentFontSize, "_");
                 this.currentXPosition = this.currentXPosition - xOffSet;
                 // Redraw the input in the console
@@ -122,7 +122,7 @@ var TSOS;
                     // console.log(_TabCompleteList);
                 }
             }
-            if (this.buffer !== "")
+            if (this.buffer !== "" && !_CPU.isExecuting)
                 this.putText("_");
         };
         Console.prototype.tabComplete = function (key, array) {

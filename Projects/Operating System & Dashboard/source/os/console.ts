@@ -35,7 +35,7 @@ module TSOS {
         }
 
         public handleInput(): void {
-            if (this.buffer !== "") {
+            if (this.buffer !== "" && !_CPU.isExecuting) {
                 var xOffSet: number = _DrawingContext.measureText(this.currentFont, this.currentFontSize, "_");
                 this.currentXPosition = this.currentXPosition - xOffSet;
                 // Redraw the input in the console
@@ -129,7 +129,7 @@ module TSOS {
                     // console.log(_TabCompleteList);
                 }
             }
-            if (this.buffer !== "")
+            if (this.buffer !== "" && !_CPU.isExecuting)
                 this.putText("_");
         }
 

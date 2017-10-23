@@ -24,6 +24,9 @@ module TSOS {
         }
          
         public runProcess(pcb: PCB): void {
+            // Set PCB state to running
+            pcb.state = this.processStates.running;
+            // Update _ProcessManager and CPU
             this.currentPCB = pcb;
             _CPU.updateCPU();
             _CPU.isExecuting = true;

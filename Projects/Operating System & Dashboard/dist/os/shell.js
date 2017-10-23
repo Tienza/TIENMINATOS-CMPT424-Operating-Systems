@@ -40,7 +40,13 @@ var TSOS;
             // runall
             sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "Run all programs in memory.");
             this.commandList[this.commandList.length] = sc;
-            // runall
+            // ps
+            sc = new TSOS.ShellCommand(this.shellPS, "ps", "Display PID of all active processes.");
+            this.commandList[this.commandList.length] = sc;
+            // kill
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "<PID> - Kill the designated process.");
+            this.commandList[this.commandList.length] = sc;
+            // clearmem
             sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "Clear all memory partitions.");
             this.commandList[this.commandList.length] = sc;
             // date
@@ -310,6 +316,31 @@ var TSOS;
             }
             else
                 _StdOut.putText("Memory is empty! Please load processes and try again");
+        };
+        Shell.prototype.shellPS = function (args) {
+            // Format the list of active processes
+            var ps = "";
+            for (var i = 0; i < _ProcessManager.processList.length; i++) {
+                var currentPCB = _ProcessManager.processList[i];
+                ps += "{PID: " + currentPCB.programId + ", State: " + currentPCB.state + "} | ";
+            }
+            ps = "[" + ps.substr(0, ps.length - 3) + "]";
+            // Print each letter individually to account for line wrapping
+            for (var i = 0; i < ps.length; i++) {
+                _StdOut.putText(ps[i]);
+            }
+        };
+        Shell.prototype.shellKill = function (args) {
+            if (args.length > 0) {
+                var pcb = _ProcessManager.getPCB(parseInt(args[0]));
+                if (pcb) {
+                    _ProcessManager.terminateProcess(pcb);
+                    _StdOut.putText("Process PID: " + pcb.programId + " Successfully Killed");
+                }
+                else {
+                    _StdOut.putText("Specified PID is not active or does not exist");
+                }
+            }
         };
         Shell.prototype.shellClearmem = function (args) {
             _MemoryManager.wipeAllPartitions();
