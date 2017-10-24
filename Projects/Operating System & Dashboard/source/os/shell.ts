@@ -54,6 +54,9 @@ module TSOS {
             // clearmem
             sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "Clear all memory partitions.");
             this.commandList[this.commandList.length] = sc;
+            // quantum
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "<int> Modify the quantum of Round Robin Scheudling");
+            this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
             this.commandList[this.commandList.length] = sc;
@@ -334,7 +337,7 @@ module TSOS {
                 }
             }
             else 
-                _StdOut.putText("Invalid PID. Please try again");
+                _StdOut.putText("Missing/Invalid PID. Please try again");
         }
 
         public shellRunAll(args) {
@@ -350,9 +353,9 @@ module TSOS {
             var ps: string = ""
             for (var i: number = 0; i < _ProcessManager.processList.length; i++) {
                 var currentPCB: PCB = _ProcessManager.processList[i]
-                ps += "{PID: " + currentPCB.programId + ", State: " + currentPCB.state + "} | ";
+                ps += "[PID: " + currentPCB.programId + ", State: " + currentPCB.state + "] | ";
             }
-            ps = "[" + ps.substr(0, ps.length - 3) + "]";
+            ps = ps.substr(0, ps.length - 3);
 
             // Print each letter individually to account for line wrapping
             for (var i: number = 0; i < ps.length; i++) {
@@ -372,6 +375,9 @@ module TSOS {
                     _StdOut.putText("Specified PID is not active or does not exist")
                 }
             }
+            else {
+                _StdOut.putText("Missing/Invalid PID. Please try again");
+            }
         }
 
         public shellClearmem(args) {
@@ -379,6 +385,15 @@ module TSOS {
             _MemoryManager.showAllPartitions();
             // Update Memory Display
             Control.initializeMemoryDisplay();
+        }
+
+        public shellQuantum(args) {
+            if (args.length > 0 && /\d+/.test(args[0])) {
+                _Scheduler.roundRobinQuantum = parseInt(args[0]);
+            }
+            else {
+                _StdOut.putText("Missing/Invalid parameter. Please enter a number and try again");
+            }
         }
 
         public shellHelp(args) {

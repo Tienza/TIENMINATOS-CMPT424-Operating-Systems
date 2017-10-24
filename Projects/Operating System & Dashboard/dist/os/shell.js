@@ -49,6 +49,9 @@ var TSOS;
             // clearmem
             sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "Clear all memory partitions.");
             this.commandList[this.commandList.length] = sc;
+            // quantum
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "<int> Modify the quantum of Round Robin Scheudling");
+            this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
             this.commandList[this.commandList.length] = sc;
@@ -308,7 +311,7 @@ var TSOS;
                 }
             }
             else
-                _StdOut.putText("Invalid PID. Please try again");
+                _StdOut.putText("Missing/Invalid PID. Please try again");
         };
         Shell.prototype.shellRunAll = function (args) {
             if (_ProcessManager.processList.length > 0) {
@@ -322,9 +325,9 @@ var TSOS;
             var ps = "";
             for (var i = 0; i < _ProcessManager.processList.length; i++) {
                 var currentPCB = _ProcessManager.processList[i];
-                ps += "{PID: " + currentPCB.programId + ", State: " + currentPCB.state + "} | ";
+                ps += "[PID: " + currentPCB.programId + ", State: " + currentPCB.state + "] | ";
             }
-            ps = "[" + ps.substr(0, ps.length - 3) + "]";
+            ps = ps.substr(0, ps.length - 3);
             // Print each letter individually to account for line wrapping
             for (var i = 0; i < ps.length; i++) {
                 _StdOut.putText(ps[i]);
@@ -341,12 +344,23 @@ var TSOS;
                     _StdOut.putText("Specified PID is not active or does not exist");
                 }
             }
+            else {
+                _StdOut.putText("Missing/Invalid PID. Please try again");
+            }
         };
         Shell.prototype.shellClearmem = function (args) {
             _MemoryManager.wipeAllPartitions();
             _MemoryManager.showAllPartitions();
             // Update Memory Display
             TSOS.Control.initializeMemoryDisplay();
+        };
+        Shell.prototype.shellQuantum = function (args) {
+            if (args.length > 0 && /\d+/.test(args[0])) {
+                _Scheduler.roundRobinQuantum = parseInt(args[0]);
+            }
+            else {
+                _StdOut.putText("Missing/Invalid parameter. Please enter a number and try again");
+            }
         };
         Shell.prototype.shellHelp = function (args) {
             _StdOut.putText("Commands:");

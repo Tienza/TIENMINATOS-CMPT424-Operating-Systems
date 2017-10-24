@@ -25,7 +25,7 @@ module TSOS {
             }
 
             public processRoundRobin(): void {
-                if (this.counter > this.roundRobinQuantum)
+                if (this.counter >= this.roundRobinQuantum)
                     _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, 0));
             }
 

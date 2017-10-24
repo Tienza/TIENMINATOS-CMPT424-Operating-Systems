@@ -51,6 +51,10 @@ var TSOS;
             TSOS.Control.updateProcessDisplay(_ProcessManager.currentPCB);
             // Update CPU Display
             TSOS.Control.updateCPUDisplay(_CPU);
+            // Update Wait Time of programs in readyQueue
+            _ProcessManager.updateWaitTime();
+            // Update Turn Around Time of programs
+            _ProcessManager.updateTurnAroundTime();
             // Execute instructions
             this.executeProgram(_ProcessManager.currentPCB);
             // Stop after one instruction if Single Step Mode is enabled

@@ -73,6 +73,8 @@ var _ProcessManager;
 var _Scheduler;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode = false;
+// Variable for Wait Time and Turn Around Time Calculator
+var _CalculateWTTAT = false;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
 var _hardwareClockID = null;

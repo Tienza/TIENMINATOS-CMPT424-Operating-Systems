@@ -96,6 +96,9 @@ var _Scheduler: TSOS.Scheduler;
 // At least this OS is not trying to kill you. (Yet.)
 var _SarcasticMode: boolean = false;
 
+// Variable for Wait Time and Turn Around Time Calculator
+var _CalculateWTTAT: boolean = false;
+
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
 

@@ -16,10 +16,12 @@ module TSOS {
                     public Yreg: number = 0,
                     public Zflag: number = 0,
                     public instruction: string = "",
-                    public isExecuting: boolean = false,
+                    public isExecuted: boolean = false,
                     public memoryIndex: any = null,
                     public state: string = "New",
-                    public programId: number = _ProcessCount) {
+                    public programId: number = _ProcessCount,
+                    public waitTime: number = 0,
+                    public turnAroundTime: number = 1) {
         }
     }
 }        

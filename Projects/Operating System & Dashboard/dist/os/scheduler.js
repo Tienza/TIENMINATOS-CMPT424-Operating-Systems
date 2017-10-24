@@ -24,7 +24,7 @@ var TSOS;
             }
         };
         Scheduler.prototype.processRoundRobin = function () {
-            if (this.counter > this.roundRobinQuantum)
+            if (this.counter >= this.roundRobinQuantum)
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, 0));
         };
         Scheduler.prototype.loadInNewProcess = function () {

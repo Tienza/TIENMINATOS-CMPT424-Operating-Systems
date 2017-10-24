@@ -278,6 +278,7 @@ module TSOS {
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
             (<HTMLButtonElement>document.getElementById("singleStepBtn")).disabled = false;
+            (<HTMLButtonElement>document.getElementById("showWTTAT")).disabled = false;
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
@@ -328,12 +329,12 @@ module TSOS {
             _SingleStep = !_SingleStep;
 
             if (_SingleStep) {
-                $('#singleStepBtn').attr('class', 'btn btn-danger');
+                $('#singleStepBtn').attr('class', 'btn btn-success');
                 $('#singleStepBtn').html("Single Step Mode: <b>ON</b>");
                 (<HTMLButtonElement>document.getElementById("stepOver")).disabled = false;
             }
             else {
-                $('#singleStepBtn').attr('class', 'btn btn-success');
+                $('#singleStepBtn').attr('class', 'btn btn-danger');
                 $('#singleStepBtn').html("Single Step Mode: <b>OFF</b>");
                 (<HTMLButtonElement>document.getElementById("stepOver")).disabled = true;
                 if (!_CPU.isExecuting)
@@ -344,6 +345,19 @@ module TSOS {
         public static hostBtnStep_click(btn): void {
             // Enable execution for one more instruction set
             _CPU.isExecuting = true;
+        }
+
+        public static hostBtnWTTAT_click(btn): void {
+            _CalculateWTTAT = !_CalculateWTTAT;
+
+            if (_CalculateWTTAT) {
+                $('#showWTTAT').attr('class', 'btn btn-success');
+                $('#showWTTAT').html("Show WT/TAT: <b>ON</b>");
+            }
+            else {
+                $('#showWTTAT').attr('class', 'btn btn-danger');
+                $('#showWTTAT').html("Show WT/TAT: <b>OFF</b>");
+            }
         }
     }
 }

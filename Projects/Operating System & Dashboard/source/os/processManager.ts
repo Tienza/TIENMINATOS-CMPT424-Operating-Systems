@@ -11,6 +11,7 @@ module TSOS {
     export class ProcessManager {
 
         constructor(public processList: PCB[] = [],
+                    public terminatedList: PCB[] = [],
                     public readyQueue = new Queue()) {
         }
 
@@ -67,10 +68,14 @@ module TSOS {
         }
 
         public terminateProcess(pcb: PCB): void {
+            // Set PCB isExecuted to true
+            pcb.isExecuted = true;
             // Wipe the associated memory partition
             _MemoryManager.wipeParition(pcb.memoryIndex);
             // Free the associated memory partition
             _MemoryManager.freePartition(pcb.memoryIndex);
+            // Add the process to the terminatedList
+            this.terminatedList.push(pcb);
             // Remove the process from the processList
             this.removePCB(pcb.programId);
             // Update the Memory Display
@@ -82,6 +87,8 @@ module TSOS {
             // Toggle CPU execution off
             if (this.readyQueue.isEmpty()) {
                 _CPU.isExecuting = false;
+                // Print Wait Time and Turn Around Time
+                this.printWTTAT();
                 // Break Line
                 _StdOut.advanceLine();
                 // Insert the prompt
@@ -91,6 +98,41 @@ module TSOS {
                 // Switch In New Process
                 _Scheduler.loadInNewProcess();
             }
+        }
+
+        public printWTTAT(): void {
+            if (_CalculateWTTAT) {
+                _StdOut.advanceLine();
+                _StdOut.putText("~~~~~~~~~~~~~~~~~~~~~");
+                for (var i: number = 0; i < this.terminatedList.length; i++) {
+                    var pcb: PCB = this.terminatedList[i];
+                    _StdOut.advanceLine();
+                    _StdOut.putText("PID: " + pcb.programId);
+                    _StdOut.advanceLine();
+                    _StdOut.putText("Wait Time: " + pcb.waitTime + " cycles");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("Turn Around Time: " + pcb.turnAroundTime + " cycles");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("~~~~~~~~~~~~~~~~~~~~~");
+                }
+            }
+            // Clear terminated process list
+            this.terminatedList = [];
+        }
+
+        public updateWaitTime(): void {
+            for (var i: number = 0; i < this.readyQueue.getSize(); i++) {
+                this.readyQueue.q[i].waitTime += 1;
+            }
+        }
+
+        public updateTurnAroundTime(): void {
+            // Update Turn Around Time of programs in the readyQueue
+            for (var i: number = 0; i < this.readyQueue.getSize(); i++) {
+                this.readyQueue.q[i].turnAroundTime += 1;
+            }
+            // Update Turn Around Time of current program
+            this.currentPCB.turnAroundTime += 1;
         }
 
         public getPCB(programId): PCB {

@@ -244,6 +244,7 @@ var TSOS;
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
             document.getElementById("singleStepBtn").disabled = false;
+            document.getElementById("showWTTAT").disabled = false;
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
@@ -284,12 +285,12 @@ var TSOS;
             // Enable and Disable Single Step Mode
             _SingleStep = !_SingleStep;
             if (_SingleStep) {
-                $('#singleStepBtn').attr('class', 'btn btn-danger');
+                $('#singleStepBtn').attr('class', 'btn btn-success');
                 $('#singleStepBtn').html("Single Step Mode: <b>ON</b>");
                 document.getElementById("stepOver").disabled = false;
             }
             else {
-                $('#singleStepBtn').attr('class', 'btn btn-success');
+                $('#singleStepBtn').attr('class', 'btn btn-danger');
                 $('#singleStepBtn').html("Single Step Mode: <b>OFF</b>");
                 document.getElementById("stepOver").disabled = true;
                 if (!_CPU.isExecuting)
@@ -299,6 +300,17 @@ var TSOS;
         Control.hostBtnStep_click = function (btn) {
             // Enable execution for one more instruction set
             _CPU.isExecuting = true;
+        };
+        Control.hostBtnWTTAT_click = function (btn) {
+            _CalculateWTTAT = !_CalculateWTTAT;
+            if (_CalculateWTTAT) {
+                $('#showWTTAT').attr('class', 'btn btn-success');
+                $('#showWTTAT').html("Show WT/TAT: <b>ON</b>");
+            }
+            else {
+                $('#showWTTAT').attr('class', 'btn btn-danger');
+                $('#showWTTAT').html("Show WT/TAT: <b>OFF</b>");
+            }
         };
         return Control;
     }());

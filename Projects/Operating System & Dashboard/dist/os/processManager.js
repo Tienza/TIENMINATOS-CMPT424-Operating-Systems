@@ -7,10 +7,12 @@
 var TSOS;
 (function (TSOS) {
     var ProcessManager = /** @class */ (function () {
-        function ProcessManager(processList, readyQueue) {
+        function ProcessManager(processList, terminatedList, readyQueue) {
             if (processList === void 0) { processList = []; }
+            if (terminatedList === void 0) { terminatedList = []; }
             if (readyQueue === void 0) { readyQueue = new TSOS.Queue(); }
             this.processList = processList;
+            this.terminatedList = terminatedList;
             this.readyQueue = readyQueue;
             this.processStates = {
                 "new": "New",
@@ -56,10 +58,14 @@ var TSOS;
             }
         };
         ProcessManager.prototype.terminateProcess = function (pcb) {
+            // Set PCB isExecuted to true
+            pcb.isExecuted = true;
             // Wipe the associated memory partition
             _MemoryManager.wipeParition(pcb.memoryIndex);
             // Free the associated memory partition
             _MemoryManager.freePartition(pcb.memoryIndex);
+            // Add the process to the terminatedList
+            this.terminatedList.push(pcb);
             // Remove the process from the processList
             this.removePCB(pcb.programId);
             // Update the Memory Display
@@ -71,6 +77,8 @@ var TSOS;
             // Toggle CPU execution off
             if (this.readyQueue.isEmpty()) {
                 _CPU.isExecuting = false;
+                // Print Wait Time and Turn Around Time
+                this.printWTTAT();
                 // Break Line
                 _StdOut.advanceLine();
                 // Insert the prompt
@@ -80,6 +88,38 @@ var TSOS;
                 // Switch In New Process
                 _Scheduler.loadInNewProcess();
             }
+        };
+        ProcessManager.prototype.printWTTAT = function () {
+            if (_CalculateWTTAT) {
+                _StdOut.advanceLine();
+                _StdOut.putText("~~~~~~~~~~~~~~~~~~~~~");
+                for (var i = 0; i < this.terminatedList.length; i++) {
+                    var pcb = this.terminatedList[i];
+                    _StdOut.advanceLine();
+                    _StdOut.putText("PID: " + pcb.programId);
+                    _StdOut.advanceLine();
+                    _StdOut.putText("Wait Time: " + pcb.waitTime + " cycles");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("Turn Around Time: " + pcb.turnAroundTime + " cycles");
+                    _StdOut.advanceLine();
+                    _StdOut.putText("~~~~~~~~~~~~~~~~~~~~~");
+                }
+            }
+            // Clear terminated process list
+            this.terminatedList = [];
+        };
+        ProcessManager.prototype.updateWaitTime = function () {
+            for (var i = 0; i < this.readyQueue.getSize(); i++) {
+                this.readyQueue.q[i].waitTime += 1;
+            }
+        };
+        ProcessManager.prototype.updateTurnAroundTime = function () {
+            // Update Turn Around Time of programs in the readyQueue
+            for (var i = 0; i < this.readyQueue.getSize(); i++) {
+                this.readyQueue.q[i].turnAroundTime += 1;
+            }
+            // Update Turn Around Time of current program
+            this.currentPCB.turnAroundTime += 1;
         };
         ProcessManager.prototype.getPCB = function (programId) {
             var pcb;
