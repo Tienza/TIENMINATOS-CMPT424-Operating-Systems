@@ -62,7 +62,7 @@ module TSOS {
                 // Write to Memory
                 _Memory.memoryArray[memoryIndex][memoryLoc] = val;
                 // Update the Memory Display
-                var id = "#memory-cell-" + (memoryLoc + this.partitions[memoryIndex].base);
+                var id: string = "#memory-cell-" + (memoryLoc + this.partitions[memoryIndex].base);
                 $(id).html(val);
                 $(id).attr('class', 'writeToLoc');
                 // Set status of write success to true

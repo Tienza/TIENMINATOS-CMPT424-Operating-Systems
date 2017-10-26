@@ -101,3 +101,7 @@ textarea {
 .writeToLoc {
   color: #337ab7;
 }
+
+.readFromLoc {
+  color: #f0ad4e;
+}
