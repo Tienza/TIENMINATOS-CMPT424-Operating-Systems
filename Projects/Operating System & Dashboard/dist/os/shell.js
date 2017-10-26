@@ -291,7 +291,7 @@ var TSOS;
                     for (var i = workingArray.length; i < _SegmentSize; i++) {
                         workingArray.push("00");
                     }
-                    workingString = workingArray.join(" ");
+                    workingString = workingArray.join(" ").toUpperCase();
                 }
                 else {
                     workingString = "Overflow";

@@ -59,6 +59,7 @@ var TSOS;
                 // Update the Memory Display
                 var id = "#memory-cell-" + (memoryLoc + this.partitions[memoryIndex].base);
                 $(id).html(val);
+                $(id).attr('class', 'writeToLoc');
                 // Set status of write success to true
                 status = true;
             }
