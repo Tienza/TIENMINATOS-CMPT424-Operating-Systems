@@ -50,11 +50,11 @@ module TSOS {
         }
 
         public fetchInstruction(pcb: PCB, PC: number): string {
-            return _MemoryManager.readFromMemory(pcb.memoryIndex, PC);
+            return _MemoryAccessor.readFromMemory(pcb.memoryIndex, PC);
         }
 
         public writeInstruction(pcb: PCB, memoryLoc: number, val: string): void {
-            var writeSuccess: boolean = _MemoryManager.writeToMemory(pcb.memoryIndex, memoryLoc, val);
+            var writeSuccess: boolean = _MemoryAccessor.writeToMemory(pcb.memoryIndex, memoryLoc, val);
 
             // If the writing to memory failed then terminate the process
             if (!writeSuccess) {

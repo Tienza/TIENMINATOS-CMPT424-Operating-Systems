@@ -37,6 +37,7 @@ var _Mode: number = 0;     // (currently unused)  0 = Kernel Mode, 1 = User Mode
 
 // Memory related global variables
 var _Memory: TSOS.Memory;
+var _MemoryAccessor: TSOS.MemoryAccessor;
 var _MemoryManager: TSOS.MemoryManager;
 var _MemorySize = 768; // 768 bytes, 3 segments of 256 bytes
 var _SegmentSize = 256;

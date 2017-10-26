@@ -31,7 +31,7 @@ module TSOS {
                 // Record which memory index the process was loaded into
                 pcb.memoryIndex = freePartition.memoryIndex;
                 // Update the current instruction to the first instruction available for that memory block
-                pcb.instruction = _MemoryManager.readFromMemory(pcb.memoryIndex, pcb.PC).toUpperCase();
+                pcb.instruction = _MemoryAccessor.readFromMemory(pcb.memoryIndex, pcb.PC).toUpperCase();
                 // Store in the process list
                 _ProcessManager.processList.push(pcb);
                 // Update the Memory Display
@@ -49,27 +49,6 @@ module TSOS {
             else {
                 _StdOut.putText("Memory partitions are full");
             }
-        }
-
-        public readFromMemory(memoryIndex: number, PC: number): string {
-            return _Memory.memoryArray[memoryIndex][PC];
-        }
-
-        public writeToMemory(memoryIndex: number, memoryLoc: number, val: string): boolean {
-            var status: boolean = false;
-            // Check to see if memory location is still in scope, if not terminate the process
-            if (memoryLoc < _SegmentSize) {
-                // Write to Memory
-                _Memory.memoryArray[memoryIndex][memoryLoc] = val;
-                // Update the Memory Display
-                var id: string = "#memory-cell-" + (memoryLoc + this.partitions[memoryIndex].base);
-                $(id).html(val);
-                $(id).attr('class', 'writeToLoc');
-                // Set status of write success to true
-                status = true;
-            }
-
-            return status;
         }
 
         public wipeParition(memoryIndex: number): void {

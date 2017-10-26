@@ -254,6 +254,8 @@ var TSOS;
             Control.updateCPUDisplay(_CPU);
             // Initialize Memory Simulation
             _Memory = new TSOS.Memory();
+            // Initialize Memory Accessor
+            _MemoryAccessor = new TSOS.MemoryAccessor();
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(TSOS.Devices.hostClockPulse, CPU_CLOCK_INTERVAL);
             // .. and call the OS Kernel Bootstrap routine.

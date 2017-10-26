@@ -292,6 +292,9 @@ module TSOS {
 
             // Initialize Memory Simulation
             _Memory = new Memory();
+            
+            // Initialize Memory Accessor
+            _MemoryAccessor = new MemoryAccessor();
 
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);

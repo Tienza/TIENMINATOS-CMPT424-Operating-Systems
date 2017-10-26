@@ -43,10 +43,10 @@ var TSOS;
             _CPU.isExecuting = true;
         };
         ProcessManager.prototype.fetchInstruction = function (pcb, PC) {
-            return _MemoryManager.readFromMemory(pcb.memoryIndex, PC);
+            return _MemoryAccessor.readFromMemory(pcb.memoryIndex, PC);
         };
         ProcessManager.prototype.writeInstruction = function (pcb, memoryLoc, val) {
-            var writeSuccess = _MemoryManager.writeToMemory(pcb.memoryIndex, memoryLoc, val);
+            var writeSuccess = _MemoryAccessor.writeToMemory(pcb.memoryIndex, memoryLoc, val);
             // If the writing to memory failed then terminate the process
             if (!writeSuccess) {
                 var accessViolationMsg = "Memory Access Violation! Terminating Process " + pcb.programId;
