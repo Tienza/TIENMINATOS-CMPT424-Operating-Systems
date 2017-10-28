@@ -83,6 +83,8 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
             // cls
             sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
+            // clear
+            sc = new TSOS.ShellCommand(this.shellCls, "clear", "- Alias for \"cls\".");
             this.commandList[this.commandList.length] = sc;
             // man <topic>
             sc = new TSOS.ShellCommand(this.shellMan, "man", "<topic> - Displays the MANual page for <topic>.");
@@ -385,14 +387,16 @@ module TSOS {
             _MemoryManager.showAllPartitions();
             // Update Memory Display
             Control.initializeMemoryDisplay();
+            _StdOut.putText("All memory partitions successfully cleared");
         }
 
         public shellQuantum(args) {
             if (args.length > 0 && /\d+/.test(args[0])) {
+                _StdOut.putText("Quantum changed from " + _Scheduler.roundRobinQuantum + " cycles to " + args[0] + " cycles")
                 _Scheduler.roundRobinQuantum = parseInt(args[0]);
             }
             else {
-                _StdOut.putText("Missing/Invalid parameter. Please enter a number and try again");
+                _StdOut.putText("Current Quantum: " + _Scheduler.roundRobinQuantum + " cycles");
             }
         }
 
