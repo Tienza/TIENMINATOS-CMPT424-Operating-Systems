@@ -63,6 +63,20 @@ var TSOS;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
         /* Memory Display Functions */
+        Control.placeDebugger = function (id) {
+            var opCodes = ["A9", "AD", "8D", "6D", "A2", "AE", "A0", "AC", "EA", "EC", "D0", "EE", "FF"];
+            var workingIndex = _Debuggers.indexOf(id);
+            if (workingIndex < 0) {
+                if (opCodes.indexOf($(id).html()) > -1) {
+                    $(id).addClass('debugger');
+                    _Debuggers.push(id);
+                }
+            }
+            else {
+                $(id).removeClass('debugger');
+                _Debuggers.splice(workingIndex, 1);
+            }
+        };
         Control.scrollToMemory = function (pcb, id) {
             // Format Memory Cell Id
             id = id.substr(1);
@@ -89,16 +103,16 @@ var TSOS;
             var id3 = "#memory-cell-" + (PC + 2);
             // Determines how many more Op Codes we need to highlight
             if (sh.indexOf(instruction) > -1) {
-                $(id).attr('class', 'currentOp');
+                $(id).addClass('currentOp');
             }
             else if (dh.indexOf(instruction) > -1) {
-                $(id).attr('class', 'currentOp');
-                $(id2).attr('class', 'currentOpNext');
+                $(id).addClass('currentOp');
+                $(id2).addClass('currentOpNext');
             }
             else {
-                $(id).attr('class', 'currentOp');
-                $(id2).attr('class', 'currentOpNext');
-                $(id3).attr('class', 'currentOpNext');
+                $(id).addClass('currentOp');
+                $(id2).addClass('currentOpNext');
+                $(id3).addClass('currentOpNext');
             }
             // Scoll to highlighted Op Code
             Control.scrollToMemory(pcb, id);
@@ -106,7 +120,14 @@ var TSOS;
         Control.unhighlightAll = function () {
             for (var i = 0; i < _MemorySize; i++) {
                 var id = "#memory-cell-" + i;
+                var debugId = undefined;
+                // Check if cell is debugger
+                if ($(id).hasClass('debugger'))
+                    debugId = id;
                 $(id).attr('class', '');
+                // If debugger is defined then highlight the background
+                if (debugId)
+                    $(debugId).attr('class', 'debugger');
             }
         };
         Control.switchMemoryTab = function (pcb) {
@@ -145,7 +166,7 @@ var TSOS;
                     memoryDisplay += "<td>" + memoryLoc + "</td>";
                     // Print all the values in the current collection of 8 instructions
                     for (var k = 0; k < memoryPartition[subPartitionCounter].length; k++) {
-                        memoryDisplay += "<td id=\"memory-cell-" + workingIndex + "\">" + memoryPartition[subPartitionCounter][k].toUpperCase() + "</td>";
+                        memoryDisplay += "<td id=\"memory-cell-" + workingIndex + "\" onclick=\"TSOS.Control.placeDebugger('#memory-cell-" + workingIndex + "')\">" + memoryPartition[subPartitionCounter][k].toUpperCase() + "</td>";
                         workingIndex++;
                     }
                     memoryDisplay += "</tr>";

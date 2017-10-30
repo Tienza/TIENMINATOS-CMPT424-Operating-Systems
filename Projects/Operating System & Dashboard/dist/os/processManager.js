@@ -77,6 +77,8 @@ var TSOS;
             // Toggle CPU execution off
             if (this.readyQueue.isEmpty()) {
                 _CPU.isExecuting = false;
+                // Remove All Debuggers
+                _Debuggers = [];
                 // Print Wait Time and Turn Around Time
                 this.printWTTAT();
                 // Break Line

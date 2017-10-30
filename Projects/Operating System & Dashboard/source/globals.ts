@@ -42,6 +42,9 @@ var _MemoryManager: TSOS.MemoryManager;
 var _MemorySize = 768; // 768 bytes, 3 segments of 256 bytes
 var _SegmentSize = 256;
 
+// Debugger variables, references Memory
+var _Debuggers: string[] = [];
+
 var _Canvas: HTMLCanvasElement;         // Initialized in Control.hostInit().
 var _DrawingContext: any; // = _Canvas.getContext("2d");  // Assigned here for type safety, but re-initialized in Control.hostInit() for OCD and logic.
 var _DefaultFontFamily: string = "sans";        // Ignored, I think. The was just a place-holder in 2008, but the HTML canvas may have use for it.

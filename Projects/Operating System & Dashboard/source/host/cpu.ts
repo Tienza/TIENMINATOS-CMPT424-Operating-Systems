@@ -72,6 +72,11 @@ module TSOS {
         public executeProgram(pcb: PCB) {
             this.instruction = _ProcessManager.fetchInstruction(pcb, this.PC);
 
+            var cellId: string = "#memory-cell-" + (this.PC + _MemoryManager.partitions[pcb.memoryIndex].base);
+            if (_Debuggers.indexOf(cellId) > -1 && _SingleStep === false) {
+                $('#singleStepBtn').click();
+            }
+
             switch (this.instruction) {
                 case "A9":
                     this.loadAccWithConst();

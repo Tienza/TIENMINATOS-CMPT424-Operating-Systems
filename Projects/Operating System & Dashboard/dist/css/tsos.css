@@ -34,6 +34,10 @@ textarea {
   resize: none;
 }
 
+td {
+  cursor: pointer;
+}
+
 #canvasScroll {
   border: 1px solid #CCCCCC;
   border-radius: 5px;
@@ -90,6 +94,10 @@ textarea {
   text-align: center;
 }
 
+.debugger {
+  background-color: #FD8A10
+}
+
 .currentOp {
   color: #D9534F;
 }
@@ -99,9 +107,9 @@ textarea {
 }
 
 .writeToLoc {
-  color: #337ab7;
+  color: #337AB7;
 }
 
 .readFromLoc {
-  color: #f0ad4e;
+  color: #F0AD4E;
 }
