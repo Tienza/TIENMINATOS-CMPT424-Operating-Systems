@@ -132,6 +132,15 @@ var TSOS;
             }
             return pcb;
         };
+        ProcessManager.prototype.getPCBbyParition = function (memoryIndex) {
+            var pcb;
+            // Retrieve the PCB at the specified partition
+            for (var i = 0; i < this.processList.length; i++) {
+                if (this.processList[i].memoryIndex === memoryIndex)
+                    pcb = this.processList[i];
+            }
+            return pcb;
+        };
         ProcessManager.prototype.removePCB = function (programId) {
             // Find the PCB with the programId and remove it from the processList
             for (var i = 0; i < this.processList.length; i++) {

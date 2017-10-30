@@ -83,6 +83,7 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
             // cls
             sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
+            this.commandList[this.commandList.length] = sc;
             // clear
             sc = new TSOS.ShellCommand(this.shellCls, "clear", "- Alias for \"cls\".");
             this.commandList[this.commandList.length] = sc;
@@ -383,11 +384,31 @@ module TSOS {
         }
 
         public shellClearmem(args) {
-            _MemoryManager.wipeAllPartitions();
-            _MemoryManager.showAllPartitions();
-            // Update Memory Display
-            Control.initializeMemoryDisplay();
-            _StdOut.putText("All memory partitions successfully cleared");
+            if (args.length > 0 && /\d+/.test(args[0])) {
+                var partition: number = parseInt(args[0]);
+                var pcb: PCB = _ProcessManager.getPCBbyParition(partition);
+                if ([0, 1, 2].indexOf(partition) > -1 && pcb) {
+                    _MemoryManager.wipeParition(partition);
+                    _MemoryManager.showAllPartitions();
+                    _MemoryManager.freePartition(partition)
+                    // Remove the PCB stored at that location
+                    _ProcessManager.removePCB(pcb.programId);
+                    Control.removeProcessDisplay(pcb.programId)
+                    // Update Memory Display
+                    Control.updateMemoryDisplay(partition);
+                    _StdOut.putText("Memory partition " + partition + " successfully cleared");
+                }
+                else {
+                    _StdOut.putText("Invalid partition number: " + partition + ". Please try again")
+                }
+            }
+            else {
+                _MemoryManager.wipeAllPartitions();
+                _MemoryManager.showAllPartitions();
+                // Update Memory Display
+                Control.initializeMemoryDisplay();
+                _StdOut.putText("All memory partitions successfully cleared");
+            }
         }
 
         public shellQuantum(args) {

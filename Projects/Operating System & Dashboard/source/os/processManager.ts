@@ -138,14 +138,22 @@ module TSOS {
         }
 
         public getPCB(programId): PCB {
-            var pcb
-
+            var pcb: PCB;
             // Retrieve the PCB specified by the user
             for (var i: number = 0; i < this.processList.length; i++) {
                 if (this.processList[i].programId === programId)
                     pcb = this.processList[i];
             }
+            return pcb;
+        }
 
+        public getPCBbyParition(memoryIndex: number) {
+            var pcb: PCB;
+            // Retrieve the PCB at the specified partition
+            for (var i: number = 0; i < this.processList.length; i++) {
+                if (this.processList[i].memoryIndex === memoryIndex)
+                    pcb = this.processList[i]
+            }
             return pcb;
         }
 
