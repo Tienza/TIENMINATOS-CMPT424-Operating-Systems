@@ -31,6 +31,8 @@ var TSOS;
                 pcb.instruction = _MemoryAccessor.readFromMemory(pcb.memoryIndex, pcb.PC).toUpperCase();
                 // Store in the process list
                 _ProcessManager.processList.push(pcb);
+                // Predict the bust time
+                pcb.predictedBurstTime = _ProcessManager.removeAllZeros(userProgram).length;
                 // Update the Memory Display
                 TSOS.Control.updateMemoryDisplay(freePartition.memoryIndex);
                 // Update the Process Display
@@ -39,7 +41,6 @@ var TSOS;
                 console.log("_Memory Partition: " + freePartition.memoryIndex);
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree);
                 this.showAllPartitions();
-                // console.log("PCBList", _ProcessManager.processList);
                 // Output PID to canvas
                 _StdOut.putText("Program Loaded Successfully. PID: " + pcb.programId);
             }

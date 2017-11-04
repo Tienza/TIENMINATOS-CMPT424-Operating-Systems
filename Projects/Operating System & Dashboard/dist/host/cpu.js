@@ -55,6 +55,8 @@ var TSOS;
             _ProcessManager.updateWaitTime();
             // Update Turn Around Time of programs
             _ProcessManager.updateTurnAroundTime();
+            // Update Burst Time of current PCB
+            _ProcessManager.updateBurstTime();
             // Execute instructions
             this.executeProgram(_ProcessManager.currentPCB);
             // Stop after one instruction if Single Step Mode is enabled

@@ -41,6 +41,11 @@ module TSOS {
                     this.readyQueue.enqueue(pcb);
                 }
             }
+
+            // If Shorted Job First then reorder the readyQueue
+            if (_Scheduler.algorithm === "sjf")
+                _Scheduler.processShortestJobFirst();
+
             this.currentPCB = this.readyQueue.dequeue();
 
             Control.switchMemoryTab(this.currentPCB);
@@ -104,8 +109,13 @@ module TSOS {
 
         public printWTTAT(): void {
             if (_CalculateWTTAT) {
+                var divider: string = "~~~~~~~~~~~~~~~~~~~~~~~~~";
+                // Declare variables for effeciency test
+                var totalWaitTime: number = 0;
+                var totalTurnAroundTime: number = 0;
+                // Print Wait Time and Turn Around Time
                 _StdOut.advanceLine();
-                _StdOut.putText("~~~~~~~~~~~~~~~~~~~~~");
+                _StdOut.putText(divider);
                 for (var i: number = 0; i < this.terminatedList.length; i++) {
                     var pcb: PCB = this.terminatedList[i];
                     _StdOut.advanceLine();
@@ -113,13 +123,29 @@ module TSOS {
                     _StdOut.advanceLine();
                     _StdOut.putText("Wait Time: " + pcb.waitTime + " cycles");
                     _StdOut.advanceLine();
+                    _StdOut.putText("Burst Time: " + pcb.burstTime + " cycles");
+                    _StdOut.advanceLine();
                     _StdOut.putText("Turn Around Time: " + pcb.turnAroundTime + " cycles");
                     _StdOut.advanceLine();
-                    _StdOut.putText("~~~~~~~~~~~~~~~~~~~~~");
+                    _StdOut.putText(divider);
+                    // Add calculated values to total calculation
+                    totalWaitTime += pcb.waitTime;
+                    totalTurnAroundTime += pcb.turnAroundTime;
                 }
+                _StdOut.advanceLine();
+                _StdOut.putText("Total Wait Time: " + totalWaitTime + " cycles");
+                _StdOut.advanceLine();
+                _StdOut.putText("Total Turn Around Time: " + totalTurnAroundTime + " cycles");
+                _StdOut.advanceLine();
+                _StdOut.putText(divider);
             }
             // Clear terminated process list
             this.terminatedList = [];
+        }
+
+        public removeAllZeros(userProgram: string[]): string[] {
+            var predictedBurstProgram = userProgram.filter(function(a){return a !== '00'});
+            return predictedBurstProgram;
         }
 
         public updateWaitTime(): void {
@@ -135,6 +161,11 @@ module TSOS {
             }
             // Update Turn Around Time of current program
             this.currentPCB.turnAroundTime += 1;
+        }
+
+        public updateBurstTime(): void {
+            // Update Burst Time of current PCB
+            this.currentPCB.burstTime += 1;
         }
 
         public getPCB(programId): PCB {

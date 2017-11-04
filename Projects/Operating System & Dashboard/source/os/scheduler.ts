@@ -12,14 +12,19 @@ module TSOS {
     
             constructor(public roundRobinQuantum: number = 6,
                         public counter: number = 0,
-                        public algorithm: string = "roundRobin") {
+                        public algorithm: string = "rr",
+                        public algoType: string[] = ["rr", "sjf", "fcfs", "priority"],
+                        public aFullName: string[] = ["Round Robin", "Shortest Job First", "First Come First Serve", "Priority"]) {
             }
 
             public checkSchedule(): void {
                 this.counter++;
                 switch(this.algorithm) {
-                    case "roundRobin":
+                    case "rr":
                         this.processRoundRobin();
+                        break;
+                    case "sjf":
+                        this.processShortestJobFirst();
                         break;
                 }
             }
@@ -27,6 +32,19 @@ module TSOS {
             public processRoundRobin(): void {
                 if (this.counter >= this.roundRobinQuantum)
                     _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, 0));
+            }
+
+            public processShortestJobFirst() {
+                // Sort the ready queue by predicted Burst Time
+                _ProcessManager.readyQueue.q.sort(function (a, b) {
+                    // If a has lower predicted Burst Time, a comes first
+                    if (a.predictedBurstTime < b.predictedBurstTime)
+                        return -1;
+                    // If a has higher predicted Burst Time, b comes first
+                    if (a.predictedBurstTime > b.predictedBurstTime)
+                        return 1;
+                    return 0
+                });
             }
 
             public loadInNewProcess(): void {

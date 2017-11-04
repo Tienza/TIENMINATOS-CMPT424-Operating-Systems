@@ -57,6 +57,9 @@ module TSOS {
             // quantum
             sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "<int> Modify the quantum of Round Robin Scheudling");
             this.commandList[this.commandList.length] = sc;
+            // scheduler
+            sc = new TSOS.ShellCommand(this.shellScheduler, "scheduler", "< [empty] | rr | sjf | fcfs | priority> Get/Set the scheduling algoritm");
+            this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
             this.commandList[this.commandList.length] = sc;
@@ -418,6 +421,25 @@ module TSOS {
             }
             else {
                 _StdOut.putText("Current Quantum: " + _Scheduler.roundRobinQuantum + " cycles");
+            }
+        }
+
+        public shellScheduler(args) {
+            if (args.length > 0) {
+                var scheduleIndex = _Scheduler.algoType.indexOf(args[0]);
+                if (scheduleIndex > -1) {
+                    // Set the scheduling algorithm
+                    _Scheduler.algorithm = args[0];
+                    _StdOut.putText("Scheduling algorithm set to: " + _Scheduler.aFullName[scheduleIndex]);
+                    // Change the schedule display
+                    $('#schedulingAlgo').html(_Scheduler.aFullName[scheduleIndex]);
+                }
+                else {
+                    _StdOut.putText("Invalid scheduling algorithm. Please try again");
+                }
+            }
+            else {
+                _StdOut.putText("Current scheduling algorithm: " + _Scheduler.aFullName[_Scheduler.algoType.indexOf(_Scheduler.algorithm)]);
             }
         }
 

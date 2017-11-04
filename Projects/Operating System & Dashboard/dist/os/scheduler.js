@@ -7,25 +7,44 @@
 var TSOS;
 (function (TSOS) {
     var Scheduler = /** @class */ (function () {
-        function Scheduler(roundRobinQuantum, counter, algorithm) {
+        function Scheduler(roundRobinQuantum, counter, algorithm, algoType, aFullName) {
             if (roundRobinQuantum === void 0) { roundRobinQuantum = 6; }
             if (counter === void 0) { counter = 0; }
-            if (algorithm === void 0) { algorithm = "roundRobin"; }
+            if (algorithm === void 0) { algorithm = "rr"; }
+            if (algoType === void 0) { algoType = ["rr", "sjf", "fcfs", "priority"]; }
+            if (aFullName === void 0) { aFullName = ["Round Robin", "Shortest Job First", "First Come First Serve", "Priority"]; }
             this.roundRobinQuantum = roundRobinQuantum;
             this.counter = counter;
             this.algorithm = algorithm;
+            this.algoType = algoType;
+            this.aFullName = aFullName;
         }
         Scheduler.prototype.checkSchedule = function () {
             this.counter++;
             switch (this.algorithm) {
-                case "roundRobin":
+                case "rr":
                     this.processRoundRobin();
+                    break;
+                case "sjf":
+                    this.processShortestJobFirst();
                     break;
             }
         };
         Scheduler.prototype.processRoundRobin = function () {
             if (this.counter >= this.roundRobinQuantum)
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, 0));
+        };
+        Scheduler.prototype.processShortestJobFirst = function () {
+            // Sort the ready queue by predicted Burst Time
+            _ProcessManager.readyQueue.q.sort(function (a, b) {
+                // If a has lower predicted Burst Time, a comes first
+                if (a.predictedBurstTime < b.predictedBurstTime)
+                    return -1;
+                // If a has higher predicted Burst Time, b comes first
+                if (a.predictedBurstTime > b.predictedBurstTime)
+                    return 1;
+                return 0;
+            });
         };
         Scheduler.prototype.loadInNewProcess = function () {
             _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();

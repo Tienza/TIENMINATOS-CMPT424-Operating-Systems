@@ -21,7 +21,9 @@ module TSOS {
                     public state: string = "New",
                     public programId: number = _ProcessCount,
                     public waitTime: number = 0,
-                    public turnAroundTime: number = 1) {
+                    public turnAroundTime: number = 0,
+                    public burstTime: number = 0,
+                    public predictedBurstTime: number = 0) {
         }
     }
 }        

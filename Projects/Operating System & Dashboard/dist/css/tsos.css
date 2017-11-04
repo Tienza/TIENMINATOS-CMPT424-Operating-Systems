@@ -67,6 +67,10 @@ td {
   font-weight: bold;
 }
 
+#schedulingAlgo {
+  float: right;
+}
+
 #placeHolderButton {
   border-color: #FFFFFF;
 }
