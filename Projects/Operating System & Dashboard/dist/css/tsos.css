@@ -60,6 +60,8 @@ td {
 
 #taHostLog {
   font-family: monospace;
+  height: 160px;
+  overflow-y: scroll;
 }
 
 #statusBar {
@@ -77,6 +79,19 @@ td {
 
 #placeHolderIcon {
   color: #FFFFFF;
+}
+
+.logLine {
+  margin-top: 0px;
+  margin-bottom: 0px;
+}
+
+.panel-body.logMsg {
+  padding: 4px;
+}
+
+.source.label.label-info.col-lg-2, .msg {
+  font-weight: bold;
 }
 
 .footerText {

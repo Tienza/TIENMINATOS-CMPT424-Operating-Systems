@@ -20,7 +20,7 @@ module TSOS {
         // OS Startup and Shutdown Routines
         //
         public krnBootstrap() {      // Page 8. {
-            Control.hostLog("bootstrap", "host");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
+            Control.hostLog("bootstrap", "HOST");  // Use hostLog because we ALWAYS want this, even if _Trace is off.
 
             // Initialize our global queues.
             _KernelInterruptQueue = new Queue();  // A (currently) non-priority queue for interrupt requests (IRQs).

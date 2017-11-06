@@ -62,14 +62,24 @@ module TSOS {
             var clock: number = _OSclock;
 
             // Note the REAL clock in milliseconds since January 1, 1970.
-            var now: number = new Date().getTime();
+            var now: Date = new Date();
+            
+            // Determine what lable type we want
+            var lableType: string = (source === "HOST") ? "label-danger" : "label-info";
 
-            // Build the log string.
-            var str: string = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now  + " })"  + "\n";
+            // Format the Log Entry
+            var str: string = "<div class=\"logEntry\"><div class=\"panel-body logMsg\"><small class=\"text-muted pull-left\"><strong class=\"date\">" + now + "</strong></small><small class=\"text-muted pull-right\"><strong class=\"clockPulse\">" + clock + "</strong></small></div><div class=\"panel-body logMsg\"><span class=\"source label " + lableType + " col-lg-2\">" + source + "</span><span class=\"msg col-lg-10\">" + msg + "</span></div></div><hr class=\"logLine\">";
 
-            // Update the log console.
-            var taLog = <HTMLInputElement> document.getElementById("taHostLog");
-            taLog.value = str + taLog.value;
+            // See if we remove the first entry and replace it or not
+            if (msg === _LastLogMsg) {
+                $('.logEntry').first().remove();
+                $('.logLine').first().remove();
+            }
+
+            $('#taHostLog').prepend(str);
+
+            // Set _LastLogMsg to the current msg
+            _LastLogMsg = msg;
 
             // TODO in the future: Optionally update a log database or some streaming service.
         }
@@ -265,14 +275,14 @@ module TSOS {
 
         public static initializeProcessDisplay(pcb: PCB): void {
             var rowId: string = "process-row-" + pcb.programId;
-            var processDisplay: string = "<tr id=\"" + rowId + "\"><td>" + Control.formatHex(pcb.programId) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
+            var processDisplay: string = "<tr id=\"" + rowId + "\"><td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
 
             $('#processDisplay').append(processDisplay);
         }
 
         public static updateProcessDisplay(pcb: PCB): void {
             var rowId: string = "#process-row-" + pcb.programId;
-            var processDisplay: string = "<td>" + Control.formatHex(pcb.programId) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
+            var processDisplay: string = "<td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
 
             $(rowId).html(processDisplay);
         }
@@ -334,8 +344,8 @@ module TSOS {
         }
 
         public static hostBtnHaltOS_click(btn): void {
-            Control.hostLog("Emergency halt", "host");
-            Control.hostLog("Attempting Kernel shutdown.", "host");
+            Control.hostLog("Emergency halt", "HOST");
+            Control.hostLog("Attempting Kernel shutdown.", "HOST");
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.

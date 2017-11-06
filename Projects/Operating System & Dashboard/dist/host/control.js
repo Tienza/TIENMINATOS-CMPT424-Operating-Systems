@@ -54,12 +54,19 @@ var TSOS;
             // Note the OS CLOCK.
             var clock = _OSclock;
             // Note the REAL clock in milliseconds since January 1, 1970.
-            var now = new Date().getTime();
-            // Build the log string.
-            var str = "({ clock:" + clock + ", source:" + source + ", msg:" + msg + ", now:" + now + " })" + "\n";
-            // Update the log console.
-            var taLog = document.getElementById("taHostLog");
-            taLog.value = str + taLog.value;
+            var now = new Date();
+            // Determine what lable type we want
+            var lableType = (source === "HOST") ? "label-danger" : "label-info";
+            // Format the Log Entry
+            var str = "<div class=\"logEntry\"><div class=\"panel-body logMsg\"><small class=\"text-muted pull-left\"><strong class=\"date\">" + now + "</strong></small><small class=\"text-muted pull-right\"><strong class=\"clockPulse\">" + clock + "</strong></small></div><div class=\"panel-body logMsg\"><span class=\"source label " + lableType + " col-lg-2\">" + source + "</span><span class=\"msg col-lg-10\">" + msg + "</span></div></div><hr class=\"logLine\">";
+            // See if we remove the first entry and replace it or not
+            if (msg === _LastLogMsg) {
+                $('.logEntry').first().remove();
+                $('.logLine').first().remove();
+            }
+            $('#taHostLog').prepend(str);
+            // Set _LastLogMsg to the current msg
+            _LastLogMsg = msg;
             // TODO in the future: Optionally update a log database or some streaming service.
         };
         /* Memory Display Functions */
@@ -235,12 +242,12 @@ var TSOS;
         };
         Control.initializeProcessDisplay = function (pcb) {
             var rowId = "process-row-" + pcb.programId;
-            var processDisplay = "<tr id=\"" + rowId + "\"><td>" + Control.formatHex(pcb.programId) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
+            var processDisplay = "<tr id=\"" + rowId + "\"><td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
             $('#processDisplay').append(processDisplay);
         };
         Control.updateProcessDisplay = function (pcb) {
             var rowId = "#process-row-" + pcb.programId;
-            var processDisplay = "<td>" + Control.formatHex(pcb.programId) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
+            var processDisplay = "<td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
             $(rowId).html(processDisplay);
         };
         Control.removeProcessDisplay = function (programId) {
@@ -289,8 +296,8 @@ var TSOS;
             }
         };
         Control.hostBtnHaltOS_click = function (btn) {
-            Control.hostLog("Emergency halt", "host");
-            Control.hostLog("Attempting Kernel shutdown.", "host");
+            Control.hostLog("Emergency halt", "HOST");
+            Control.hostLog("Attempting Kernel shutdown.", "HOST");
             // Call the OS shutdown routine.
             _Kernel.krnShutdown();
             // Stop the interval that's simulating our clock pulse.

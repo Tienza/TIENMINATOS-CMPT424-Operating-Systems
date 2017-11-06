@@ -37,7 +37,7 @@ module TSOS {
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
             // load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Verify user input and load into memory.");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", " < [empty] | [int] > - Verify user input and load user program into memory. If priority null, default is 3");
             this.commandList[this.commandList.length] = sc;
             // run
             sc = new TSOS.ShellCommand(this.shellRun, "run", "< PID > - Run the designated program.");
@@ -280,7 +280,7 @@ module TSOS {
             }
         }
 
-        public shellLoad(arg) {
+        public shellLoad(args) {
             var userInput = $('#taProgramInput').val();
             userInput = cleanInput(userInput);
             var hexObj: { [key: string]: any } = isHex(userInput);
@@ -289,7 +289,21 @@ module TSOS {
             if (userInput !== "Overflow") {
                 if (isHexValid && userInput !== "") {
                     hexObj.hexVal = hexObj.hexVal.split(" ");
+                    // Declare a new PCB for the program
                     var pcb = new PCB();
+                    // If priority is provided then set the priority of the program
+                    if (args.length > 0 && /\d+/.test(args[0])) {
+                        pcb.priority = parseInt(args[0]);
+                        _StdOut.putText("Program priority set to " + args[0]);
+                        _StdOut.advanceLine();
+                    }
+                    else if (args.length === 0) {
+                        // Do Nothing
+                    }
+                    else {
+                        _StdOut.putText("Invalid priority argument. Defaulting to 3");
+                    }
+                    // Increment the _ProcessCount
                     _ProcessCount++;
                     _MemoryManager.loadProgram(hexObj.hexVal, pcb);
                     // Switch to active Memory Tab

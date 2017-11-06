@@ -40,6 +40,8 @@ var TSOS;
             // If Shorted Job First then reorder the readyQueue
             if (_Scheduler.algorithm === "sjf")
                 _Scheduler.processShortestJobFirst();
+            else if (_Scheduler.algorithm === "priority")
+                _Scheduler.processPriority();
             this.currentPCB = this.readyQueue.dequeue();
             TSOS.Control.switchMemoryTab(this.currentPCB);
             _CPU.updateCPU();

@@ -29,6 +29,10 @@ module TSOS {
                         break;
                     case "fcfs":
                         this.processFirstComeFirstServe();
+                        break;
+                    case "priority":
+                        this.processPriority();
+                        break;
                 }
             }
 
@@ -37,7 +41,7 @@ module TSOS {
                     _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, 0));
             }
 
-            public processShortestJobFirst() {
+            public processShortestJobFirst(): void {
                 // Sort the ready queue by predicted Burst Time
                 _ProcessManager.readyQueue.q.sort(function (a, b) {
                     // If a has lower predicted Burst Time, a comes first
@@ -50,9 +54,22 @@ module TSOS {
                 });
             }
 
-            public processFirstComeFirstServe() {
+            public processFirstComeFirstServe(): void {
                 if (this.counter >= this.maxInt)
                     _KernelInputQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, 0));
+            }
+
+            public processPriority(): void {
+                // Sort the ready queue by priority
+                _ProcessManager.readyQueue.q.sort(function (a, b) {
+                    // If a has higher priority (lower int), a comes first
+                    if (a.priority < b.priority)
+                        return -1;
+                    // If a has lower priority (higher int), b comes first
+                    if (a.priority > b.priority)
+                        return 1;
+                    return 0
+                });
             }
 
             public loadInNewProcess(): void {

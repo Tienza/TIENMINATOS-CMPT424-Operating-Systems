@@ -32,6 +32,10 @@ var TSOS;
                     break;
                 case "fcfs":
                     this.processFirstComeFirstServe();
+                    break;
+                case "priority":
+                    this.processPriority();
+                    break;
             }
         };
         Scheduler.prototype.processRoundRobin = function () {
@@ -53,6 +57,18 @@ var TSOS;
         Scheduler.prototype.processFirstComeFirstServe = function () {
             if (this.counter >= this.maxInt)
                 _KernelInputQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, 0));
+        };
+        Scheduler.prototype.processPriority = function () {
+            // Sort the ready queue by priority
+            _ProcessManager.readyQueue.q.sort(function (a, b) {
+                // If a has higher priority (lower int), a comes first
+                if (a.priority < b.priority)
+                    return -1;
+                // If a has lower priority (higher int), b comes first
+                if (a.priority > b.priority)
+                    return 1;
+                return 0;
+            });
         };
         Scheduler.prototype.loadInNewProcess = function () {
             _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();
