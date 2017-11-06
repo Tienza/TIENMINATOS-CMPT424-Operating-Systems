@@ -485,13 +485,22 @@ var TSOS;
         Shell.prototype.shellMan = function (args) {
             if (args.length > 0) {
                 var topic = args[0];
-                switch (topic) {
-                    case "help":
-                        _StdOut.putText("Help displays a list of (hopefully) valid commands.");
+                var description = undefined;
+                // Cycle through command list to get the description of the command
+                for (var i = 0; i < _OsShell.commandList.length; i++) {
+                    if (topic === _OsShell.commandList[i].command) {
+                        description = _OsShell.commandList[i].description;
                         break;
-                    // TODO: Make descriptive MANual page entries for the the rest of the shell commands here.
-                    default:
-                        _StdOut.putText("No manual entry for " + args[0] + ".");
+                    }
+                }
+                // Print out the description
+                if (description) {
+                    for (var i = 0; i < description.length; i++) {
+                        _StdOut.putText(description[i]);
+                    }
+                }
+                else {
+                    _StdOut.putText("No manual entry for " + args[0] + ".");
                 }
             }
             else {
