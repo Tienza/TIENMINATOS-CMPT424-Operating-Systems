@@ -11,6 +11,7 @@ module TSOS {
         export class Scheduler {
     
             constructor(public roundRobinQuantum: number = 6,
+                        public maxInt: number = Math.pow(2, 53) - 1,
                         public counter: number = 0,
                         public algorithm: string = "rr",
                         public algoType: string[] = ["rr", "sjf", "fcfs", "priority"],
@@ -26,6 +27,8 @@ module TSOS {
                     case "sjf":
                         this.processShortestJobFirst();
                         break;
+                    case "fcfs":
+                        this.processFirstComeFirstServe();
                 }
             }
 
@@ -45,6 +48,11 @@ module TSOS {
                         return 1;
                     return 0
                 });
+            }
+
+            public processFirstComeFirstServe() {
+                if (this.counter >= this.maxInt)
+                    _KernelInputQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, 0));
             }
 
             public loadInNewProcess(): void {

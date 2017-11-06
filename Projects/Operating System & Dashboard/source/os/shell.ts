@@ -40,7 +40,7 @@ module TSOS {
             sc = new TSOS.ShellCommand(this.shellLoad, "load", "- Verify user input and load into memory.");
             this.commandList[this.commandList.length] = sc;
             // run
-            sc = new TSOS.ShellCommand(this.shellRun, "run", "<PID> - Run the designated program.");
+            sc = new TSOS.ShellCommand(this.shellRun, "run", "< PID > - Run the designated program.");
             this.commandList[this.commandList.length] = sc;
             // runall
             sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "Run all programs in memory.");
@@ -49,16 +49,19 @@ module TSOS {
             sc = new TSOS.ShellCommand(this.shellPS, "ps", "Display PID of all active processes.");
             this.commandList[this.commandList.length] = sc;
             // kill
-            sc = new TSOS.ShellCommand(this.shellKill, "kill", "<PID> - Kill the designated process.");
+            sc = new TSOS.ShellCommand(this.shellKill, "kill", "< PID > - Kill the designated process.");
             this.commandList[this.commandList.length] = sc;
             // clearmem
             sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "Clear all memory partitions.");
             this.commandList[this.commandList.length] = sc;
             // quantum
-            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "<int> Modify the quantum of Round Robin Scheudling");
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "< int > - Modify the quantum of Round Robin Scheudling");
             this.commandList[this.commandList.length] = sc;
             // scheduler
-            sc = new TSOS.ShellCommand(this.shellScheduler, "scheduler", "< [empty] | rr | sjf | fcfs | priority> Get/Set the scheduling algoritm");
+            sc = new TSOS.ShellCommand(this.shellScheduler, "scheduler", "< [empty] | rr | sjf | fcfs | priority > - Get/Set the scheduling algoritm");
+            this.commandList[this.commandList.length] = sc;
+            // toggle
+            sc = new TSOS.ShellCommand(this.shellToggle, "toggle", "< wttat | ssm > - Toggle the various modes of the operating system");
             this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
@@ -440,6 +443,29 @@ module TSOS {
             }
             else {
                 _StdOut.putText("Current scheduling algorithm: " + _Scheduler.aFullName[_Scheduler.algoType.indexOf(_Scheduler.algorithm)]);
+            }
+        }
+
+        public shellToggle(args) {
+            if (args.length > 0) {
+                var modes: string[] = ["wttat", "ssm"];
+                var mode: string = args[0];
+                if (modes.indexOf(mode) > -1) {
+                    switch(mode) {
+                        case "wttat":
+                            $('#showWTTAT').click();
+                            break;
+                        case "ssm":
+                            $('#singleStepBtn').click();
+                            break;
+                    }
+                }
+                else {
+                    _StdOut.putText("Invalid mode. Please try again");
+                }
+            }
+            else {
+                _StdOut.putText("< Print WT/TAT: " + _CalculateWTTAT.toString().toUpperCase() + " | Single Step Mode: " + _SingleStep.toString().toUpperCase() + " >");
             }
         }
 

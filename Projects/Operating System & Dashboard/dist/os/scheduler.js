@@ -7,13 +7,15 @@
 var TSOS;
 (function (TSOS) {
     var Scheduler = /** @class */ (function () {
-        function Scheduler(roundRobinQuantum, counter, algorithm, algoType, aFullName) {
+        function Scheduler(roundRobinQuantum, maxInt, counter, algorithm, algoType, aFullName) {
             if (roundRobinQuantum === void 0) { roundRobinQuantum = 6; }
+            if (maxInt === void 0) { maxInt = Math.pow(2, 53) - 1; }
             if (counter === void 0) { counter = 0; }
             if (algorithm === void 0) { algorithm = "rr"; }
             if (algoType === void 0) { algoType = ["rr", "sjf", "fcfs", "priority"]; }
             if (aFullName === void 0) { aFullName = ["Round Robin", "Shortest Job First", "First Come First Serve", "Priority"]; }
             this.roundRobinQuantum = roundRobinQuantum;
+            this.maxInt = maxInt;
             this.counter = counter;
             this.algorithm = algorithm;
             this.algoType = algoType;
@@ -28,6 +30,8 @@ var TSOS;
                 case "sjf":
                     this.processShortestJobFirst();
                     break;
+                case "fcfs":
+                    this.processFirstComeFirstServe();
             }
         };
         Scheduler.prototype.processRoundRobin = function () {
@@ -45,6 +49,10 @@ var TSOS;
                     return 1;
                 return 0;
             });
+        };
+        Scheduler.prototype.processFirstComeFirstServe = function () {
+            if (this.counter >= this.maxInt)
+                _KernelInputQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, 0));
         };
         Scheduler.prototype.loadInNewProcess = function () {
             _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();
