@@ -68,8 +68,25 @@ module TSOS {
                     // If a has lower priority (higher int), b comes first
                     if (a.priority > b.priority)
                         return 1;
-                    return 0
+
+                    return 0;
                 });
+            }
+
+            public removeAllZeros(userProgram: string[]): string[] {
+                var predictedBurstProgram = userProgram.filter(function(a){return a !== '00'});
+                
+                return predictedBurstProgram;
+            }
+
+            public addWeightedD0(userProgram: string[]): number {
+                var weightedD0: number = 0;
+
+                for (var i: number = 0; i < userProgram.length; i++) {
+                    weightedD0 += (userProgram[i] === "D0") ? 50 : 0;
+                }
+
+                return weightedD0;
             }
 
             public loadInNewProcess(): void {

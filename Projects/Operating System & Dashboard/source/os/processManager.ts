@@ -145,11 +145,6 @@ module TSOS {
             this.terminatedList = [];
         }
 
-        public removeAllZeros(userProgram: string[]): string[] {
-            var predictedBurstProgram = userProgram.filter(function(a){return a !== '00'});
-            return predictedBurstProgram;
-        }
-
         public updateWaitTime(): void {
             for (var i: number = 0; i < this.readyQueue.getSize(); i++) {
                 this.readyQueue.q[i].waitTime += 1;

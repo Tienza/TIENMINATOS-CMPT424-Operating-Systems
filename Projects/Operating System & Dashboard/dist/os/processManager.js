@@ -131,10 +131,6 @@ var TSOS;
             // Clear terminated process list
             this.terminatedList = [];
         };
-        ProcessManager.prototype.removeAllZeros = function (userProgram) {
-            var predictedBurstProgram = userProgram.filter(function (a) { return a !== '00'; });
-            return predictedBurstProgram;
-        };
         ProcessManager.prototype.updateWaitTime = function () {
             for (var i = 0; i < this.readyQueue.getSize(); i++) {
                 this.readyQueue.q[i].waitTime += 1;

@@ -70,6 +70,17 @@ var TSOS;
                 return 0;
             });
         };
+        Scheduler.prototype.removeAllZeros = function (userProgram) {
+            var predictedBurstProgram = userProgram.filter(function (a) { return a !== '00'; });
+            return predictedBurstProgram;
+        };
+        Scheduler.prototype.addWeightedD0 = function (userProgram) {
+            var weightedD0 = 0;
+            for (var i = 0; i < userProgram.length; i++) {
+                weightedD0 += (userProgram[i] === "D0") ? 50 : 0;
+            }
+            return weightedD0;
+        };
         Scheduler.prototype.loadInNewProcess = function () {
             _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();
             _ProcessManager.currentPCB.state = _ProcessManager.processStates.running;

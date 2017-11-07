@@ -35,7 +35,7 @@ module TSOS {
                 // Store in the process list
                 _ProcessManager.processList.push(pcb);
                 // Predict the bust time
-                pcb.predictedBurstTime = _ProcessManager.removeAllZeros(userProgram).length;
+                pcb.predictedBurstTime = _Scheduler.removeAllZeros(userProgram).length + _Scheduler.addWeightedD0(userProgram);
                 // Update the Memory Display
                 Control.updateMemoryDisplay(freePartition.memoryIndex);
                 // Update the Process Display
