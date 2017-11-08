@@ -71,7 +71,7 @@ module TSOS {
             this.instruction = "";
         }
 
-        public executeProgram(pcb: PCB) {
+        public executeProgram(pcb: PCB): void {
             this.instruction = _ProcessManager.fetchInstruction(pcb, this.PC);
 
             var cellId: string = "#memory-cell-" + (this.PC + _MemoryManager.partitions[pcb.memoryIndex].base);
@@ -130,7 +130,7 @@ module TSOS {
             this.updatePCB(_ProcessManager.currentPCB);
         }
 
-        public updatePCB(pcb: PCB) {
+        public updatePCB(pcb: PCB): void {
             pcb.instruction = this.instruction;
             pcb.Acc = this.Acc;
             pcb.PC = this.PC;
@@ -139,7 +139,7 @@ module TSOS {
             pcb.Zflag = this.Zflag;
         }
         
-        public updateCPU() {
+        public updateCPU(): void {
             this.instruction = _ProcessManager.currentPCB.instruction;
             this.Acc = _ProcessManager.currentPCB.Acc;
             this.PC = _ProcessManager.currentPCB.PC;
@@ -148,12 +148,12 @@ module TSOS {
             this.Zflag = _ProcessManager.currentPCB.Zflag;
         }
 
-        public consumeInstruction() {
+        public consumeInstruction(): void {
             this.PC++;
         }
 
         /****************************** 6502a Op Codes Functions ******************************/
-        public loadAccWithConst() {
+        public loadAccWithConst(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Assign the following constant to the Acc
@@ -162,7 +162,7 @@ module TSOS {
             this.consumeInstruction();
         }
 
-        public loadAccFromMemo() {
+        public loadAccFromMemo(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location where we want to load the Accumulator with
@@ -176,7 +176,7 @@ module TSOS {
             this.consumeInstruction();
         }
 
-        public storeAccInMemo() {
+        public storeAccInMemo(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location where we want to store the Accumulator
@@ -195,7 +195,7 @@ module TSOS {
             this.consumeInstruction();
         }
 
-        public addWithCarry() {
+        public addWithCarry(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location where we want to add to the Accumulator
@@ -211,7 +211,7 @@ module TSOS {
 
         }
 
-        public loadXWithConst() {
+        public loadXWithConst(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Decode the current Op Code and assign it to the X Register
@@ -220,7 +220,7 @@ module TSOS {
             this.consumeInstruction();
         }
 
-        public loadXFromMemo() {
+        public loadXFromMemo(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location that we want to load the X Register with
@@ -235,7 +235,7 @@ module TSOS {
             this.consumeInstruction();
         }
 
-        public loadYWithConst() {
+        public loadYWithConst(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Decode the current Op Code and assign it to the Y Register
@@ -244,7 +244,7 @@ module TSOS {
             this.consumeInstruction();
         }
 
-        public loadYFromMemo() {
+        public loadYFromMemo(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location that we want to load the Y Register with
@@ -259,19 +259,19 @@ module TSOS {
             this.consumeInstruction();
         }
 
-        public noOperation() {
+        public noOperation(): void {
             // Pass over current Op Code
             this.consumeInstruction();
         }
 
-        public breakProgram() {
+        public breakProgram(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Terminate the process
             _ProcessManager.terminateProcess(_ProcessManager.currentPCB);
         }
 
-        public compareMemoToX() {
+        public compareMemoToX(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // Fetch the memory location that we want to compare with the X Register
@@ -286,7 +286,7 @@ module TSOS {
             this.consumeInstruction();
         }
 
-        public branchNBytes() {
+        public branchNBytes(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             if (this.Zflag === 0) {
@@ -309,7 +309,7 @@ module TSOS {
             }
         }
 
-        public incrementByte() {
+        public incrementByte(): void {
             // Pass over current Op code
             this.consumeInstruction()
             // Fetch the memory location that we want to increment
@@ -332,7 +332,7 @@ module TSOS {
             this.consumeInstruction();
         }
 
-        public systemCall() {
+        public systemCall(): void {
             // Pass over current Op Code
             this.consumeInstruction();
             // If the X Register is 1 then print the constant in the Y Register
