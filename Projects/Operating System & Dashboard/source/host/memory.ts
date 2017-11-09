@@ -17,6 +17,6 @@ module TSOS {
                     public memory2: string[] = []) {
         }
 
-        public memoryArray = [this.memory0, this.memory1, this.memory2];
+        public memoryArray: any[] = [this.memory0, this.memory1, this.memory2];
     }
 } 
