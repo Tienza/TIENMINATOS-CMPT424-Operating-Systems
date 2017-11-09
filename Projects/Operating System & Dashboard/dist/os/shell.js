@@ -361,6 +361,9 @@ var TSOS;
                 var pcb = _ProcessManager.getPCB(parseInt(args[0]));
                 if (pcb) {
                     _ProcessManager.terminateProcess(pcb);
+                    if (_ProcessManager.isRunningAll) {
+                        _ProcessManager.removePCBFromReadyQueue(pcb.programId);
+                    }
                     _StdOut.putText("Process PID: " + pcb.programId + " Successfully Killed");
                 }
                 else {

@@ -7,13 +7,15 @@
 var TSOS;
 (function (TSOS) {
     var ProcessManager = /** @class */ (function () {
-        function ProcessManager(processList, terminatedList, readyQueue) {
+        function ProcessManager(processList, terminatedList, readyQueue, isRunningAll) {
             if (processList === void 0) { processList = []; }
             if (terminatedList === void 0) { terminatedList = []; }
             if (readyQueue === void 0) { readyQueue = new TSOS.Queue(); }
+            if (isRunningAll === void 0) { isRunningAll = false; }
             this.processList = processList;
             this.terminatedList = terminatedList;
             this.readyQueue = readyQueue;
+            this.isRunningAll = isRunningAll;
             this.processStates = {
                 "new": "New",
                 "ready": "Ready",
@@ -22,14 +24,22 @@ var TSOS;
             };
         }
         ProcessManager.prototype.runProcess = function (pcb) {
-            // Set PCB state to running
-            pcb.state = this.processStates.running;
-            // Update _ProcessManager and CPU
-            this.currentPCB = pcb;
-            _CPU.updateCPU();
-            _CPU.isExecuting = true;
+            if (!this.isRunningAll) {
+                // Set PCB state to running
+                pcb.state = this.processStates.running;
+                // Update _ProcessManager and CPU
+                this.currentPCB = pcb;
+                _CPU.updateCPU();
+                _CPU.isExecuting = true;
+            }
+            else {
+                pcb.state = this.processStates.ready;
+                this.readyQueue.enqueue(pcb);
+            }
         };
         ProcessManager.prototype.runAllProcess = function () {
+            // Set the isRunningAll boolean to true, for load/run processing
+            this.isRunningAll = true;
             for (var i = 0; i < this.processList.length; i++) {
                 var pcb = this.processList[i];
                 if (pcb.state === this.processStates["new"]) {
@@ -82,6 +92,8 @@ var TSOS;
             // Toggle CPU execution off
             if (this.readyQueue.isEmpty()) {
                 _CPU.isExecuting = false;
+                // Toggle isRunningAll to false
+                this.isRunningAll = false;
                 // Remove All Debuggers
                 _Debuggers = [];
                 // Print Wait Time and Turn Around Time
@@ -171,6 +183,14 @@ var TSOS;
             for (var i = 0; i < this.processList.length; i++) {
                 if (this.processList[i].programId === programId) {
                     this.processList.splice(i, 1);
+                }
+            }
+        };
+        ProcessManager.prototype.removePCBFromReadyQueue = function (programId) {
+            // FInd the PCB with the programId and remove it from the readyQueue
+            for (var i = 0; i < this.readyQueue.q.length; i++) {
+                if (this.readyQueue.q[i].programId === programId) {
+                    this.readyQueue.q.splice(i, 1);
                 }
             }
         };

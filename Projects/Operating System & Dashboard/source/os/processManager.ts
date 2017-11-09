@@ -12,7 +12,8 @@ module TSOS {
 
         constructor(public processList: PCB[] = [],
                     public terminatedList: PCB[] = [],
-                    public readyQueue = new Queue()) {
+                    public readyQueue: Queue = new Queue(),
+                    public isRunningAll: boolean = false) {
         }
 
         public currentPCB: TSOS.PCB;
@@ -25,15 +26,23 @@ module TSOS {
         }
          
         public runProcess(pcb: PCB): void {
-            // Set PCB state to running
-            pcb.state = this.processStates.running;
-            // Update _ProcessManager and CPU
-            this.currentPCB = pcb;
-            _CPU.updateCPU();
-            _CPU.isExecuting = true;
+            if (!this.isRunningAll) {
+                // Set PCB state to running
+                pcb.state = this.processStates.running;
+                // Update _ProcessManager and CPU
+                this.currentPCB = pcb;
+                _CPU.updateCPU();
+                _CPU.isExecuting = true;
+            }
+            else {
+                pcb.state = this.processStates.ready;
+                this.readyQueue.enqueue(pcb);
+            }
         }
 
         public runAllProcess(): void {
+            // Set the isRunningAll boolean to true, for load/run processing
+            this.isRunningAll = true;
             for (var i: number = 0; i < this.processList.length; i++) {
                 var pcb: PCB = this.processList[i];
                 if (pcb.state === this.processStates.new) {
@@ -45,6 +54,7 @@ module TSOS {
             // If Shorted Job First then reorder the readyQueue
             if (_Scheduler.algorithm === "sjf")
                 _Scheduler.processShortestJobFirst();
+            // If Priority then reorder the readyQueue
             else if (_Scheduler.algorithm === "priority")
                 _Scheduler.processPriority();
 
@@ -94,6 +104,8 @@ module TSOS {
             // Toggle CPU execution off
             if (this.readyQueue.isEmpty()) {
                 _CPU.isExecuting = false;
+                // Toggle isRunningAll to false
+                this.isRunningAll = false;
                 // Remove All Debuggers
                 _Debuggers = [];
                 // Print Wait Time and Turn Around Time
@@ -185,13 +197,22 @@ module TSOS {
             return pcb;
         }
 
-        public removePCB(programId): void {
+        public removePCB(programId: number): void {
             // Find the PCB with the programId and remove it from the processList
             for (var i: number = 0; i < this.processList.length; i++) {
                 if (this.processList[i].programId === programId) {
                     this.processList.splice(i, 1);
                 }
             }
+        }
+
+        public removePCBFromReadyQueue(programId: number): void {
+            // FInd the PCB with the programId and remove it from the readyQueue
+            for (var i: number = 0; i < this.readyQueue.q.length; i++) {
+                if (this.readyQueue.q[i].programId === programId) {
+                    this.readyQueue.q.splice(i, 1);
+                }
+            } 
         }
     }
 } 
