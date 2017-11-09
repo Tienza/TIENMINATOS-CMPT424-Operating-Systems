@@ -19,6 +19,8 @@ var TIMER_IRQ = 0; // Pages 23 (timer), 9 (interrupts), and 561 (interrupt prior
 // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 var KEYBOARD_IRQ = 1;
 var CONTEXT_SWITCH_IRQ = 2;
+var FILE_SYSTEM_IRQ = 3;
+var EMPTY_FILE_DATA = "000000000000000000000000000000000000000000000000000000000000";
 //
 // Global Variables
 // TODO: Make a global object and use that instead of the "_" naming convention in the global namespace.
@@ -33,6 +35,9 @@ var _MemoryAccessor;
 var _MemoryManager;
 var _MemorySize = 768; // 768 bytes, 3 segments of 256 bytes
 var _SegmentSize = 256;
+// Storage related global variables
+var _HDD;
+var _HDDAccessor;
 // Debugger variables, references Memory
 var _Debuggers = [];
 var _Canvas; // Initialized in Control.hostInit().
@@ -80,6 +85,7 @@ var _SarcasticMode = false;
 var _CalculateWTTAT = false;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
+var _krnFsDriver;
 var _hardwareClockID = null;
 // Global Variable For Log Message
 var _LastLogMsg = null;

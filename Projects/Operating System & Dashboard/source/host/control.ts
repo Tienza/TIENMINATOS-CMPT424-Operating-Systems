@@ -329,6 +329,13 @@ module TSOS {
             
             // Initialize Memory Accessor
             _MemoryAccessor = new MemoryAccessor();
+            
+            // Initialize HDD Accessor
+            _HDDAccessor = new HDDAccessor()
+
+            // Initialize HDD Storage
+            _HDD = new HDD();
+            _HDD.init();
 
             // ... then set the host clock pulse ...
             _hardwareClockID = setInterval(Devices.hostClockPulse, CPU_CLOCK_INTERVAL);

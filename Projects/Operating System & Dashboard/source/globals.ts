@@ -22,6 +22,8 @@ const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (inte
                               // NOTE: The timer is different from hardware/host clock pulses. Don't confuse these.
 const KEYBOARD_IRQ: number = 1;
 const  CONTEXT_SWITCH_IRQ: number = 2;
+const FILE_SYSTEM_IRQ: number = 3;
+const EMPTY_FILE_DATA: string = "000000000000000000000000000000000000000000000000000000000000";
 
 
 //
@@ -41,6 +43,10 @@ var _MemoryAccessor: TSOS.MemoryAccessor;
 var _MemoryManager: TSOS.MemoryManager;
 var _MemorySize = 768; // 768 bytes, 3 segments of 256 bytes
 var _SegmentSize = 256;
+
+// Storage related global variables
+var _HDD: TSOS.HDD;
+var _HDDAccessor: TSOS.HDDAccessor;
 
 // Debugger variables, references Memory
 var _Debuggers: string[] = [];
@@ -105,6 +111,7 @@ var _CalculateWTTAT: boolean = false;
 
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
+var _krnFsDriver: TSOS.DeviceDriverFs;
 
 var _hardwareClockID: number = null;
 
