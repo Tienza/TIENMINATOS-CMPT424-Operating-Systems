@@ -71,33 +71,64 @@ var TSOS;
                 }
             }
         };
-        DeviceDriverFs.prototype.fetchNextDir = function () {
+        DeviceDriverFs.prototype.fetchNextDirLoc = function () {
+            var mbr = _HDDAccessor.readFromHDD("0,0,0");
+            return _HDDAccessor.getTSB(mbr[0], mbr[1], mbr[2]);
+        };
+        DeviceDriverFs.prototype.fetchNextFileLoc = function () {
             var mbr = _HDDAccessor.readFromHDD("0,0,0");
             return _HDDAccessor.getTSB(mbr[3], mbr[4], mbr[5]);
         };
-        DeviceDriverFs.prototype.alterNextDir = function () {
+        DeviceDriverFs.prototype.alterNextDirLoc = function () {
             var mbr = _HDDAccessor.readFromHDD("0,0,0");
-            var indexedRecord = mbr.split("");
+            var mbrWorkingArray = mbr.split("");
             var located = false;
             for (var tsb in _HDD.storage) {
+                // If the tsb is NOT the Master Boot Record, located ON the 0 Track, and NOT in use
                 if (tsb !== "0,0,0" && tsb[0] === "0" && _HDDAccessor.readFromHDD(tsb)[0] === "0") {
                     located = true;
-                    // Assign the value of tsb to indexedRecord, the provided indexes arre used to skip over the commas in the string
-                    indexedRecord[0] = tsb[0];
-                    indexedRecord[1] = tsb[2];
-                    indexedRecord[2] = tsb[4];
-                    // Write it to the Master Boot Record
-                    _HDDAccessor.writeToHDD("0,0,0", indexedRecord.join(""));
+                    // Assign the value of tsb to mbrWorkingArray, the provided indexes are used to skip over the commas in the string
+                    mbrWorkingArray[0] = tsb[0];
+                    mbrWorkingArray[1] = tsb[2];
+                    mbrWorkingArray[2] = tsb[4];
+                    // Write the changes the Master Boot Record
+                    _HDDAccessor.writeToHDD("0,0,0", mbrWorkingArray.join(""));
                     // Break out of the operation
                     break;
                 }
             }
             // If we cannot locate it then that means that there are no dir blocks left (u,u,u)
             if (!located) {
-                indexedRecord[0] = "u";
-                indexedRecord[1] = "u";
-                indexedRecord[2] = "u";
-                _HDDAccessor.writeToHDD("0,0,0", indexedRecord.join(""));
+                mbrWorkingArray[0] = "u";
+                mbrWorkingArray[1] = "u";
+                mbrWorkingArray[2] = "u";
+                _HDDAccessor.writeToHDD("0,0,0", mbrWorkingArray.join(""));
+            }
+        };
+        DeviceDriverFs.prototype.alterNextFileLoc = function () {
+            var mbr = _HDDAccessor.readFromHDD("0,0,0");
+            var mbrWorkingArray = mbr.split("");
+            var located = false;
+            for (var tsb in _HDD.storage) {
+                // If the file block is NOT on the 0 Track and NOT in use
+                if (parseInt(tsb[0]) > 0 && _HDDAccessor.readFromHDD(tsb)[0] !== "0") {
+                    located = true;
+                    // Assign the value of tsb to mbrWorkingArray, the provided indexes are used to skip over the commas in the string
+                    mbrWorkingArray[3] = tsb[0];
+                    mbrWorkingArray[4] = tsb[2];
+                    mbrWorkingArray[5] = tsb[4];
+                    // Write the changes ot the Master Boot Record
+                    _HDDAccessor.writeToHDD("0,0,0", mbrWorkingArray.join(""));
+                    // Break out of the operation
+                    break;
+                }
+                // If we cannot locate it then that means that there are no dir blocks left (u,u,u)
+                if (!located) {
+                    mbrWorkingArray[3] = "u";
+                    mbrWorkingArray[4] = "u";
+                    mbrWorkingArray[5] = "u";
+                    _HDDAccessor.writeToHDD("0,0,0", mbrWorkingArray.join(""));
+                }
             }
         };
         return DeviceDriverFs;

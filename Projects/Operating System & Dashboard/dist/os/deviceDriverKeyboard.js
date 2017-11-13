@@ -150,6 +150,9 @@ var TSOS;
                 chr = "up_key";
                 _KernelInputQueue.enqueue(chr);
             }
+            else if (keyCode === 39 && _SingleStep) {
+                $('#stepOver').click();
+            }
             else if (keyCode === 40) {
                 chr = "down_key";
                 _KernelInputQueue.enqueue(chr);

@@ -151,6 +151,10 @@ module TSOS {
                 chr = "up_key";
                 _KernelInputQueue.enqueue(chr);
             }
+            // Process Right_Key
+            else if (keyCode === 39 && _SingleStep) {
+                $('#stepOver').click();
+            } 
             // Process Down_Key
             else if (keyCode === 40) {
                 chr = "down_key";
