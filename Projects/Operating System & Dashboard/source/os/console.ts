@@ -144,6 +144,20 @@ module TSOS {
             return results;
         }
 
+        public printOSFeedBack(text: string): void {
+            for (var i: number = 0; i < text.length; i++) {
+                this.putText(text[i]);
+            }
+            this.advanceLine();
+            _OsShell.putPrompt();
+        }
+
+        public printLongText(text: string): void {
+            for (var i: number = 0; i < text.length; i++) {
+                this.putText(text[i]);
+            }
+        }
+
         public putText(text: string): void {
             // My first inclination here was to write two functions: putChar() and putString().
             // Then I remembered that JavaScript is (sadly) untyped and it won't differentiate

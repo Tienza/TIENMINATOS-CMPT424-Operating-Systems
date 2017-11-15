@@ -135,6 +135,18 @@ var TSOS;
             }
             return results;
         };
+        Console.prototype.printOSFeedBack = function (text) {
+            for (var i = 0; i < text.length; i++) {
+                this.putText(text[i]);
+            }
+            this.advanceLine();
+            _OsShell.putPrompt();
+        };
+        Console.prototype.printLongText = function (text) {
+            for (var i = 0; i < text.length; i++) {
+                this.putText(text[i]);
+            }
+        };
         Console.prototype.putText = function (text) {
             // My first inclination here was to write two functions: putChar() and putString().
             // Then I remembered that JavaScript is (sadly) untyped and it won't differentiate

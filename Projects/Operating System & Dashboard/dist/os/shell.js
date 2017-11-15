@@ -326,10 +326,8 @@ var TSOS;
                 ps += "[PID: " + currentPCB.programId + ", State: " + currentPCB.state + "] | ";
             }
             ps = ps.substr(0, ps.length - 3);
-            // Print each letter individually to account for line wrapping
-            for (var i = 0; i < ps.length; i++) {
-                _StdOut.putText(ps[i]);
-            }
+            // Print out the active processes
+            _StdOut.printLongText(ps);
         };
         Shell.prototype.shellKill = function (args) {
             if (args.length > 0) {
@@ -484,9 +482,7 @@ var TSOS;
                 }
                 // Print out the description
                 if (description) {
-                    for (var i = 0; i < description.length; i++) {
-                        _StdOut.putText(description[i]);
-                    }
+                    _StdOut.printLongText(description);
                 }
                 else {
                     _StdOut.putText("No manual entry for " + args[0] + ".");

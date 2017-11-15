@@ -352,11 +352,8 @@ module TSOS {
             }
             ps = ps.substr(0, ps.length - 3);
 
-            // Print each letter individually to account for line wrapping
-            for (var i: number = 0; i < ps.length; i++) {
-                _StdOut.putText(ps[i]);
-            }
-            
+            // Print out the active processes
+           _StdOut.printLongText(ps);
         }
 
         public shellKill(args) {
@@ -525,9 +522,7 @@ module TSOS {
                 }
                 // Print out the description
                 if (description) {
-                    for (var i: number = 0; i < description.length; i++) {
-                        _StdOut.putText(description[i]);
-                    }
+                    _StdOut.printLongText(description);
                 }
                 else {
                     _StdOut.putText("No manual entry for " + args[0] + ".");

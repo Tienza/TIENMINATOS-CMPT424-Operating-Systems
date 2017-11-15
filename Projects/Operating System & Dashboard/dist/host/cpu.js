@@ -329,9 +329,7 @@ var TSOS;
                     code = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, address), 16);
                 }
                 // Print the individual letters so that putText can calculate word wrap
-                for (var i = 0; i < workingString.length; i++) {
-                    _StdOut.putText(workingString[i]);
-                }
+                _StdOut.printLongText(workingString);
             }
         };
         return CPU;

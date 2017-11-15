@@ -68,9 +68,7 @@ var TSOS;
                     }
                 }
                 else {
-                    _StdOut.putText("Error: Disk not formatted! Please use the format command");
-                    _StdOut.advanceLine();
-                    _OsShell.putPrompt();
+                    _StdOut.printOSFeedBack("Error: Disk not formatted! Please use the format command");
                 }
             }
         };
@@ -78,9 +76,7 @@ var TSOS;
             var directoryTSB = this.fetchNextFreeDirectoryLoc();
             var fileTSB = this.fetchNextFreeFileLoc();
             if (directoryTSB === this.isFull || fileTSB === this.isFull) {
-                _StdOut.putText("HDD is at full capacity. Please delete files or format the disk");
-                _StdOut.advanceLine();
-                _OsShell.putPrompt();
+                _StdOut.printOSFeedBack("HDD is at full capacity. Please delete files or format the disk");
             }
             else {
                 var directoryTSBVal = "1" + this.fetchFileTSBVal(fileTSB);
@@ -89,6 +85,9 @@ var TSOS;
                 if (directoryTSBValSize <= _HDD.bytes) {
                     console.log(directoryTSBVal);
                     console.log(fileNameHex);
+                }
+                else {
+                    _StdOut.printOSFeedBack("File name exceeds allocated memory. Please shorten and try again");
                 }
             }
         };
