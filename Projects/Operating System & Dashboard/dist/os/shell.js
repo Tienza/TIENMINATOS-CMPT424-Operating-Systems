@@ -58,6 +58,9 @@ var TSOS;
             // toggle
             sc = new TSOS.ShellCommand(this.shellToggle, "toggle", "< wttat | ssm > - Toggle the various modes of the operating system");
             this.commandList[this.commandList.length] = sc;
+            // create
+            sc = new TSOS.ShellCommand(this.shellCreate, "create", "< filename > - Creates a file on the hard disk");
+            this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
             this.commandList[this.commandList.length] = sc;
@@ -261,8 +264,8 @@ var TSOS;
         };
         Shell.prototype.shellLoad = function (args) {
             var userInput = $('#taProgramInput').val();
-            userInput = cleanInput(userInput);
-            var hexObj = isHex(userInput);
+            userInput = TSOS.Utils.cleanInput(userInput);
+            var hexObj = TSOS.Utils.isHex(userInput);
             var isHexValid = hexObj.isHex;
             if (userInput !== "Overflow") {
                 if (isHexValid && userInput !== "") {
@@ -292,34 +295,6 @@ var TSOS;
             }
             else {
                 _StdOut.putText("User input is too large, please reduce size and try again");
-            }
-            function isHex(userInput) {
-                var testInput = userInput.replace(/ /g, "");
-                var testInputArray = testInput.split("");
-                var isHex = true;
-                for (var i = 0; i < testInputArray.length; i++) {
-                    var processedString = parseInt(testInputArray[i], 16);
-                    if ((processedString.toString(16) === testInputArray[i].toLowerCase()) === false) {
-                        isHex = false;
-                        break;
-                    }
-                }
-                return { isHex: isHex, hexVal: userInput };
-            }
-            function cleanInput(string) {
-                var workingString = string.replace(new RegExp(" ", 'g'), "");
-                var workingArray = workingString.match(/.{1,2}/g);
-                if (workingArray.length <= _SegmentSize) {
-                    // Append 00 to end of code for standardization
-                    for (var i = workingArray.length; i < _SegmentSize; i++) {
-                        workingArray.push("00");
-                    }
-                    workingString = workingArray.join(" ").toUpperCase();
-                }
-                else {
-                    workingString = "Overflow";
-                }
-                return workingString;
             }
         };
         Shell.prototype.shellRun = function (args) {
@@ -448,6 +423,17 @@ var TSOS;
             }
             else {
                 _StdOut.putText("< Print WT/TAT: " + _CalculateWTTAT.toString().toUpperCase() + " | Single Step Mode: " + _SingleStep.toString().toUpperCase() + " >");
+            }
+        };
+        Shell.prototype.shellCreate = function (args) {
+            if (args.length > 0) {
+                var fileName = args[0];
+                var parameters = ["create", fileName];
+                console.log(FILE_SYSTEM_IRQ);
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, parameters));
+            }
+            else {
+                _StdOut.putText("Please provide a file name and try again");
             }
         };
         Shell.prototype.shellHelp = function (args) {

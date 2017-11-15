@@ -8,6 +8,41 @@ var TSOS;
     var Utils = /** @class */ (function () {
         function Utils() {
         }
+        Utils.toHex = function (input) {
+            var hexVal = "";
+            for (var i = 0; i < input.length; i++) {
+                hexVal += "" + input.charCodeAt(i).toString(16).toUpperCase();
+            }
+            return hexVal;
+        };
+        Utils.isHex = function (userInput) {
+            var testInput = userInput.replace(/ /g, "");
+            var testInputArray = testInput.split("");
+            var isHex = true;
+            for (var i = 0; i < testInputArray.length; i++) {
+                var processedString = parseInt(testInputArray[i], 16);
+                if ((processedString.toString(16) === testInputArray[i].toLowerCase()) === false) {
+                    isHex = false;
+                    break;
+                }
+            }
+            return { isHex: isHex, hexVal: userInput };
+        };
+        Utils.cleanInput = function (userInput) {
+            var workingString = userInput.replace(new RegExp(" ", 'g'), "");
+            var workingArray = workingString.match(/.{1,2}/g);
+            if (workingArray.length <= _SegmentSize) {
+                // Append 00 to end of code for standardization
+                for (var i = workingArray.length; i < _SegmentSize; i++) {
+                    workingArray.push("00");
+                }
+                workingString = workingArray.join(" ").toUpperCase();
+            }
+            else {
+                workingString = "Overflow";
+            }
+            return workingString;
+        };
         Utils.trim = function (str) {
             // Use a regular expression to remove leading and trailing spaces.
             return str.replace(/^\s+ | \s+$/g, "");

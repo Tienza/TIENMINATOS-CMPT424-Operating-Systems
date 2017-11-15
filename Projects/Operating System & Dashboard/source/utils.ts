@@ -8,6 +8,47 @@ module TSOS {
 
     export class Utils {
 
+        public static toHex(input): string {
+            var hexVal: string = "";
+
+            for(var i = 0; i < input.length; i++) {
+                hexVal += "" + input.charCodeAt(i).toString(16).toUpperCase();
+            }
+            
+            return hexVal;
+        }
+
+        public static isHex(userInput): {[key: string]: any} {
+            var testInput: string = userInput.replace(/ /g, "");
+            var testInputArray: string[] = testInput.split("");
+            var isHex: boolean = true;
+            for (var i = 0; i < testInputArray.length; i++) {
+                var processedString = parseInt(testInputArray[i], 16);
+                if ((processedString.toString(16) === testInputArray[i].toLowerCase()) === false) {
+                    isHex = false;
+                    break;
+                }
+            }
+            return { isHex: isHex, hexVal: userInput };
+        }
+
+        public static cleanInput(userInput): string {
+            var workingString: string = userInput.replace(new RegExp(" ", 'g'), "");
+            var workingArray: string[] = workingString.match(/.{1,2}/g);
+            if (workingArray.length <= _SegmentSize) {
+                // Append 00 to end of code for standardization
+                for (var i: number = workingArray.length; i < _SegmentSize; i++) {
+                    workingArray.push("00");
+                }
+                workingString = workingArray.join(" ").toUpperCase();
+            }
+            else {
+                workingString = "Overflow";
+            }
+
+            return workingString;
+        }
+
         public static trim(str): string {
             // Use a regular expression to remove leading and trailing spaces.
             return str.replace(/^\s+ | \s+$/g, "");

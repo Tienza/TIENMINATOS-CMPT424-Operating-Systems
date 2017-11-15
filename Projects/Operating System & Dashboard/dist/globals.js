@@ -85,7 +85,7 @@ var _SarcasticMode = false;
 var _CalculateWTTAT = false;
 // Global Device Driver Objects - page 12
 var _krnKeyboardDriver; //  = null;
-var _krnFsDriver;
+var _krnFileSystemDriver;
 var _hardwareClockID = null;
 // Global Variable For Log Message
 var _LastLogMsg = null;

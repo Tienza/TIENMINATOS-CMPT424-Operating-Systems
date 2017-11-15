@@ -56,9 +56,9 @@ module TSOS {
 
             // Load the File System Driver
             this.krnTrace("Loading the file system driver.");
-            _krnFsDriver = new DeviceDriverFs();
-            _krnFsDriver.driverEntry();
-            this.krnTrace(_krnFsDriver.status);
+            _krnFileSystemDriver = new DeviceDriverFs();
+            _krnFileSystemDriver.driverEntry();
+            this.krnTrace(_krnFileSystemDriver.status);
 
             //
             // ... more?
@@ -149,6 +149,9 @@ module TSOS {
                     break;
                 case CONTEXT_SWITCH_IRQ:
                     _Scheduler.contextSwitch();
+                    break;
+                case FILE_SYSTEM_IRQ:
+                    _krnFileSystemDriver.isr(params);
                     break;
                 default:
                     this.krnTrapError("Invalid Interrupt Request. irq=" + irq + " params=[" + params + "]");

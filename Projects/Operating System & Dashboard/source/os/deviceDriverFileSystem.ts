@@ -14,7 +14,7 @@
         // Extends DeviceDriver
         export class DeviceDriverFs extends DeviceDriver {
     
-            constructor() {
+            constructor(public isFull: string = "u,u,u") {
                 // Override the base method pointers.
     
                 // The code below cannot run because "this" can only be
@@ -43,6 +43,7 @@
                     if (_HDD.isFormatted) {
                         switch (operation) {
                             case "create":
+                                this.createFile(fileName);
                                 break;
                             case "ls":
                                 break;
@@ -66,17 +67,43 @@
                 }
             }
 
-            private fetchNextDirLoc(): string {
+            private createFile(fileName: string) {
+                var directoryTSB: string = this.fetchNextFreeDirectoryLoc();
+                var fileTSB: string = this.fetchNextFreeFileLoc();
+
+                if (directoryTSB === this.isFull || fileTSB === this.isFull) {
+                    _StdOut.putText("HDD is at full capacity. Please delete files or format the disk");
+                    _StdOut.advanceLine();
+                    _OsShell.putPrompt();
+                }
+                else {
+                    var directoryTSBVal: string = "1" + this.fetchFileTSBVal(fileTSB);
+                    var fileNameHex: string = TSOS.Utils.toHex(fileName);
+                    var directoryTSBValSize: number = directoryTSBVal.length + fileNameHex.length;
+
+                    if (directoryTSBValSize <= _HDD.bytes) {
+                        console.log(directoryTSBVal);
+                        console.log(fileNameHex);
+                    }
+
+                }
+            } 
+
+            public fetchNextFreeDirectoryLoc(): string {
                 var mbr: string = _HDDAccessor.readFromHDD("0,0,0");
                 return _HDDAccessor.getTSB(mbr[0], mbr[1], mbr[2]);
             }
 
-            private fetchNextFileLoc(): string {
+            public fetchNextFreeFileLoc(): string {
                 var mbr: string = _HDDAccessor.readFromHDD("0,0,0");
                 return _HDDAccessor.getTSB(mbr[3], mbr[4], mbr[5]);
             }
 
-            private alterNextDirLoc(): void {
+            public fetchFileTSBVal(fileTSB) {
+                return fileTSB[0] + fileTSB[2] + fileTSB[4];
+            }
+
+            public alterNextDirLoc(): void {
                 var mbr: string = _HDDAccessor.readFromHDD("0,0,0");
                 var mbrWorkingArray: string[] = mbr.split("");
                 var located: boolean = false;
@@ -105,7 +132,7 @@
                 }
             }
 
-            private alterNextFileLoc() {
+            public alterNextFileLoc() {
                 var mbr: string = _HDDAccessor.readFromHDD("0,0,0");
                 var mbrWorkingArray: string[] = mbr.split("");
                 var located: boolean = false;
