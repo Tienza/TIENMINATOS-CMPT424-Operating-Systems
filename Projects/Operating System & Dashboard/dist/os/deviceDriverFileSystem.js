@@ -22,15 +22,19 @@ var TSOS;
     // Extends DeviceDriver
     var DeviceDriverFs = /** @class */ (function (_super) {
         __extends(DeviceDriverFs, _super);
-        function DeviceDriverFs(isFull) {
+        function DeviceDriverFs(isFull, seperator, seperatorHex) {
             // Override the base method pointers.
             if (isFull === void 0) { isFull = "u,u,u"; }
+            if (seperator === void 0) { seperator = "`"; }
+            if (seperatorHex === void 0) { seperatorHex = TSOS.Utils.toHex(seperator); }
             var _this = 
             // The code below cannot run because "this" can only be
             // accessed after calling super.
             //super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
             _super.call(this) || this;
             _this.isFull = isFull;
+            _this.seperator = seperator;
+            _this.seperatorHex = seperatorHex;
             _this.driverEntry = _this.krnFsDriverEntry;
             _this.isr = _this.krnFsDispatchKeyPress;
             return _this;
@@ -78,13 +82,36 @@ var TSOS;
             if (directoryTSB === this.isFull || fileTSB === this.isFull) {
                 _StdOut.printOSFeedBack("HDD is at full capacity. Please delete files or format the disk");
             }
+            else if (this.checkFileExists(fileName) !== "FILE DOES NOT EXIST") {
+                _StdOut.printOSFeedBack("A file named " + fileName + " already exists. Please rename and try again");
+            }
             else {
                 var directoryTSBVal = "1" + this.fetchFileTSBVal(fileTSB);
                 var fileNameHex = TSOS.Utils.toHex(fileName);
-                var directoryTSBValSize = directoryTSBVal.length + fileNameHex.length;
+                var dateTime = TSOS.Utils.getDateTime();
+                var dateTimeHex = TSOS.Utils.toHex(dateTime);
+                var fileSize = TSOS.Utils.toHex("0");
+                var directoryInfo = directoryTSBVal + fileNameHex + this.seperatorHex + dateTimeHex + this.seperatorHex + fileSize + this.seperatorHex;
+                var directoryTSBValSize = directoryInfo.length;
                 if (directoryTSBValSize <= _HDD.bytes) {
-                    console.log(directoryTSBVal);
-                    console.log(fileNameHex);
+                    // Zero fill directory data
+                    for (var i = directoryTSBValSize; i < _HDD.bytes; i++) {
+                        directoryInfo += "0";
+                    }
+                    console.log("diractoryTSBVal Size: " + directoryInfo.length);
+                    console.log("directoryTSBVal: " + directoryInfo);
+                    var translatedVal = TSOS.Utils.fromHex(directoryInfo.substring(4)).split(this.seperator);
+                    console.log("File Name: " + translatedVal[0], "Create Date: " + translatedVal[1], "Size: " + translatedVal[2]);
+                    // Create the file - Notate as in-use, final file location, and empty data
+                    var fileInfo = "1uuu" + EMPTY_FILE_DATA;
+                    // Write to the HDD - Directory first then file
+                    _HDDAccessor.writeToHDD(directoryTSB, directoryInfo);
+                    _HDDAccessor.writeToHDD(fileTSB, fileInfo);
+                    // Update the directory and file information
+                    this.alterNextDirLoc();
+                    this.alterNextFileLoc();
+                    // Confirm file creation
+                    _StdOut.printOSFeedBack("File " + fileName + " successfully created at " + dateTime);
                 }
                 else {
                     _StdOut.printOSFeedBack("File name exceeds allocated memory. Please shorten and try again");
@@ -134,7 +161,7 @@ var TSOS;
             var located = false;
             for (var tsb in _HDD.storage) {
                 // If the file block is NOT on the 0 Track and NOT in use
-                if (parseInt(tsb[0]) > 0 && _HDDAccessor.readFromHDD(tsb)[0] !== "0") {
+                if (parseInt(tsb[0]) > 0 && _HDDAccessor.readFromHDD(tsb)[0] !== "1") {
                     located = true;
                     // Assign the value of tsb to mbrWorkingArray, the provided indexes are used to skip over the commas in the string
                     mbrWorkingArray[3] = tsb[0];
@@ -153,6 +180,21 @@ var TSOS;
                     _HDDAccessor.writeToHDD("0,0,0", mbrWorkingArray.join(""));
                 }
             }
+        };
+        DeviceDriverFs.prototype.checkFileExists = function (fileName) {
+            var trackSectorBlock = "FILE DOES NOT EXIST";
+            for (var tsb in _HDD.storage) {
+                // Check if the tsb is in the 0 track and if it is currently in use
+                if (tsb[0] === "0" && _HDDAccessor.readFromHDD(tsb)[0] === "1") {
+                    var existingFileNameHex = _HDDAccessor.readFromHDD(tsb).substring(4);
+                    var existingFileNameAscii = TSOS.Utils.fromHex(existingFileNameHex);
+                    if (fileName === existingFileNameAscii) {
+                        trackSectorBlock = tsb;
+                        break;
+                    }
+                }
+            }
+            return trackSectorBlock;
         };
         return DeviceDriverFs;
     }(TSOS.DeviceDriver));

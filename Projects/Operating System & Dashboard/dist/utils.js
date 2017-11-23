@@ -8,12 +8,44 @@ var TSOS;
     var Utils = /** @class */ (function () {
         function Utils() {
         }
+        Utils.getDateTime = function () {
+            var now = new Date();
+            var year = "" + now.getFullYear();
+            var month = "" + (now.getMonth() + 1);
+            if (month.length == 1) {
+                month = "0" + month;
+            }
+            var day = "" + now.getDate();
+            if (day.length == 1) {
+                day = "0" + day;
+            }
+            var hour = "" + now.getHours();
+            if (hour.length == 1) {
+                hour = "0" + hour;
+            }
+            var minute = "" + now.getMinutes();
+            if (minute.length == 1) {
+                minute = "0" + minute;
+            }
+            var second = "" + now.getSeconds();
+            if (second.length == 1) {
+                second = "0" + second;
+            }
+            return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
+        };
         Utils.toHex = function (input) {
             var hexVal = "";
             for (var i = 0; i < input.length; i++) {
-                hexVal += "" + input.charCodeAt(i).toString(16).toUpperCase();
+                hexVal += input.charCodeAt(i).toString(16).toUpperCase();
             }
             return hexVal;
+        };
+        Utils.fromHex = function (input) {
+            var asciiVal = "";
+            for (var i = 0; i < input.length; i += 2) {
+                asciiVal += String.fromCharCode(parseInt(input.substr(i, 2), 16));
+            }
+            return asciiVal;
         };
         Utils.isHex = function (userInput) {
             var testInput = userInput.replace(/ /g, "");

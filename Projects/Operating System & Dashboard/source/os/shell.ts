@@ -459,7 +459,6 @@ module TSOS {
             if (args.length > 0) {
                 var fileName: string = args[0];
                 var parameters: string[] = ["create", fileName];
-                console.log(FILE_SYSTEM_IRQ);
                 _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, parameters));
             }
             else {
@@ -624,7 +623,7 @@ module TSOS {
         }
 
         public shellDateTime(args) {
-            _StdOut.putText(Date());
+            _StdOut.putText(TSOS.Utils.getDateTime());
         }
 
         public shellLatLong(args) {

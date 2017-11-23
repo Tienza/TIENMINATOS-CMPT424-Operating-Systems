@@ -73,8 +73,6 @@ var TSOS;
                         chr = ".";
                     else if (keyCode === 191)
                         chr = "/";
-                    else if (keyCode === 192)
-                        chr = "`";
                     else if (keyCode === 219)
                         chr = "[";
                     else if (keyCode === 220)
@@ -118,8 +116,6 @@ var TSOS;
                         chr = ">";
                     else if (keyCode === 191)
                         chr = "?";
-                    else if (keyCode === 192)
-                        chr = "~";
                     else if (keyCode === 219)
                         chr = "{";
                     else if (keyCode === 220)

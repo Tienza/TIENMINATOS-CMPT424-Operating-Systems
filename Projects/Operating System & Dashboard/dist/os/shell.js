@@ -427,7 +427,6 @@ var TSOS;
             if (args.length > 0) {
                 var fileName = args[0];
                 var parameters = ["create", fileName];
-                console.log(FILE_SYSTEM_IRQ);
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, parameters));
             }
             else {
@@ -574,7 +573,7 @@ var TSOS;
             _StdOut.putText(time);
         };
         Shell.prototype.shellDateTime = function (args) {
-            _StdOut.putText(Date());
+            _StdOut.putText(TSOS.Utils.getDateTime());
         };
         Shell.prototype.shellLatLong = function (args) {
             getLocation();

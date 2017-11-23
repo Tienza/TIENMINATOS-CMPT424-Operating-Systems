@@ -67,8 +67,9 @@ module TSOS {
                         chr = ".";
                     else if (keyCode === 191)
                         chr = "/";
-                    else if (keyCode === 192)
-                        chr = "`";
+                    // Special character reserved as sperator for file information
+                    /*else if (keyCode === 192)
+                        chr = "`";*/
                     else if (keyCode === 219)
                         chr = "[";
                     else if (keyCode === 220)
@@ -114,8 +115,9 @@ module TSOS {
                         chr = ">";
                     else if (keyCode === 191)
                         chr = "?";
-                    else if (keyCode === 192)
-                        chr = "~";
+                    // Special character reserved for system files
+                    /*else if (keyCode === 192)
+                        chr = "~";*/
                     else if (keyCode === 219)
                         chr = "{";
                     else if (keyCode === 220)
