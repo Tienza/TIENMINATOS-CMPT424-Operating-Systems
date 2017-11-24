@@ -8,6 +8,17 @@ module TSOS {
 
     export class Utils {
 
+        public static isProperWriteData(data: string[]): boolean {
+            var isProper = false;
+            var firstWord: string = data[0];
+            var lastWord: string = data[data.length - 1];
+            
+            if ((/^\"/.test(firstWord) && /\"$/.test(lastWord)) || (/^\'/.test(firstWord) && /\'$/.test(lastWord)))
+                isProper = true;
+            
+            return isProper;
+        }
+
         public static getDateTime(): string {
             var now = new Date();
             var year = "" + now.getFullYear();
@@ -16,7 +27,7 @@ module TSOS {
             var hour = "" + now.getHours(); if (hour.length == 1) { hour = "0" + hour; }
             var minute = "" + now.getMinutes(); if (minute.length == 1) { minute = "0" + minute; }
             var second = "" + now.getSeconds(); if (second.length == 1) { second = "0" + second; }
-            
+
             return year + "-" + month + "-" + day + " " + hour + ":" + minute + ":" + second;
         }
 

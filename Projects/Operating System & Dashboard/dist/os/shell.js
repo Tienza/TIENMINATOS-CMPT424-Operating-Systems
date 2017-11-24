@@ -50,16 +50,28 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "Clear all memory partitions.");
             this.commandList[this.commandList.length] = sc;
             // quantum
-            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "< int > - Modify the quantum of Round Robin Scheudling");
+            sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "< int > - Modify the quantum of Round Robin Scheudling.");
             this.commandList[this.commandList.length] = sc;
             // scheduler
-            sc = new TSOS.ShellCommand(this.shellScheduler, "scheduler", "< [empty] | rr | sjf | fcfs | priority > - Get/Set the scheduling algoritm");
+            sc = new TSOS.ShellCommand(this.shellScheduler, "scheduler", "< [empty] | rr | sjf | fcfs | priority > - Get/Set the scheduling algoritm.");
             this.commandList[this.commandList.length] = sc;
             // toggle
-            sc = new TSOS.ShellCommand(this.shellToggle, "toggle", "< wttat | ssm > - Toggle the various modes of the operating system");
+            sc = new TSOS.ShellCommand(this.shellToggle, "toggle", "< wttat | ssm > - Toggle the various modes of the operating system.");
             this.commandList[this.commandList.length] = sc;
             // create
-            sc = new TSOS.ShellCommand(this.shellCreate, "create", "< filename > - Creates a file on the hard disk");
+            sc = new TSOS.ShellCommand(this.shellCreate, "create", "< filename > - Creates a file on the hard disk.");
+            this.commandList[this.commandList.length] = sc;
+            // touch
+            sc = new TSOS.ShellCommand(this.shellCreate, "touch", "Alias for 'create'.");
+            this.commandList[this.commandList.length] = sc;
+            // read
+            sc = new TSOS.ShellCommand(this.shellRead, "read", "< filename > - Displays the contents of a file.");
+            this.commandList[this.commandList.length] = sc;
+            // cat
+            sc = new TSOS.ShellCommand(this.shellRead, "cat", "Alias for 'read'.");
+            this.commandList[this.commandList.length] = sc;
+            // write
+            sc = new TSOS.ShellCommand(this.shellWrite, "write", "< filename > < \" data \" > - Writes the specified data to the file.");
             this.commandList[this.commandList.length] = sc;
             // date
             sc = new TSOS.ShellCommand(this.shellDate, "date", "- Displays the current date.");
@@ -89,7 +101,7 @@ var TSOS;
             sc = new TSOS.ShellCommand(this.shellCls, "cls", "- Clears the screen and resets the cursor position.");
             this.commandList[this.commandList.length] = sc;
             // clear
-            sc = new TSOS.ShellCommand(this.shellCls, "clear", "- Alias for \"cls\".");
+            sc = new TSOS.ShellCommand(this.shellCls, "clear", "- Alias for 'cls'.");
             this.commandList[this.commandList.length] = sc;
             // man <topic>
             sc = new TSOS.ShellCommand(this.shellMan, "man", "<topic> - Displays the MANual page for <topic>.");
@@ -431,6 +443,33 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
+            }
+        };
+        Shell.prototype.shellRead = function (args) {
+            if (args.length > 0) {
+                var fileName = args[0];
+                var parameters = ["read", fileName];
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, parameters));
+            }
+            else {
+                _StdOut.putText("Please provide a file name and try again");
+            }
+        };
+        Shell.prototype.shellWrite = function (args) {
+            if (args.length > 0) {
+                var fileName = args[0];
+                var writeData = args.slice(1, args.length);
+                if (TSOS.Utils.isProperWriteData(writeData)) {
+                    var data = writeData.join(" ");
+                    var parameters = ["write", fileName, data];
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, parameters));
+                }
+                else {
+                    _StdOut.printLongText("The data that you want to write to the file must be surrounded by \"double quotes\" or 'single quotes'");
+                }
+            }
+            else {
+                _StdOut.putText("Please provide a file name and/or data to write to file");
             }
         };
         Shell.prototype.shellHelp = function (args) {

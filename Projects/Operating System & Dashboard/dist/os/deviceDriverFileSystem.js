@@ -22,9 +22,10 @@ var TSOS;
     // Extends DeviceDriver
     var DeviceDriverFs = /** @class */ (function (_super) {
         __extends(DeviceDriverFs, _super);
-        function DeviceDriverFs(isFull, seperator, seperatorHex) {
+        function DeviceDriverFs(isFull, noSuchFile, seperator, seperatorHex) {
             // Override the base method pointers.
             if (isFull === void 0) { isFull = "u,u,u"; }
+            if (noSuchFile === void 0) { noSuchFile = "FILE DOES NOT EXIST"; }
             if (seperator === void 0) { seperator = "`"; }
             if (seperatorHex === void 0) { seperatorHex = TSOS.Utils.toHex(seperator); }
             var _this = 
@@ -33,6 +34,7 @@ var TSOS;
             //super(this.krnKbdDriverEntry, this.krnKbdDispatchKeyPress);
             _super.call(this) || this;
             _this.isFull = isFull;
+            _this.noSuchFile = noSuchFile;
             _this.seperator = seperator;
             _this.seperatorHex = seperatorHex;
             _this.driverEntry = _this.krnFsDriverEntry;
@@ -60,10 +62,12 @@ var TSOS;
                         case "ls":
                             break;
                         case "write":
+                            this.writeFile(fileName, data);
                             break;
                         case "delete":
                             break;
                         case "read":
+                            this.readFile(fileName);
                             break;
                         case "rollOut":
                             break;
@@ -76,6 +80,58 @@ var TSOS;
                 }
             }
         };
+        DeviceDriverFs.prototype.readFile = function (fileName) {
+            var directoryTSB = this.checkFileExists(fileName);
+            if (directoryTSB !== this.noSuchFile) {
+                // Buffer for file content
+                var fileContent = "";
+                // Fetch the TSB of the file from the first file block stored in the directory
+                var directoryVal = _HDDAccessor.readFromHDD(directoryTSB);
+                var fileTSB = this.getTSBFromVal(directoryVal);
+                // Read the value of the first fileTSB
+                var fileVal = this.getVal(_HDDAccessor.readFromHDD(fileTSB));
+                // Check to see if file isn't empty, if it is then stop reading
+                if (fileVal !== EMPTY_FILE_DATA) {
+                    fileContent += TSOS.Utils.fromHex(fileVal);
+                    _StdOut.printOSFeedBack(fileContent);
+                }
+                else {
+                    _StdOut.printOSFeedBack("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
+                }
+            }
+            else {
+                _StdOut.printOSFeedBack("File '" + fileName + "' does not exist. Please try again");
+            }
+        };
+        DeviceDriverFs.prototype.writeFile = function (fileName, data) {
+            var directoryTSB = this.checkFileExists(fileName);
+            if (directoryTSB !== this.noSuchFile) {
+                // Get the file TSB from the directory TSB
+                var directoryVal = _HDDAccessor.readFromHDD(directoryTSB);
+                var fileTSB = this.getTSBFromVal(directoryVal);
+                // Remove the open and closing quotes from the string and convert to hex
+                var hexData = TSOS.Utils.toHex(data.slice(1, -1));
+                // Retrieve the contents at the fileTSB
+                var fileVal = _HDDAccessor.readFromHDD(fileTSB);
+                var nextTSB = this.getTSBFromVal(fileVal);
+                var fileHeader = this.getFileHeader(fileVal);
+                console.log(fileHeader);
+                // Assemble the string
+                var fileInfo = fileHeader + hexData;
+                if (fileInfo.length <= _HDD.bytes) {
+                    // Write to the _HDD
+                    _HDDAccessor.writeToHDD(fileTSB, fileInfo);
+                    // Print confirmation
+                    _StdOut.printOSFeedBack("Successfully wrote to file '" + fileName + "'");
+                }
+                else {
+                    _StdOut.printOSFeedBack("Text is currently too large, logic to write new files will be written soon");
+                }
+            }
+            else {
+                _StdOut.printOSFeedBack("File '" + fileName + "' does not exist. Please try again");
+            }
+        };
         DeviceDriverFs.prototype.createFile = function (fileName) {
             var directoryTSB = this.fetchNextFreeDirectoryLoc();
             var fileTSB = this.fetchNextFreeFileLoc();
@@ -86,32 +142,34 @@ var TSOS;
                 _StdOut.printOSFeedBack("A file named " + fileName + " already exists. Please rename and try again");
             }
             else {
-                var directoryTSBVal = "1" + this.fetchFileTSBVal(fileTSB);
+                var directoryVal = "";
+                var fileTSBString = "1" + this.removeCommaFromTSB(fileTSB);
                 var fileNameHex = TSOS.Utils.toHex(fileName);
                 var dateTime = TSOS.Utils.getDateTime();
                 var dateTimeHex = TSOS.Utils.toHex(dateTime);
                 var fileSize = TSOS.Utils.toHex("0");
-                var directoryInfo = directoryTSBVal + fileNameHex + this.seperatorHex + dateTimeHex + this.seperatorHex + fileSize + this.seperatorHex;
-                var directoryTSBValSize = directoryInfo.length;
-                if (directoryTSBValSize <= _HDD.bytes) {
+                // Assign all the associated variables to directoryVal
+                directoryVal = fileTSBString + fileNameHex + this.seperatorHex + dateTimeHex + this.seperatorHex + fileSize + this.seperatorHex;
+                var directoryValSize = directoryVal.length;
+                if (directoryValSize <= _HDD.bytes) {
                     // Zero fill directory data
-                    for (var i = directoryTSBValSize; i < _HDD.bytes; i++) {
-                        directoryInfo += "0";
+                    for (var i = directoryValSize; i < _HDD.bytes; i++) {
+                        directoryVal += "0";
                     }
-                    console.log("diractoryTSBVal Size: " + directoryInfo.length);
-                    console.log("directoryTSBVal: " + directoryInfo);
-                    var translatedVal = TSOS.Utils.fromHex(directoryInfo.substring(4)).split(this.seperator);
+                    console.log("diractoryVal Size: " + directoryVal.length);
+                    console.log("directoryVal: " + directoryVal);
+                    var translatedVal = this.translateDirectoryInformation(directoryVal);
                     console.log("File Name: " + translatedVal[0], "Create Date: " + translatedVal[1], "Size: " + translatedVal[2]);
                     // Create the file - Notate as in-use, final file location, and empty data
                     var fileInfo = "1uuu" + EMPTY_FILE_DATA;
                     // Write to the HDD - Directory first then file
-                    _HDDAccessor.writeToHDD(directoryTSB, directoryInfo);
+                    _HDDAccessor.writeToHDD(directoryTSB, directoryVal);
                     _HDDAccessor.writeToHDD(fileTSB, fileInfo);
                     // Update the directory and file information
                     this.alterNextDirLoc();
                     this.alterNextFileLoc();
                     // Confirm file creation
-                    _StdOut.printOSFeedBack("File " + fileName + " successfully created at " + dateTime);
+                    _StdOut.printOSFeedBack("File '" + fileName + "' successfully created");
                 }
                 else {
                     _StdOut.printOSFeedBack("File name exceeds allocated memory. Please shorten and try again");
@@ -126,7 +184,7 @@ var TSOS;
             var mbr = _HDDAccessor.readFromHDD("0,0,0");
             return _HDDAccessor.getTSB(mbr[3], mbr[4], mbr[5]);
         };
-        DeviceDriverFs.prototype.fetchFileTSBVal = function (fileTSB) {
+        DeviceDriverFs.prototype.removeCommaFromTSB = function (fileTSB) {
             return fileTSB[0] + fileTSB[2] + fileTSB[4];
         };
         DeviceDriverFs.prototype.alterNextDirLoc = function () {
@@ -182,12 +240,13 @@ var TSOS;
             }
         };
         DeviceDriverFs.prototype.checkFileExists = function (fileName) {
-            var trackSectorBlock = "FILE DOES NOT EXIST";
+            var trackSectorBlock = this.noSuchFile;
             for (var tsb in _HDD.storage) {
                 // Check if the tsb is in the 0 track and if it is currently in use
                 if (tsb[0] === "0" && _HDDAccessor.readFromHDD(tsb)[0] === "1") {
-                    var existingFileNameHex = _HDDAccessor.readFromHDD(tsb).substring(4);
-                    var existingFileNameAscii = TSOS.Utils.fromHex(existingFileNameHex);
+                    var directoryTSBVal = _HDDAccessor.readFromHDD(tsb);
+                    var translatedVal = this.translateDirectoryInformation(directoryTSBVal);
+                    var existingFileNameAscii = translatedVal[0];
                     if (fileName === existingFileNameAscii) {
                         trackSectorBlock = tsb;
                         break;
@@ -195,6 +254,18 @@ var TSOS;
                 }
             }
             return trackSectorBlock;
+        };
+        DeviceDriverFs.prototype.getFileHeader = function (tsbVal) {
+            return tsbVal.substring(0, 4);
+        };
+        DeviceDriverFs.prototype.getTSBFromVal = function (tsbVal) {
+            return _HDDAccessor.getTSB(tsbVal[1], tsbVal[2], tsbVal[3]);
+        };
+        DeviceDriverFs.prototype.getVal = function (tsbVal) {
+            return tsbVal.substring(4);
+        };
+        DeviceDriverFs.prototype.translateDirectoryInformation = function (hexVal) {
+            return TSOS.Utils.fromHex(hexVal.substring(4)).split(this.seperator);
         };
         return DeviceDriverFs;
     }(TSOS.DeviceDriver));

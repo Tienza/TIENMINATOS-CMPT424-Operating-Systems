@@ -8,6 +8,14 @@ var TSOS;
     var Utils = /** @class */ (function () {
         function Utils() {
         }
+        Utils.isProperWriteData = function (data) {
+            var isProper = false;
+            var firstWord = data[0];
+            var lastWord = data[data.length - 1];
+            if ((/^\"/.test(firstWord) && /\"$/.test(lastWord)) || (/^\'/.test(firstWord) && /\'$/.test(lastWord)))
+                isProper = true;
+            return isProper;
+        };
         Utils.getDateTime = function () {
             var now = new Date();
             var year = "" + now.getFullYear();
