@@ -485,8 +485,7 @@ module TSOS {
         public shellCreate(args) {
             if (args.length > 0) {
                 var fileName: string = args[0];
-                var parameters: string[] = ["create", fileName];
-                _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, parameters));
+                _krnFileSystemDriver.createFile(fileName);
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
@@ -496,8 +495,7 @@ module TSOS {
         public shellRead(args) {
             if (args.length > 0) {
                 var fileName: string = args[0];
-                var parameters: string[] = ["read", fileName];
-                _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, parameters));
+                _krnFileSystemDriver.readFile(fileName);
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
@@ -510,8 +508,7 @@ module TSOS {
                 var writeData: string[] = args.slice(1, args.length);
                 if (TSOS.Utils.isProperWriteData(writeData)) {
                     var data: string = writeData.join(" ");
-                    var parameters: string[] = ["write", fileName, data];
-                    _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, parameters));
+                    _krnFileSystemDriver.writeFile(fileName, data);
                 }
                 else {
                     _StdOut.printLongText("The data that you want to write to the file must be surrounded by \"double quotes\" or 'single quotes'");

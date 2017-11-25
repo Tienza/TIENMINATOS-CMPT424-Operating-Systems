@@ -130,7 +130,7 @@ var TSOS;
                 } while (fileTSB !== "u,u,u");
             }
             else {
-                _StdOut.printOSFeedBack("File '" + fileName + "' does not exist. Please try again");
+                _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
         };
         DeviceDriverFs.prototype.readFile = function (fileName) {
@@ -152,14 +152,14 @@ var TSOS;
                         fileTSB = this.getTSBFromVal(fileVal);
                     } while (fileTSB !== "u,u,u");
                     // Print file contents to the console
-                    _StdOut.printOSFeedBack(fileContent);
+                    _StdOut.printLongText(fileContent);
                 }
                 else {
-                    _StdOut.printOSFeedBack("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
+                    _StdOut.printLongText("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
                 }
             }
             else {
-                _StdOut.printOSFeedBack("File '" + fileName + "' does not exist. Please try again");
+                _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
         };
         DeviceDriverFs.prototype.writeFile = function (fileName, data) {
@@ -187,7 +187,7 @@ var TSOS;
                         var workingTSB = this.fetchNextFreeFileLoc();
                         if (workingTSB === "u,u,u") {
                             nextTSB = "uuu";
-                            _StdOut.printOSFeedBack("File partially written. HDD is at capacity.");
+                            _StdOut.printLongText("File partially written. HDD is at capacity.");
                             data = "";
                         }
                         else {
@@ -222,20 +222,20 @@ var TSOS;
                 // Write the updatedVal back to the directoryTSB
                 _HDDAccessor.writeToHDD(directoryTSB, updatedVal);
                 // Print confirmation
-                _StdOut.printOSFeedBack("Successfully wrote to file '" + fileName + "'");
+                _StdOut.printLongText("Successfully wrote to file '" + fileName + "'");
             }
             else {
-                _StdOut.printOSFeedBack("File '" + fileName + "' does not exist. Please try again");
+                _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
         };
         DeviceDriverFs.prototype.createFile = function (fileName) {
             var directoryTSB = this.fetchNextFreeDirectoryLoc();
             var fileTSB = this.fetchNextFreeFileLoc();
             if (directoryTSB === this.isFull || fileTSB === this.isFull) {
-                _StdOut.printOSFeedBack("HDD is at full capacity. Please delete files or format the disk");
+                _StdOut.printLongText("HDD is at full capacity. Please delete files or format the disk");
             }
             else if (this.checkFileExists(fileName) !== "FILE DOES NOT EXIST") {
-                _StdOut.printOSFeedBack("A file named " + fileName + " already exists. Please rename and try again");
+                _StdOut.printLongText("A file named " + fileName + " already exists. Please rename and try again");
             }
             else {
                 var directoryVal = "";
@@ -263,10 +263,10 @@ var TSOS;
                     this.alterNextDirLoc();
                     this.alterNextFileLoc();
                     // Confirm file creation
-                    _StdOut.printOSFeedBack("File '" + fileName + "' successfully created");
+                    _StdOut.printLongText("File '" + fileName + "' successfully created");
                 }
                 else {
-                    _StdOut.printOSFeedBack("File name exceeds allocated memory. Please shorten and try again");
+                    _StdOut.printLongText("File name exceeds allocated memory. Please shorten and try again");
                 }
             }
         };
