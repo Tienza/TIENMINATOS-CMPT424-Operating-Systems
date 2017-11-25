@@ -261,7 +261,10 @@ module TSOS {
                 _StdOut.printLongText("Successfully wrote to file '" + fileName + "'");
             }
             else {
-                _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                _StdOut.printLongText("File '" + fileName + "' does not exist. Creating file... ");
+                this.createFile(fileName);
+                _StdOut.advanceLine();
+                this.writeFile(fileName, data);
             }
         }
 

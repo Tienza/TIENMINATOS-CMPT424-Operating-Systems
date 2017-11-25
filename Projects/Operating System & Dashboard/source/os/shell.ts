@@ -63,6 +63,9 @@ module TSOS {
             // toggle
             sc = new TSOS.ShellCommand(this.shellToggle, "toggle", "< wttat | ssm > - Toggle the various modes of the operating system.");
             this.commandList[this.commandList.length] = sc;
+            // format
+            sc = new TSOS.ShellCommand(this.shellFormat, "format", "< -quick | -full > - Format the HDD.");
+            this.commandList[this.commandList.length] = sc;
             // ls
             sc = new TSOS.ShellCommand(this.shellLS, "ls", " - Lists the files found on the HDD.");
             this.commandList[this.commandList.length] = sc;
@@ -475,6 +478,20 @@ module TSOS {
             }
             else {
                 _StdOut.putText("< Print WT/TAT: " + _CalculateWTTAT.toString().toUpperCase() + " | Single Step Mode: " + _SingleStep.toString().toUpperCase() + " >");
+            }
+        }
+
+        public shellFormat(args) {
+            if (args.length > 0) {
+                if (args[0] === "-f" || args[0] === "-full")
+                    _HDD.init();
+                else if (args[0] === "-q" || args[0] === "-quick")
+                    console.log("This currently does nothing");
+                else
+                    _StdOut.putText("Invalid argument! Try '-q' or '-f'"); 
+            }
+            else {
+                _StdOut.putText("Please specify a mode! Try '-q' or '-f'");
             }
         }
 
