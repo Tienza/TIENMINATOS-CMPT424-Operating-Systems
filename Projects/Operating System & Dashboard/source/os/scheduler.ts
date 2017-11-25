@@ -52,6 +52,11 @@ module TSOS {
                         return 1;
                     return 0
                 });
+                // Prempt if a process with lower predicted Burst Time is in the queue
+                if (_ProcessManager.currentPCB !== undefined && _ProcessManager.currentPCB !== null && _ProcessManager.readyQueue.q[0] !== undefined && _ProcessManager.readyQueue.q[0] !== null) {
+                    if (_ProcessManager.readyQueue.q[0].priority < _ProcessManager.currentPCB.priority)
+                        _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, 0));
+                }
             }
 
             public processFirstComeFirstServe(): void {
@@ -71,6 +76,11 @@ module TSOS {
 
                     return 0;
                 });
+                // Prempt if a process with higher priority (lower int) is in the queue
+                if (_ProcessManager.currentPCB !== undefined && _ProcessManager.currentPCB !== null && _ProcessManager.readyQueue.q[0] !== undefined && _ProcessManager.readyQueue.q[0] !== null) {
+                    if (_ProcessManager.readyQueue.q[0].priority < _ProcessManager.currentPCB.priority)
+                        _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, 0));
+                }
             }
 
             public removeAllZeros(userProgram: string[]): string[] {
