@@ -98,7 +98,10 @@ module TSOS {
                 }
                 else {
                     var fileInfoString: string = fileInfo.join(" | ");
-                    _StdOut.printLongText(fileInfoString);
+                    if (fileInfoString !== "")
+                        _StdOut.printLongText(fileInfoString);
+                    else
+                        _StdOut.putText("No files found on HDD");
                 }
             }
             else {
@@ -106,7 +109,32 @@ module TSOS {
             }
         }
 
-        public wipeFile(fileName: string) {
+        public deleteFile(fileName: string): void {
+            var directoryTSB: string = this.checkFileExists(fileName);
+
+            if (directoryTSB !== this.noSuchFile) {
+                var directoryVal: string = _HDDAccessor.readFromHDD(directoryTSB);
+                var fileTSB: string = this.getTSBFromVal(directoryVal);
+                // Wipe the file sections
+                do {
+                    var fileVal: string = _HDDAccessor.readFromHDD(fileTSB);
+                    _HDDAccessor.writeToHDD(fileTSB, "0000" + EMPTY_FILE_DATA);
+                    fileTSB = this.getTSBFromVal(fileVal);
+                } while (fileTSB !== "u,u,u");
+                // Wipe the directory section
+                _HDDAccessor.writeToHDD(directoryTSB, "0000" + EMPTY_FILE_DATA);
+                // Update the Master Boot Record
+                this.alterNextDirLoc();
+                this.alterNextFileLoc();
+                // Print confirmation message
+                _StdOut.printLongText("File '" + fileName + "' successfully removed");
+            }
+            else {
+                _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+            }
+        }
+
+        public wipeFile(fileName: string): void {
             var directoryTSB: string = this.checkFileExists(fileName);
 
             if (directoryTSB !== this.noSuchFile) {
@@ -115,13 +143,13 @@ module TSOS {
                 var firstFileVal: boolean = true;
                 do {
                     // Retrieve the value stored before we start over writing
-                    var fileVal = _HDDAccessor.readFromHDD(fileTSB);
+                    var fileVal: string = _HDDAccessor.readFromHDD(fileTSB);
                     // Do a clear wipe and remove all references to other TSB if it is the first file Val
                     if (firstFileVal) {
                         _HDDAccessor.writeToHDD(fileTSB, "1uuu" + EMPTY_FILE_DATA);
                         firstFileVal = false;
                     }
-                    // Else formate the entire TSB
+                    // Else format the entire TSB
                     else {
                         _HDDAccessor.writeToHDD(fileTSB, "0000" + EMPTY_FILE_DATA);
                     }
@@ -294,7 +322,7 @@ module TSOS {
             return _HDDAccessor.getTSB(mbr[3], mbr[4], mbr[5]);
         }
 
-        public removeCommaFromTSB(TSB) {
+        public removeCommaFromTSB(TSB): string {
             return TSB[0] + TSB[2] + TSB[4];
         }
 

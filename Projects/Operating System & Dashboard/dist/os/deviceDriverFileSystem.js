@@ -105,11 +105,37 @@ var TSOS;
                 }
                 else {
                     var fileInfoString = fileInfo.join(" | ");
-                    _StdOut.printLongText(fileInfoString);
+                    if (fileInfoString !== "")
+                        _StdOut.printLongText(fileInfoString);
+                    else
+                        _StdOut.putText("No files found on HDD");
                 }
             }
             else {
                 _StdOut.putText("No files found on HDD");
+            }
+        };
+        DeviceDriverFs.prototype.deleteFile = function (fileName) {
+            var directoryTSB = this.checkFileExists(fileName);
+            if (directoryTSB !== this.noSuchFile) {
+                var directoryVal = _HDDAccessor.readFromHDD(directoryTSB);
+                var fileTSB = this.getTSBFromVal(directoryVal);
+                // Wipe the file sections
+                do {
+                    var fileVal = _HDDAccessor.readFromHDD(fileTSB);
+                    _HDDAccessor.writeToHDD(fileTSB, "0000" + EMPTY_FILE_DATA);
+                    fileTSB = this.getTSBFromVal(fileVal);
+                } while (fileTSB !== "u,u,u");
+                // Wipe the directory section
+                _HDDAccessor.writeToHDD(directoryTSB, "0000" + EMPTY_FILE_DATA);
+                // Update the Master Boot Record
+                this.alterNextDirLoc();
+                this.alterNextFileLoc();
+                // Print confirmation message
+                _StdOut.printLongText("File '" + fileName + "' successfully removed");
+            }
+            else {
+                _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
         };
         DeviceDriverFs.prototype.wipeFile = function (fileName) {

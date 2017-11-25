@@ -75,6 +75,11 @@ module TSOS {
             // touch
             sc = new TSOS.ShellCommand(this.shellCreate, "touch", " - Alias for 'create'.");
             this.commandList[this.commandList.length] = sc;
+            // delete
+            sc = new TSOS.ShellCommand(this.shellDelete, "delete", "< filename > - Remove a file from the hard disk.");
+            // delete
+            sc = new TSOS.ShellCommand(this.shellDelete, "rm", " - Alias for 'delete'.");
+            this.commandList[this.commandList.length] = sc;
             // read
             sc = new TSOS.ShellCommand(this.shellRead, "read", "< filename > - Displays the contents of a file.");
             this.commandList[this.commandList.length] = sc;
@@ -493,6 +498,16 @@ module TSOS {
             if (args.length > 0) {
                 var fileName: string = args[0];
                 _krnFileSystemDriver.createFile(fileName);
+            }
+            else {
+                _StdOut.putText("Please provide a file name and try again");
+            }
+        }
+
+        public shellDelete(args) {
+            if (args.length > 0) {
+                var fileName: string = args[0];
+                _krnFileSystemDriver.deleteFile(fileName);
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
