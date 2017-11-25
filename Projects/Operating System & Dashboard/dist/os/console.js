@@ -147,6 +147,12 @@ var TSOS;
                 this.putText(text[i]);
             }
         };
+        Console.prototype.verticalList = function (textList) {
+            for (var i = 0; i < textList.length; i++) {
+                this.printLongText(textList[i]);
+                this.advanceLine();
+            }
+        };
         Console.prototype.putText = function (text) {
             // My first inclination here was to write two functions: putChar() and putString().
             // Then I remembered that JavaScript is (sadly) untyped and it won't differentiate

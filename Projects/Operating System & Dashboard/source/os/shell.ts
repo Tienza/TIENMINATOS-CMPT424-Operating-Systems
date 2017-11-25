@@ -43,16 +43,16 @@ module TSOS {
             sc = new TSOS.ShellCommand(this.shellRun, "run", "< PID > - Run the designated program.");
             this.commandList[this.commandList.length] = sc;
             // runall
-            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", "Run all programs in memory.");
+            sc = new TSOS.ShellCommand(this.shellRunAll, "runall", " - Run all programs in memory.");
             this.commandList[this.commandList.length] = sc;
             // ps
-            sc = new TSOS.ShellCommand(this.shellPS, "ps", "Display PID of all active processes.");
+            sc = new TSOS.ShellCommand(this.shellPS, "ps", " - Display PID of all active processes.");
             this.commandList[this.commandList.length] = sc;
             // kill
             sc = new TSOS.ShellCommand(this.shellKill, "kill", "< PID > - Kill the designated process.");
             this.commandList[this.commandList.length] = sc;
             // clearmem
-            sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", "Clear all memory partitions.");
+            sc = new TSOS.ShellCommand(this.shellClearmem, "clearmem", " - Clear all memory partitions.");
             this.commandList[this.commandList.length] = sc;
             // quantum
             sc = new TSOS.ShellCommand(this.shellQuantum, "quantum", "< int > - Modify the quantum of Round Robin Scheudling.");
@@ -63,17 +63,20 @@ module TSOS {
             // toggle
             sc = new TSOS.ShellCommand(this.shellToggle, "toggle", "< wttat | ssm > - Toggle the various modes of the operating system.");
             this.commandList[this.commandList.length] = sc;
+            // ls
+            sc = new TSOS.ShellCommand(this.shellLS, "ls", " - Lists the files found on the HDD.");
+            this.commandList[this.commandList.length] = sc;
             // create
             sc = new TSOS.ShellCommand(this.shellCreate, "create", "< filename > - Creates a file on the hard disk.");
             this.commandList[this.commandList.length] = sc;
             // touch
-            sc = new TSOS.ShellCommand(this.shellCreate, "touch", "Alias for 'create'.");
+            sc = new TSOS.ShellCommand(this.shellCreate, "touch", " - Alias for 'create'.");
             this.commandList[this.commandList.length] = sc;
             // read
             sc = new TSOS.ShellCommand(this.shellRead, "read", "< filename > - Displays the contents of a file.");
             this.commandList[this.commandList.length] = sc;
             // cat
-            sc = new TSOS.ShellCommand(this.shellRead, "cat", "Alias for 'read'.");
+            sc = new TSOS.ShellCommand(this.shellRead, "cat", " - Alias for 'read'.");
             this.commandList[this.commandList.length] = sc;
             // write
             sc = new TSOS.ShellCommand(this.shellWrite, "write", "< filename > < \" data \" > - Writes the specified data to the file.");
@@ -362,7 +365,7 @@ module TSOS {
                 var currentPCB: PCB = _ProcessManager.processList[i]
                 ps += "[PID: " + currentPCB.programId + ", State: " + currentPCB.state + "] | ";
             }
-            ps = ps.substr(0, ps.length - 3);
+            ps = ps.substring(0, ps.length - 3);
 
             // Print out the active processes
            _StdOut.printLongText(ps);
@@ -464,6 +467,18 @@ module TSOS {
             }
             else {
                 _StdOut.putText("< Print WT/TAT: " + _CalculateWTTAT.toString().toUpperCase() + " | Single Step Mode: " + _SingleStep.toString().toUpperCase() + " >");
+            }
+        }
+
+        public shellLS(args) {
+            if (args.length > 0) {
+                if (args[0] === "-l")
+                    _krnFileSystemDriver.listFiles(args[0]);
+                else
+                    _StdOut.putText("Invalid argument! Try '-l'");
+            }
+            else {
+                _krnFileSystemDriver.listFiles(null);
             }
         }
 

@@ -59,8 +59,6 @@ var TSOS;
                         case "create":
                             this.createFile(fileName);
                             break;
-                        case "ls":
-                            break;
                         case "write":
                             this.writeFile(fileName, data);
                             break;
@@ -78,6 +76,36 @@ var TSOS;
                 else {
                     _StdOut.printOSFeedBack("Error: Disk not formatted! Please use the format command");
                 }
+            }
+        };
+        DeviceDriverFs.prototype.listFiles = function (arg) {
+            var ll = false;
+            var filesFound = false;
+            var fileInfo = "";
+            if (arg === "-l")
+                ll = true;
+            for (var TSB in _HDD.storage) {
+                // Check if the TSB is in the 0 track and if it is currently in use
+                if (TSB[0] === "0" && _HDDAccessor.readFromHDD(TSB)[0] === "1") {
+                    var directoryVal = _HDDAccessor.readFromHDD(TSB);
+                    var translatedVal = this.translateDirectoryInformation(directoryVal);
+                    fileInfo += (ll) ? "[File Name: " + translatedVal[0] + " | Create Date: " + translatedVal[1] + " | File Size: " + translatedVal[2] + " Bytes]" + this.seperator : "[" + translatedVal[0] + "] " + this.seperator + " ";
+                    filesFound = true;
+                }
+            }
+            if (filesFound) {
+                if (ll) {
+                    var textList = fileInfo.split(this.seperator);
+                    textList.pop();
+                    _StdOut.verticalList(textList);
+                }
+                else {
+                    fileInfo = fileInfo.replace(/`/g, "|");
+                    _StdOut.printLongText(fileInfo.substring(0, fileInfo.length - 3));
+                }
+            }
+            else {
+                _StdOut.putText("No files found on HDD");
             }
         };
         DeviceDriverFs.prototype.wipeFile = function (fileName) {
@@ -257,14 +285,14 @@ var TSOS;
             var mbr = _HDDAccessor.readFromHDD("0,0,0");
             var mbrWorkingArray = mbr.split("");
             var located = false;
-            for (var tsb in _HDD.storage) {
-                // If the tsb is NOT the Master Boot Record, located ON the 0 Track, and NOT in use
-                if (tsb !== "0,0,0" && tsb[0] === "0" && _HDDAccessor.readFromHDD(tsb)[0] === "0") {
+            for (var TSB in _HDD.storage) {
+                // If the TSB is NOT the Master Boot Record, located ON the 0 Track, and NOT in use
+                if (TSB !== "0,0,0" && TSB[0] === "0" && _HDDAccessor.readFromHDD(TSB)[0] === "0") {
                     located = true;
-                    // Assign the value of tsb to mbrWorkingArray, the provided indexes are used to skip over the commas in the string
-                    mbrWorkingArray[0] = tsb[0];
-                    mbrWorkingArray[1] = tsb[2];
-                    mbrWorkingArray[2] = tsb[4];
+                    // Assign the value of TSB to mbrWorkingArray, the provided indexes are used to skip over the commas in the string
+                    mbrWorkingArray[0] = TSB[0];
+                    mbrWorkingArray[1] = TSB[2];
+                    mbrWorkingArray[2] = TSB[4];
                     // Write the changes the Master Boot Record
                     _HDDAccessor.writeToHDD("0,0,0", mbrWorkingArray.join(""));
                     // Break out of the operation
@@ -283,14 +311,14 @@ var TSOS;
             var mbr = _HDDAccessor.readFromHDD("0,0,0");
             var mbrWorkingArray = mbr.split("");
             var located = false;
-            for (var tsb in _HDD.storage) {
+            for (var TSB in _HDD.storage) {
                 // If the file block is NOT on the 0 Track and NOT in use
-                if (parseInt(tsb[0]) > 0 && _HDDAccessor.readFromHDD(tsb)[0] !== "1") {
+                if (parseInt(TSB[0]) > 0 && _HDDAccessor.readFromHDD(TSB)[0] !== "1") {
                     located = true;
-                    // Assign the value of tsb to mbrWorkingArray, the provided indexes are used to skip over the commas in the string
-                    mbrWorkingArray[3] = tsb[0];
-                    mbrWorkingArray[4] = tsb[2];
-                    mbrWorkingArray[5] = tsb[4];
+                    // Assign the value of TSB to mbrWorkingArray, the provided indexes are used to skip over the commas in the string
+                    mbrWorkingArray[3] = TSB[0];
+                    mbrWorkingArray[4] = TSB[2];
+                    mbrWorkingArray[5] = TSB[4];
                     // Write the changes ot the Master Boot Record
                     _HDDAccessor.writeToHDD("0,0,0", mbrWorkingArray.join(""));
                     // Break out of the operation
@@ -307,14 +335,14 @@ var TSOS;
         };
         DeviceDriverFs.prototype.checkFileExists = function (fileName) {
             var trackSectorBlock = this.noSuchFile;
-            for (var tsb in _HDD.storage) {
-                // Check if the tsb is in the 0 track and if it is currently in use
-                if (tsb[0] === "0" && _HDDAccessor.readFromHDD(tsb)[0] === "1") {
-                    var directoryVal = _HDDAccessor.readFromHDD(tsb);
+            for (var TSB in _HDD.storage) {
+                // Check if the TSB is in the 0 track and if it is currently in use
+                if (TSB[0] === "0" && _HDDAccessor.readFromHDD(TSB)[0] === "1") {
+                    var directoryVal = _HDDAccessor.readFromHDD(TSB);
                     var translatedVal = this.translateDirectoryInformation(directoryVal);
                     var existingFileNameAscii = translatedVal[0];
                     if (fileName === existingFileNameAscii) {
-                        trackSectorBlock = tsb;
+                        trackSectorBlock = TSB;
                         break;
                     }
                 }
