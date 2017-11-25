@@ -51,7 +51,10 @@ var TSOS;
         Utils.fromHex = function (input) {
             var asciiVal = "";
             for (var i = 0; i < input.length; i += 2) {
-                asciiVal += String.fromCharCode(parseInt(input.substr(i, 2), 16));
+                if (input[i] === "0" && input[i + 1] === "0")
+                    break;
+                else
+                    asciiVal += String.fromCharCode(parseInt(input.substr(i, 2), 16));
             }
             return asciiVal;
         };
