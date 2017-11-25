@@ -71,7 +71,7 @@ module TSOS {
         public listFiles(arg): void {
             var ll: boolean = false;
             var filesFound: boolean = false;
-            var fileInfo: string = "";
+            var fileInfo: string[] = [];
 
             if (arg === "-l")
                 ll = true;
@@ -81,20 +81,24 @@ module TSOS {
                 if (TSB[0] === "0" && _HDDAccessor.readFromHDD(TSB)[0] === "1") {
                     var directoryVal: string = _HDDAccessor.readFromHDD(TSB);
                     var translatedVal: string[] = this.translateDirectoryInformation(directoryVal);
-                    fileInfo += (ll) ? "[File Name: " + translatedVal[0] + " | Create Date: " + translatedVal[1] + " | File Size: " + translatedVal[2] + " Bytes]" + this.seperator : "[" + translatedVal[0] + "] " + this.seperator + " ";
+                    if (ll) {
+                        fileInfo.push("[File Name: " + translatedVal[0] + " | Create Date: " + translatedVal[1] + " | File Size: " + translatedVal[2] + " Bytes]");
+                    }
+                    else if (!/^\./.test(translatedVal[0]) && !/^\~/.test(translatedVal[0])) {
+                        fileInfo.push("[" + translatedVal[0] + "]");
+                    }
                     filesFound = true;
                 }
             }
 
             if (filesFound) {
+                fileInfo = fileInfo.sort();
                 if (ll) {
-                    var textList: string[] = fileInfo.split(this.seperator);
-                    textList.pop();
-                    _StdOut.verticalList(textList);
+                    _StdOut.verticalList(fileInfo);
                 }
                 else {
-                    fileInfo = fileInfo.replace(/`/g, "|");
-                    _StdOut.printLongText(fileInfo.substring(0, fileInfo.length - 3));
+                    var fileInfoString: string = fileInfo.join(" | ");
+                    _StdOut.printLongText(fileInfoString);
                 }
             }
             else {

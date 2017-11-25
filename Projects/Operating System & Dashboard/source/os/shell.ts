@@ -66,6 +66,9 @@ module TSOS {
             // ls
             sc = new TSOS.ShellCommand(this.shellLS, "ls", " - Lists the files found on the HDD.");
             this.commandList[this.commandList.length] = sc;
+            // ll
+            sc = new TSOS.ShellCommand(this.shellLL, "ll", " - Alias for 'ls -l'");
+            this.commandList[this.commandList.length] = sc;
             // create
             sc = new TSOS.ShellCommand(this.shellCreate, "create", "< filename > - Creates a file on the hard disk.");
             this.commandList[this.commandList.length] = sc;
@@ -480,6 +483,10 @@ module TSOS {
             else {
                 _krnFileSystemDriver.listFiles(null);
             }
+        }
+
+        public shellLL(args) {
+            _krnFileSystemDriver.listFiles("-l");
         }
 
         public shellCreate(args) {

@@ -81,7 +81,7 @@ var TSOS;
         DeviceDriverFs.prototype.listFiles = function (arg) {
             var ll = false;
             var filesFound = false;
-            var fileInfo = "";
+            var fileInfo = [];
             if (arg === "-l")
                 ll = true;
             for (var TSB in _HDD.storage) {
@@ -89,19 +89,23 @@ var TSOS;
                 if (TSB[0] === "0" && _HDDAccessor.readFromHDD(TSB)[0] === "1") {
                     var directoryVal = _HDDAccessor.readFromHDD(TSB);
                     var translatedVal = this.translateDirectoryInformation(directoryVal);
-                    fileInfo += (ll) ? "[File Name: " + translatedVal[0] + " | Create Date: " + translatedVal[1] + " | File Size: " + translatedVal[2] + " Bytes]" + this.seperator : "[" + translatedVal[0] + "] " + this.seperator + " ";
+                    if (ll) {
+                        fileInfo.push("[File Name: " + translatedVal[0] + " | Create Date: " + translatedVal[1] + " | File Size: " + translatedVal[2] + " Bytes]");
+                    }
+                    else if (!/^\./.test(translatedVal[0]) && !/^\~/.test(translatedVal[0])) {
+                        fileInfo.push("[" + translatedVal[0] + "]");
+                    }
                     filesFound = true;
                 }
             }
             if (filesFound) {
+                fileInfo = fileInfo.sort();
                 if (ll) {
-                    var textList = fileInfo.split(this.seperator);
-                    textList.pop();
-                    _StdOut.verticalList(textList);
+                    _StdOut.verticalList(fileInfo);
                 }
                 else {
-                    fileInfo = fileInfo.replace(/`/g, "|");
-                    _StdOut.printLongText(fileInfo.substring(0, fileInfo.length - 3));
+                    var fileInfoString = fileInfo.join(" | ");
+                    _StdOut.printLongText(fileInfoString);
                 }
             }
             else {
