@@ -218,6 +218,17 @@ module TSOS {
             return pcb;
         }
 
+        public findPCBonDisk(): PCB {
+            var pcb: PCB = null;
+
+            for (var i: number = 0; i < this.readyQueue.q.length; i++) {
+                if (this.readyQueue.q[i].location === this.processLocations.hdd)
+                    pcb = this.readyQueue.q[i];
+            }
+
+            return pcb;
+        }
+
         public removePCB(programId: number): void {
             // Find the PCB with the programId and remove it from the processList
             for (var i: number = 0; i < this.processList.length; i++) {

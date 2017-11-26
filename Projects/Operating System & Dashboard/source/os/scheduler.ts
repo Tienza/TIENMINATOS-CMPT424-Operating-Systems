@@ -15,7 +15,8 @@ module TSOS {
                         public counter: number = 0,
                         public algorithm: string = "rr",
                         public algoType: string[] = ["rr", "sjf", "fcfs", "priority"],
-                        public aFullName: string[] = ["Round Robin", "Shortest Job First", "First Come First Serve", "Priority"]) {
+                        public aFullName: string[] = ["Round Robin", "Shortest Job First", "First Come First Serve", "Priority"],
+                        public rolledOut: boolean = false) {
             }
 
             public checkSchedule(): void {
@@ -103,9 +104,16 @@ module TSOS {
                 _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();
                 _ProcessManager.currentPCB.state = _ProcessManager.processStates.running;
 
-                // Roll in
-                if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.hdd)
+                // Roll in - If the next PCB is located on the HDD or previously there had been a roll out
+                if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.hdd) {
                     _krnFileSystemDriver.rollIn(_ProcessManager.currentPCB.programId);
+                }
+                else if (this.rolledOut) {
+                    var pcb: PCB = _ProcessManager.findPCBonDisk();
+                    _krnFileSystemDriver.rollIn(pcb.programId);
+                    Control.updateProcessDisplay(pcb);
+                    this.rolledOut = false;
+                }
 
                 Control.switchMemoryTab(_ProcessManager.currentPCB);
                 Control.updateProcessDisplay(_ProcessManager.currentPCB);
@@ -115,9 +123,13 @@ module TSOS {
             public loadOutNewProcess(): void {
                 _ProcessManager.currentPCB.state = _ProcessManager.processStates.ready;
 
-                // Roll out
-                if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.memory)
+                // Check for free partitions
+                var freePartition: {[key: string]: any} = _MemoryManager.checkFreePartition();
+                // Roll out - If there are no free partitions and the ReadyQueue is longer has more than 2 PCBs
+                if (freePartition.isFree === undefined && _ProcessManager.readyQueue.q.length > 2) {
                     _krnFileSystemDriver.rollOut(_ProcessManager.currentPCB.programId, _MemoryAccessor.fetchCodeFromMemory(_ProcessManager.currentPCB.memoryIndex));
+                    this.rolledOut = true;
+                }
 
                 _ProcessManager.readyQueue.enqueue(_ProcessManager.currentPCB);
                 Control.updateProcessDisplay(_ProcessManager.currentPCB);

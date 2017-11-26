@@ -7,19 +7,21 @@
 var TSOS;
 (function (TSOS) {
     var Scheduler = /** @class */ (function () {
-        function Scheduler(roundRobinQuantum, maxInt, counter, algorithm, algoType, aFullName) {
+        function Scheduler(roundRobinQuantum, maxInt, counter, algorithm, algoType, aFullName, rolledOut) {
             if (roundRobinQuantum === void 0) { roundRobinQuantum = 6; }
             if (maxInt === void 0) { maxInt = Math.pow(2, 53) - 1; }
             if (counter === void 0) { counter = 0; }
             if (algorithm === void 0) { algorithm = "rr"; }
             if (algoType === void 0) { algoType = ["rr", "sjf", "fcfs", "priority"]; }
             if (aFullName === void 0) { aFullName = ["Round Robin", "Shortest Job First", "First Come First Serve", "Priority"]; }
+            if (rolledOut === void 0) { rolledOut = false; }
             this.roundRobinQuantum = roundRobinQuantum;
             this.maxInt = maxInt;
             this.counter = counter;
             this.algorithm = algorithm;
             this.algoType = algoType;
             this.aFullName = aFullName;
+            this.rolledOut = rolledOut;
         }
         Scheduler.prototype.checkSchedule = function () {
             this.counter++;
@@ -94,18 +96,29 @@ var TSOS;
         Scheduler.prototype.loadInNewProcess = function () {
             _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();
             _ProcessManager.currentPCB.state = _ProcessManager.processStates.running;
-            // Roll in
-            if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.hdd)
+            // Roll in - If the next PCB is located on the HDD or previously there had been a roll out
+            if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.hdd) {
                 _krnFileSystemDriver.rollIn(_ProcessManager.currentPCB.programId);
+            }
+            else if (this.rolledOut) {
+                var pcb = _ProcessManager.findPCBonDisk();
+                _krnFileSystemDriver.rollIn(pcb.programId);
+                TSOS.Control.updateProcessDisplay(pcb);
+                this.rolledOut = false;
+            }
             TSOS.Control.switchMemoryTab(_ProcessManager.currentPCB);
             TSOS.Control.updateProcessDisplay(_ProcessManager.currentPCB);
             _CPU.updateCPU();
         };
         Scheduler.prototype.loadOutNewProcess = function () {
             _ProcessManager.currentPCB.state = _ProcessManager.processStates.ready;
-            // Roll out
-            if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.memory)
+            // Check for free partitions
+            var freePartition = _MemoryManager.checkFreePartition();
+            // Roll out - If there are no free partitions and the ReadyQueue is longer has more than 2 PCBs
+            if (freePartition.isFree === undefined && _ProcessManager.readyQueue.q.length > 2) {
                 _krnFileSystemDriver.rollOut(_ProcessManager.currentPCB.programId, _MemoryAccessor.fetchCodeFromMemory(_ProcessManager.currentPCB.memoryIndex));
+                this.rolledOut = true;
+            }
             _ProcessManager.readyQueue.enqueue(_ProcessManager.currentPCB);
             TSOS.Control.updateProcessDisplay(_ProcessManager.currentPCB);
         };
