@@ -18,7 +18,7 @@ var TSOS;
         MemoryManager.prototype.init = function () {
             this.wipeAllPartitions();
         };
-        MemoryManager.prototype.loadProgram = function (userProgram, pcb) {
+        MemoryManager.prototype.loadProgram = function (pcb, userProgram) {
             var freePartition = this.checkFreePartition();
             if (freePartition.isFree !== undefined) {
                 // Operate on the partition returned
@@ -29,10 +29,12 @@ var TSOS;
                 pcb.memoryIndex = freePartition.memoryIndex;
                 // Update the current instruction to the first instruction available for that memory block
                 pcb.instruction = _MemoryAccessor.readFromMemory(pcb.memoryIndex, pcb.PC).toUpperCase();
-                // Store in the process list
-                _ProcessManager.processList.push(pcb);
+                // Update the current location of the PCB to Memory
+                pcb.location = _ProcessManager.processLocations.memory;
                 // Predict the bust time
                 pcb.predictedBurstTime = _Scheduler.removeAllZeros(userProgram).length + _Scheduler.addWeightedD0(userProgram);
+                // Store in the process list
+                _ProcessManager.processList.push(pcb);
                 // Update the Memory Display
                 TSOS.Control.updateMemoryDisplay(freePartition.memoryIndex);
                 // Update the Process Display
@@ -42,7 +44,47 @@ var TSOS;
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree);
                 this.showAllPartitions();
                 // Output PID to canvas
-                _StdOut.putText("Program Loaded Successfully. PID: " + pcb.programId);
+                _StdOut.printLongText("Program Loaded Successfully Into Memory. PID: " + pcb.programId);
+            }
+            else if (_HDD.isFormatted) {
+                // Update the current instruction to the first instruction available for that memory block
+                pcb.instruction = userProgram[0];
+                // Update the current location of hte PCB to HDD
+                pcb.location = _ProcessManager.processLocations.hdd;
+                // Predict the bust time
+                pcb.predictedBurstTime = _Scheduler.removeAllZeros(userProgram).length + _Scheduler.addWeightedD0(userProgram);
+                // Store in the process list
+                _ProcessManager.processList.push(pcb);
+                // Update the Process Display
+                TSOS.Control.initializeProcessDisplay(pcb);
+                // Roll Out to the HDD
+                _krnFileSystemDriver.rollOut(pcb.programId, userProgram);
+                // Output PID to canvas
+                _StdOut.printLongText("Program Loaded Successfully Into HDD. PID: " + pcb.programId);
+            }
+            else {
+                _StdOut.putText("Memory partitions are full");
+            }
+        };
+        MemoryManager.prototype.loadProgramFromHDD = function (pcb, userProgram) {
+            var freePartition = this.checkFreePartition();
+            if (freePartition.isFree !== undefined) {
+                // Operate on the partition returned
+                freePartition.isFree = false;
+                // Load the process in to the memory partition returned
+                _Memory.memoryArray[freePartition.memoryIndex] = userProgram;
+                // Record which memory index the process was loaded into
+                pcb.memoryIndex = freePartition.memoryIndex;
+                // Update the current location of the PCB to Memory
+                pcb.location = _ProcessManager.processLocations.memory;
+                // Update the Memory Display
+                TSOS.Control.updateMemoryDisplay(freePartition.memoryIndex);
+                // Update the Process Display
+                TSOS.Control.updateProcessDisplay(pcb);
+                // Print updated memory status
+                console.log("_Memory Partition: " + freePartition.memoryIndex);
+                console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree);
+                this.showAllPartitions();
             }
             else {
                 _StdOut.putText("Memory partitions are full");

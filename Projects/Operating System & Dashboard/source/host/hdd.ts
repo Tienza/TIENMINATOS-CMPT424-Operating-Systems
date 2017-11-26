@@ -14,6 +14,7 @@ module TSOS {
                     public sectors: number = 7,
                     public blocks: number = 7,
                     public bytes: number = 64,
+                    public blockSize: number = 60,
                     public storage: Storage = sessionStorage,
                     public isFormatted: boolean = false) {
         }

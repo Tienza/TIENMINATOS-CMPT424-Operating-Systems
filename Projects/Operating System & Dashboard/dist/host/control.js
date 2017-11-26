@@ -242,12 +242,12 @@ var TSOS;
         };
         Control.initializeProcessDisplay = function (pcb) {
             var rowId = "process-row-" + pcb.programId;
-            var processDisplay = "<tr id=\"" + rowId + "\"><td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
+            var processDisplay = "<tr id=\"" + rowId + "\"><td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td><td>" + pcb.location + "</td></tr>";
             $('#processDisplay').append(processDisplay);
         };
         Control.updateProcessDisplay = function (pcb) {
             var rowId = "#process-row-" + pcb.programId;
-            var processDisplay = "<td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td></tr>";
+            var processDisplay = "<td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td><td>" + pcb.location + "</td></tr>";
             $(rowId).html(processDisplay);
         };
         Control.removeProcessDisplay = function (programId) {

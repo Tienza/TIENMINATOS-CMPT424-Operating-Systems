@@ -207,15 +207,14 @@ module TSOS {
                 // Remove the open and closing quotes from the string and convert to hex
                 var hexData: string = TSOS.Utils.toHex(data.slice(1, -1));
                 var hexDataSize: number = hexData.length;
-                // Retrieve the contents at the fileTSB
-                var fileVal: string = _HDDAccessor.readFromHDD(fileTSB);
+                // Placeholder for the next TSB
                 var nextTSB: string = "";
                 // File writing process
                 while (hexData.length > 0) {
                     // Assemble the substring that will be written to the current TSB
-                    var workingData: string = hexData.substring(0, 60);
+                    var workingData: string = hexData.substring(0, _HDD.blockSize);
                     // Remove the data that will be written
-                    hexData = hexData.substring(60);
+                    hexData = hexData.substring(_HDD.blockSize);
 
                     // Fetch and format the next working TSB - If length 0 means EOF
                     if (hexData.length > 0) {
@@ -261,10 +260,7 @@ module TSOS {
                 _StdOut.printLongText("Successfully wrote to file '" + fileName + "'");
             }
             else {
-                _StdOut.printLongText("File '" + fileName + "' does not exist. Creating file... ");
-                this.createFile(fileName);
-                _StdOut.advanceLine();
-                this.writeFile(fileName, data);
+                _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
         }
 
@@ -314,6 +310,86 @@ module TSOS {
 
             }
         } 
+
+        public rollOut(programId: number, userProgram: string[]) {
+            var pcb: PCB = _ProcessManager.getPCB(programId);
+            var hexData: string = userProgram.join("");
+            // If program is coming from memory, then free that partition of memory
+            if (pcb.location === _ProcessManager.processLocations.memory) 
+                _MemoryManager.freePartition(pcb.memoryIndex);
+            // Assign the PCB the next free file location
+            var hddTSB: string = this.fetchNextFreeFileLoc();
+            // Update the PCB values
+            pcb.hddTSB = hddTSB;
+            pcb.location = _ProcessManager.processLocations.hdd;
+            // Update the PCB display
+            Control.updateProcessDisplay(pcb);
+            // Reserve the file location
+            _HDDAccessor.writeToHDD(hddTSB, "1uuu" + EMPTY_FILE_DATA);
+            // Update the next available file location
+            this.alterNextFileLoc();
+            // Placeholder for the next TSB
+            var nextTSB: string = "";
+            // File writing process
+            while (hexData.length > 0) {
+                // Assemble the substring that will be written to the current TSB
+                var workingData: string = hexData.substring(0, _HDD.blockSize);
+                // Remove the data that will be written
+                hexData = hexData.substring(_HDD.blockSize);
+
+                // Fetch and format the next working TSB - If length 0 means EOF
+                if (hexData.length > 0) {
+                    var workingTSB: string = this.fetchNextFreeFileLoc();
+                    if (workingTSB === "u,u,u") {
+                        nextTSB = "uuu";
+                        _StdOut.printLongText("File partially written. HDD is at capacity.");
+                        hexData = "";
+                    }
+                    else {
+                        nextTSB = this.removeCommaFromTSB(workingTSB);
+                    }
+                }
+                else {
+                    nextTSB = "uuu";
+                }
+
+                // Write to the HDD
+                var fileVal: string = "1" + nextTSB + workingData + EMPTY_FILE_DATA.substring(workingData.length);
+                _HDDAccessor.writeToHDD(hddTSB, fileVal);
+                // Reserve space for the next TSB
+                if (nextTSB !== "uuu")
+                    _HDDAccessor.writeToHDD(_HDDAccessor.getTSB(nextTSB[0], nextTSB[1], nextTSB[2]), "1uuu" + EMPTY_FILE_DATA);
+                // Update the Master Boot Record
+                this.alterNextFileLoc();
+                // Update the file TSB to the next working TSB
+                hddTSB = _HDDAccessor.getTSB(nextTSB[0], nextTSB[1], nextTSB[2]);
+            }
+        }
+
+        public rollIn(programId) {
+            var pcb: PCB = _ProcessManager.getPCB(programId);
+            var hddTSB: string = pcb.hddTSB;
+            var userCode: string = "";
+            // Assemble the userCode string and wipe the file sections as you go
+            do {
+                var fileVal = _HDDAccessor.readFromHDD(hddTSB);
+                // Append the OP Codes
+                userCode += this.getVal(fileVal);
+                // Wipe the TSB file section
+                _HDDAccessor.writeToHDD(hddTSB, "0000" + EMPTY_FILE_DATA);
+                hddTSB = this.getTSBFromVal(fileVal);
+            } while (hddTSB !== "u,u,u");
+            // Update the Master Boot Record
+            this.alterNextFileLoc();
+            // Filter out the garbage data - Twice the size of memory because these are individual characters
+            userCode = userCode.substring(0, _Memory.singleMemSize * 2);
+            var userProgram: string[] = TSOS.Utils.cleanInput(userCode).split(" ");
+            // Update PCB values
+            pcb.hddTSB = null;
+            pcb.location = _ProcessManager.processLocations.memory;
+            // Load the program into Memory
+            _MemoryManager.loadProgramFromHDD(pcb, userProgram);
+        }
 
         public fetchNextFreeDirectoryLoc(): string {
             var mbr: string = _HDDAccessor.readFromHDD("0,0,0");

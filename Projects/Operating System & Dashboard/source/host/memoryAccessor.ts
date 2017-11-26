@@ -32,5 +32,9 @@ module TSOS {
 
             return status;
         }
+
+        public fetchCodeFromMemory(memoryIndex: number): string[] {
+            return _Memory.memoryArray[memoryIndex];
+        }
     }
 } 

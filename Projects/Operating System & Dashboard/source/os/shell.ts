@@ -334,7 +334,7 @@ module TSOS {
                     }
                     // Increment the _ProcessCount
                     _ProcessCount++;
-                    _MemoryManager.loadProgram(hexObj.hexVal, pcb);
+                    _MemoryManager.loadProgram(pcb, hexObj.hexVal);
                     // Switch to active Memory Tab
                     Control.switchMemoryTab(pcb);
                 }

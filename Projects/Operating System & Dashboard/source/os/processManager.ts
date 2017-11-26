@@ -25,8 +25,29 @@ module TSOS {
             "terminated": "Terminated"
         }
          
+        public processLocations: {[key: string]: any} = {
+            "memory": "Memory",
+            "hdd": "HDD"
+        }
+
         public runProcess(pcb: PCB): void {
             if (!this.isRunningAll) {
+                // Check if the PCB resides on the HDD
+                if (pcb.location === this.processLocations.hdd) {
+                    var freePartition: {[key: string]: any} = _MemoryManager.checkFreePartition();
+                    // If there is no space, then roll out the last PCB on Memory
+                    if (freePartition.isFree === undefined) {
+                        var rollOutPCB: PCB = this.getPCBbyParition(2);
+                        // Roll Out
+                        _krnFileSystemDriver.rollOut(rollOutPCB.programId, _MemoryAccessor.fetchCodeFromMemory(rollOutPCB.memoryIndex));
+                        // Roll In
+                        _krnFileSystemDriver.rollIn(pcb.programId);
+                    }
+                    // Else just place on Memory
+                    else {
+                        _krnFileSystemDriver.rollIn(pcb.programId);
+                    }
+                }
                 // Set PCB state to running
                 pcb.state = this.processStates.running;
                 // Update _ProcessManager and CPU

@@ -27,6 +27,9 @@ var TSOS;
             }
             return status;
         };
+        MemoryAccessor.prototype.fetchCodeFromMemory = function (memoryIndex) {
+            return _Memory.memoryArray[memoryIndex];
+        };
         return MemoryAccessor;
     }());
     TSOS.MemoryAccessor = MemoryAccessor;

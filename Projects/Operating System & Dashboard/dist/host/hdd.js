@@ -7,17 +7,19 @@
 var TSOS;
 (function (TSOS) {
     var HDD = /** @class */ (function () {
-        function HDD(tracks, sectors, blocks, bytes, storage, isFormatted) {
+        function HDD(tracks, sectors, blocks, bytes, blockSize, storage, isFormatted) {
             if (tracks === void 0) { tracks = 3; }
             if (sectors === void 0) { sectors = 7; }
             if (blocks === void 0) { blocks = 7; }
             if (bytes === void 0) { bytes = 64; }
+            if (blockSize === void 0) { blockSize = 60; }
             if (storage === void 0) { storage = sessionStorage; }
             if (isFormatted === void 0) { isFormatted = false; }
             this.tracks = tracks;
             this.sectors = sectors;
             this.blocks = blocks;
             this.bytes = bytes;
+            this.blockSize = blockSize;
             this.storage = storage;
             this.isFormatted = isFormatted;
         }

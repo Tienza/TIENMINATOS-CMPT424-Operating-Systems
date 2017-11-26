@@ -102,6 +102,11 @@ module TSOS {
             public loadInNewProcess(): void {
                 _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();
                 _ProcessManager.currentPCB.state = _ProcessManager.processStates.running;
+
+                // Roll in
+                if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.hdd)
+                    _krnFileSystemDriver.rollIn(_ProcessManager.currentPCB.programId);
+
                 Control.switchMemoryTab(_ProcessManager.currentPCB);
                 Control.updateProcessDisplay(_ProcessManager.currentPCB);
                 _CPU.updateCPU();
@@ -109,8 +114,13 @@ module TSOS {
 
             public loadOutNewProcess(): void {
                 _ProcessManager.currentPCB.state = _ProcessManager.processStates.ready;
-                Control.updateProcessDisplay(_ProcessManager.currentPCB);
+
+                // Roll out
+                if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.memory)
+                    _krnFileSystemDriver.rollOut(_ProcessManager.currentPCB.programId, _MemoryAccessor.fetchCodeFromMemory(_ProcessManager.currentPCB.memoryIndex));
+
                 _ProcessManager.readyQueue.enqueue(_ProcessManager.currentPCB);
+                Control.updateProcessDisplay(_ProcessManager.currentPCB);
             }
 
             public contextSwitch(): void {
