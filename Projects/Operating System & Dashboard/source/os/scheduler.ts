@@ -38,7 +38,7 @@ module TSOS {
             }
 
             public processRoundRobin(): void {
-                if (this.counter >= this.roundRobinQuantum)
+                if (this.counter >= this.roundRobinQuantum && _ProcessManager.readyQueue.q.length > 0)
                     _KernelInterruptQueue.enqueue(new Interrupt(CONTEXT_SWITCH_IRQ, 0));
             }
 
@@ -107,6 +107,7 @@ module TSOS {
                 // Roll in - If the next PCB is located on the HDD or previously there had been a roll out
                 if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.hdd) {
                     _krnFileSystemDriver.rollIn(_ProcessManager.currentPCB.programId);
+                    this.rolledOut = false;
                 }
                 else if (this.rolledOut) {
                     var pcb: PCB = _ProcessManager.findPCBonDisk();

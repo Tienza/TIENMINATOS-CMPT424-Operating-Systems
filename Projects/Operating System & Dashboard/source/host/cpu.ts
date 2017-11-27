@@ -172,7 +172,7 @@ module TSOS {
             // Convert the memory location to an index on the memory partition
             var memoryloc: number = parseInt(address, 16);
             // Assign the value at the memory location to the Accumulator
-            this.Acc = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc));
+            this.Acc = parseInt(_ProcessManager.fetchInstruction(_ProcessManager.currentPCB, memoryloc), 16);
             this.consumeInstruction();
         }
 

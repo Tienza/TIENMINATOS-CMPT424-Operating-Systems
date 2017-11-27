@@ -41,7 +41,7 @@ var TSOS;
             }
         };
         Scheduler.prototype.processRoundRobin = function () {
-            if (this.counter >= this.roundRobinQuantum)
+            if (this.counter >= this.roundRobinQuantum && _ProcessManager.readyQueue.q.length > 0)
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(CONTEXT_SWITCH_IRQ, 0));
         };
         Scheduler.prototype.processShortestJobFirst = function () {
@@ -99,6 +99,7 @@ var TSOS;
             // Roll in - If the next PCB is located on the HDD or previously there had been a roll out
             if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.hdd) {
                 _krnFileSystemDriver.rollIn(_ProcessManager.currentPCB.programId);
+                this.rolledOut = false;
             }
             else if (this.rolledOut) {
                 var pcb = _ProcessManager.findPCBonDisk();
