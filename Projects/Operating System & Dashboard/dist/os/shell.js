@@ -472,14 +472,17 @@ var TSOS;
             else {
                 _krnFileSystemDriver.listFiles(null);
             }
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, 0));
         };
         Shell.prototype.shellLL = function (args) {
             _krnFileSystemDriver.listFiles("-l");
+            _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, 0));
         };
         Shell.prototype.shellCreate = function (args) {
             if (args.length > 0) {
                 var fileName = args[0];
                 _krnFileSystemDriver.createFile(fileName);
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, 0));
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
@@ -489,6 +492,7 @@ var TSOS;
             if (args.length > 0) {
                 var fileName = args[0];
                 _krnFileSystemDriver.deleteFile(fileName);
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, 0));
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
@@ -498,6 +502,7 @@ var TSOS;
             if (args.length > 0) {
                 var fileName = args[0];
                 _krnFileSystemDriver.readFile(fileName);
+                _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, 0));
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
@@ -510,6 +515,7 @@ var TSOS;
                 if (TSOS.Utils.isProperWriteData(writeData)) {
                     var data = writeData.join(" ");
                     _krnFileSystemDriver.writeFile(fileName, data);
+                    _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, 0));
                 }
                 else {
                     _StdOut.printLongText("The data that you want to write to the file must be surrounded by \"double quotes\" or 'single quotes'");

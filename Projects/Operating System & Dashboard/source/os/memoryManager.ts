@@ -42,10 +42,10 @@ module TSOS {
                 Control.updateMemoryDisplay(freePartition.memoryIndex);
                 // Update the Process Display
                 Control.initializeProcessDisplay(pcb);
-                // Print updated memory status
+                /*// Print updated memory status
                 console.log("_Memory Partition: " + freePartition.memoryIndex);
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree)
-                this.showAllPartitions();
+                this.showAllPartitions();*/
                 // Output PID to canvas
                 _StdOut.printLongText("Program Loaded Successfully Into Memory. PID: " + pcb.programId);
             }
@@ -86,10 +86,10 @@ module TSOS {
                 Control.updateMemoryDisplay(freePartition.memoryIndex);
                 // Update the Process Display
                 Control.updateProcessDisplay(pcb);
-                // Print updated memory status
+                /*// Print updated memory status
                 console.log("_Memory Partition: " + freePartition.memoryIndex);
                 console.log("_Memory Partition " + freePartition.memoryIndex + " is Free: " + freePartition.isFree)
-                this.showAllPartitions();
+                this.showAllPartitions();*/
             }
             else {
                 _StdOut.putText("Memory partitions are full");

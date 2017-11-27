@@ -63,13 +63,10 @@ var TSOS;
                             this.writeFile(fileName, data);
                             break;
                         case "delete":
+                            this.deleteFile(fileName);
                             break;
                         case "read":
                             this.readFile(fileName);
-                            break;
-                        case "rollOut":
-                            break;
-                        case "rollIn":
                             break;
                     }
                 }
@@ -300,6 +297,10 @@ var TSOS;
             }
         };
         DeviceDriverFs.prototype.rollOut = function (programId, userProgram) {
+            // Send the actions message to the log
+            var rollOutMessage = "Rolling Out ProgramId " + programId + " To HDD";
+            _Kernel.krnTrace(rollOutMessage);
+            // Get the associated PCB from the programId
             var pcb = _ProcessManager.getPCB(programId);
             var hexData = userProgram.join("");
             // If program is coming from memory, then free that partition of memory
@@ -352,6 +353,10 @@ var TSOS;
             }
         };
         DeviceDriverFs.prototype.rollIn = function (programId) {
+            // Send the actions message to the log
+            var rollInMessage = "Rolling In ProgramId " + programId + " From HDD";
+            _Kernel.krnTrace(rollInMessage);
+            // Get the associated PCB from the programId
             var pcb = _ProcessManager.getPCB(programId);
             var hddTSB = pcb.hddTSB;
             var userCode = "";

@@ -52,13 +52,10 @@ module TSOS {
                             this.writeFile(fileName, data);
                             break;
                         case "delete":
+                            this.deleteFile(fileName);
                             break;
                         case "read":
                             this.readFile(fileName);
-                            break;
-                        case "rollOut":
-                            break;
-                        case "rollIn":
                             break;
                     }
                 }
@@ -312,6 +309,10 @@ module TSOS {
         } 
 
         public rollOut(programId: number, userProgram: string[]) {
+            // Send the actions message to the log
+            var rollOutMessage: string = "Rolling Out ProgramId " + programId + " To HDD";
+            _Kernel.krnTrace(rollOutMessage);
+            // Get the associated PCB from the programId
             var pcb: PCB = _ProcessManager.getPCB(programId);
             var hexData: string = userProgram.join("");
             // If program is coming from memory, then free that partition of memory
@@ -367,6 +368,10 @@ module TSOS {
         }
 
         public rollIn(programId) {
+            // Send the actions message to the log
+            var rollInMessage: string = "Rolling In ProgramId " + programId + " From HDD";
+            _Kernel.krnTrace(rollInMessage);
+            // Get the associated PCB from the programId
             var pcb: PCB = _ProcessManager.getPCB(programId);
             var hddTSB: string = pcb.hddTSB;
             var userCode: string = "";

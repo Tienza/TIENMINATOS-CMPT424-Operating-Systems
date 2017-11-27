@@ -101,46 +101,69 @@ module TSOS {
             }
 
             public loadInNewProcess(): void {
+                // Dequeue the first PCB on the Ready Queue and place it on the CPU
                 _ProcessManager.currentPCB = _ProcessManager.readyQueue.dequeue();
+                // Change the state of the PCB from "Ready" to "Running"
                 _ProcessManager.currentPCB.state = _ProcessManager.processStates.running;
 
                 // Roll in - If the next PCB is located on the HDD or previously there had been a roll out
                 if (_ProcessManager.currentPCB.location === _ProcessManager.processLocations.hdd) {
+                    // Faux Kernal Interrupt
+                    _Kernel.krnTrace("Handling IRQ~" + FILE_SYSTEM_IRQ);
+                    // Roll in the current PCB
                     _krnFileSystemDriver.rollIn(_ProcessManager.currentPCB.programId);
+                    // Let the Scheduler know that a roll in was performed
                     this.rolledOut = false;
                 }
                 else if (this.rolledOut) {
+                    // Faux Kernal Interrupt
+                    _Kernel.krnTrace("Handling IRQ~" + FILE_SYSTEM_IRQ);
+                    // Find any PCB that is currently on the HDD
                     var pcb: PCB = _ProcessManager.findPCBonDisk();
+                    // Roll in that PCB
                     _krnFileSystemDriver.rollIn(pcb.programId);
+                    // Update the Process Display accordingly
                     Control.updateProcessDisplay(pcb);
+                    // Let the Scheduler know that a roll in was performed
                     this.rolledOut = false;
                 }
-
+                // Switch the Memory Tab and update the Process Display accordingly
                 Control.switchMemoryTab(_ProcessManager.currentPCB);
                 Control.updateProcessDisplay(_ProcessManager.currentPCB);
+                // Update the CPU with the current PCB values
                 _CPU.updateCPU();
             }
 
             public loadOutNewProcess(): void {
+                // Change the state of the PCB from "Running" to "Ready"
                 _ProcessManager.currentPCB.state = _ProcessManager.processStates.ready;
 
                 // Check for free partitions
                 var freePartition: {[key: string]: any} = _MemoryManager.checkFreePartition();
                 // Roll out - If there are no free partitions and the ReadyQueue is longer has more than 2 PCBs
                 if (freePartition.isFree === undefined && _ProcessManager.readyQueue.q.length > 2) {
+                    // Faux Kernal Interrupt
+                    _Kernel.krnTrace("Handling IRQ~" + FILE_SYSTEM_IRQ);
+                    // Roll out the current PCB
                     _krnFileSystemDriver.rollOut(_ProcessManager.currentPCB.programId, _MemoryAccessor.fetchCodeFromMemory(_ProcessManager.currentPCB.memoryIndex));
+                    // Let the Scheduler know that a roll out was performed
                     this.rolledOut = true;
                 }
-
+                // Take the PCB on the CPU and put it on the back of the Ready Queue
                 _ProcessManager.readyQueue.enqueue(_ProcessManager.currentPCB);
+                // Update the Process Display accordingly
                 Control.updateProcessDisplay(_ProcessManager.currentPCB);
             }
 
             public contextSwitch(): void {
                 var contextSwitchMessage: string = "Context Switch: ProgramId " + _ProcessManager.currentPCB.programId;
+                // Remove the PCB from the CPU and put it on the back of the Ready Queue
                 this.loadOutNewProcess();
+                // Reset the cycle counter
                 this.resetCounter();
+                // Dequeue the first PCB on the Ready Queue and place it on the CPU
                 this.loadInNewProcess();
+                // Send the actions message to the log
                 contextSwitchMessage += " to ProgramId " + _ProcessManager.currentPCB.programId;
                 _Kernel.krnTrace(contextSwitchMessage);
             }

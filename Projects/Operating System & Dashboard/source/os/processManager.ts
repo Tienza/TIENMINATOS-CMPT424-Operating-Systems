@@ -120,8 +120,8 @@ module TSOS {
             Control.updateMemoryDisplay(pcb.memoryIndex);
             // Remove the Process Display
             Control.removeProcessDisplay(pcb.programId);
-            // Show Memory Partitions
-            _MemoryManager.showAllPartitions();
+            /*// Show Memory Partitions
+            _MemoryManager.showAllPartitions();*/
             // Toggle CPU execution off
             if (this.readyQueue.isEmpty()) {
                 _CPU.isExecuting = false;
