@@ -62,14 +62,57 @@
                 <!-- /.row -->
                 <br/>
                 <div class="row">
-                        <div id="divConsole" class="col-lg-6" width="553px" height="451px" style="overflow-x: hidden;">
+                        <div id="divConsole" class="col-lg-6" width="553px" height="451px" style="overflow-x: hidden; overflow-y: hidden">
                                 <label>Console</label>
-                                <div id="canvasScroll" style="height: 451px; overflow-x: hidden; overflow-y: scroll; overflow-x: hidden; width: 570px;">
+                                <div id="canvasScroll" style="height: 451px; overflow-x: hidden; overflow-y: scroll; width: 570px;">
                                         <canvas id="display" tabindex="3" width="553px" height="440px" style="overflow-x: hidden;"></canvas>
                                 </div>
                                 <br/>
-                                <label>User Program Input</label>
-                                <textarea id="taProgramInput" class="form-control" name="taProgramInput">A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</textarea>
+                                <label>Hard Drive Display</label>
+                                <div id="hddDisplayHolder" style="overflow-y: scroll;">
+                                        <table class="table table-striped cpuPcbDisplay">
+                                                <thead>
+                                                        <tr>
+                                                                <th>TSB</th>
+                                                                <th>In Use</th>
+                                                                <th>Reference</th>
+                                                                <th>Data</th>
+                                                        </tr>
+                                                </thead>
+                                                <tbody id="hddDisplay">
+                                                        <tr>
+                                                                <td>-----</td>
+                                                                <td>-</td>
+                                                                <td>---</td>
+                                                                <td>------------------------------------------------------------</td>
+                                                        </tr>
+                                                        <tr>
+                                                                <td>-----</td>
+                                                                <td>-</td>
+                                                                <td>---</td>
+                                                                <td>------------------------------------------------------------</td>
+                                                        </tr>
+                                                        <tr>
+                                                                <td>-----</td>
+                                                                <td>-</td>
+                                                                <td>---</td>
+                                                                <td>------------------------------------------------------------</td>
+                                                        </tr>
+                                                        <tr>
+                                                                <td>-----</td>
+                                                                <td>-</td>
+                                                                <td>---</td>
+                                                                <td>------------------------------------------------------------</td>
+                                                        </tr>
+                                                        <tr>
+                                                                <td>-----</td>
+                                                                <td>-</td>
+                                                                <td>---</td>
+                                                                <td>------------------------------------------------------------</td>
+                                                        </tr>
+                                                </tbody>
+                                        </table>
+                                </div>
                         </div>
                         <div class="col-lg-6">
                                 <label>Host Log</label>
@@ -130,6 +173,8 @@
 						</div>
 					</div>
                                 </div>
+                        </div>
+                        <div class="col-lg-3">
                                 <label>CPU Display</label>
                                 <table class="table table-striped table-bordered cpuPcbDisplay">
                                         <thead>
@@ -152,7 +197,13 @@
                                                         <td>--</td>
                                                 </tr>
                                         </tbody>
-                                </table>                            
+                                </table>
+                        </div>
+                        <div class="col-lg-3">                              
+                                <label>User Program Input</label>
+                                <textarea id="taProgramInput" class="form-control" name="taProgramInput">A9 03 8D 41 00 A9 01 8D 40 00 AC 40 00 A2 01 FF EE 40 00 AE 40 00 EC 41 00 D0 EF A9 44 8D 42 00 A9 4F 8D 43 00 A9 4E 8D 44 00 A9 45 8D 45 00 A9 00 8D 46 00 A2 02 A0 42 FF 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00</textarea>
+                        </div>
+                        <div class="col-lg-6">                            
                                 <label>PCB Display</label><label id="schedulingAlgo">Round Robin</label>
                                 <table class="table table-striped table-bordered cpuPcbDisplay">
                                         <thead>
@@ -170,6 +221,9 @@
                                                 </tr>
                                         </thead>
                                         <tbody id="processDisplay">
+                                                <tr>
+                                                        <td colspan="10">No Programs In Execution</td>
+                                                </tr>
                                         </tbody>
                                 </table>
                         </div>

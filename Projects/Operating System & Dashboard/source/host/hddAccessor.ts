@@ -20,8 +20,9 @@ module TSOS {
             return _HDD.storage.getItem(trackSectorBranch);
         }
 
-        public writeToHDD(trackSectorBranch: string, bytes: string): void {
-            return _HDD.storage.setItem(trackSectorBranch, bytes);
+        public writeToHDD(trackSectorBlock: string, bytes: string): void {
+            Control.updateHDDDisplay(trackSectorBlock, bytes);
+            return _HDD.storage.setItem(trackSectorBlock, bytes);
         }
     }
 } 

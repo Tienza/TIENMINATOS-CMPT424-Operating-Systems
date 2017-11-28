@@ -49,6 +49,7 @@ var TSOS;
             this.krnTrace("Loading the file system driver.");
             _krnFileSystemDriver = new TSOS.DeviceDriverFs();
             _krnFileSystemDriver.driverEntry();
+            TSOS.Control.initializeHDDDisplay();
             this.krnTrace(_krnFileSystemDriver.status);
             //
             // ... more?

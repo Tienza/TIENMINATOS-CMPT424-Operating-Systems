@@ -100,7 +100,7 @@ var TSOS;
             // Double highlight Op Codes
             var dh = ["A9", "A0", "A2", "D0"];
             // Unhighlight all Op Codes
-            Control.unhighlightAll();
+            Control.unhighlightAllMemory();
             // Get the instruction to see how many characters we need to highlight
             var instruction = _ProcessManager.fetchInstruction(pcb, PC);
             // Check to see what offset we need for highlighting
@@ -124,7 +124,7 @@ var TSOS;
             // Scoll to highlighted Op Code
             Control.scrollToMemory(pcb, id);
         };
-        Control.unhighlightAll = function () {
+        Control.unhighlightAllMemory = function () {
             for (var i = 0; i < _MemorySize; i++) {
                 var id = "#memory-cell-" + i;
                 var debugId = undefined;
@@ -237,22 +237,80 @@ var TSOS;
         };
         /* CPU && Process Display Functions */
         Control.updateCPUDisplay = function (cpu) {
-            var cpuDisplay = "<tr><td>" + Control.formatHex(cpu.PC) + "</td><td>" + cpu.instruction + "</td><td>" + Control.formatHex(cpu.Acc) + "</td><td>" + Control.formatHex(cpu.Xreg) + "</td><td>" + Control.formatHex(cpu.Yreg) + "</td><td>" + Control.formatHex(cpu.Zflag) + "</td></tr>";
+            var cpuDisplay = "<tr><td>" + Control.formatHex(cpu.PC) + "</td><td class=\"instruction\">" + cpu.instruction + "</td><td>" + Control.formatHex(cpu.Acc) + "</td><td>" + Control.formatHex(cpu.Xreg) + "</td><td>" + Control.formatHex(cpu.Yreg) + "</td><td>" + Control.formatHex(cpu.Zflag) + "</td></tr>";
             $("#cpuDisplay").html(cpuDisplay);
         };
         Control.initializeProcessDisplay = function (pcb) {
+            // Grab the current value of the process display and clear if it is the default message
+            var currentMessage = $('#processDisplay').html().replace(/\s/g, "");
+            if (currentMessage === Control.processDefaultMessageCheck) {
+                $('#processDisplay').html("");
+            }
+            // Assemble the string
             var rowId = "process-row-" + pcb.programId;
             var processDisplay = "<tr id=\"" + rowId + "\"><td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td><td>" + pcb.location + "</td></tr>";
             $('#processDisplay').append(processDisplay);
         };
         Control.updateProcessDisplay = function (pcb) {
+            // Unhighlight other instructions
+            Control.unhighlightInstructions();
+            // Update PCB
             var rowId = "#process-row-" + pcb.programId;
-            var processDisplay = "<td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td>" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td><td>" + pcb.location + "</td></tr>";
+            var highlight = "";
+            if (_CPU.isExecuting)
+                highlight = "instruction";
+            var processDisplay = "<td>" + Control.formatHex(pcb.programId) + "</td><td>" + Control.formatHex(pcb.priority) + "</td><td>" + pcb.state + "</td><td>" + Control.formatHex(pcb.PC) + "</td><td class=\"" + highlight + "\">" + pcb.instruction + "</td><td>" + Control.formatHex(pcb.Acc) + "</td><td>" + Control.formatHex(pcb.Xreg) + "</td><td>" + Control.formatHex(pcb.Yreg) + "</td><td>" + Control.formatHex(pcb.Zflag) + "</td><td>" + pcb.location + "</td></tr>";
             $(rowId).html(processDisplay);
         };
         Control.removeProcessDisplay = function (programId) {
+            // Remove the row associated with the Program Id
             var rowId = "#process-row-" + programId;
             $(rowId).remove();
+            // Insert the default message if the Process Display is Empty
+            if ($('#processDisplay').html().replace(/\s/g, "") === "") {
+                $('#processDisplay').html(Control.processDefaultMessage);
+            }
+        };
+        Control.unhighlightInstructions = function () {
+            var instructionTD = $('#processDisplay').find('td.instruction');
+            for (var i = 0; i < instructionTD.length; i++) {
+                $(instructionTD[i]).removeClass('instruction');
+            }
+        };
+        Control.initializeHDDDisplay = function () {
+            var hddDisplay = "";
+            for (var track = 0; track <= _HDD.tracks; track++) {
+                for (var sector = 0; sector <= _HDD.sectors; sector++) {
+                    for (var block = 0; block <= _HDD.blocks; block++) {
+                        var bytes = "";
+                        if (track === 0 && sector === 0 && block === 0) {
+                            bytes += "001100"; // Set first available dir entry and file entry (0,0,1 and 1,0,0) for MBR
+                            for (var i = 0; i < _HDD.bytes - 6; i++)
+                                bytes += 0; // set rest to 0
+                        }
+                        else {
+                            for (var i = 0; i < _HDD.bytes; i++)
+                                bytes += 0;
+                        }
+                        var TSB = _krnFileSystemDriver.removeCommaFromTSB(_HDDAccessor.getTSB(track, sector, block));
+                        var id = "tsb-" + TSB;
+                        hddDisplay += "<tr id=\"" + id + "\"><td>" + TSB + "</td><td>" + bytes[0] + "</td><td>" + _krnFileSystemDriver.getTSBFromVal(bytes) + "</td><td>" + _krnFileSystemDriver.getVal(bytes) + "</td></tr>";
+                    }
+                }
+            }
+            $('#hddDisplay').html(hddDisplay);
+        };
+        Control.updateHDDDisplay = function (trackSectorBlock, bytes) {
+            var id = "#tsb-" + _krnFileSystemDriver.removeCommaFromTSB(trackSectorBlock);
+            console.log(id);
+            var updatedVal = "";
+            if (id === "#tsb-000") {
+                updatedVal = "<td>" + trackSectorBlock + "</td><td>" + bytes[0] + "</td><td>" + _HDDAccessor.getTSB(bytes[0], bytes[1], bytes[2]) + "</td><td>" + bytes.substring(3, 63) + "</td>";
+            }
+            else {
+                updatedVal = "<td>" + trackSectorBlock + "</td><td>" + bytes[0] + "</td><td>" + _krnFileSystemDriver.getTSBFromVal(bytes) + "</td><td>" + _krnFileSystemDriver.getVal(bytes) + "</td>";
+            }
+            $(id).html(updatedVal);
         };
         Control.formatHex = function (input) {
             var hex = input.toString(16);
@@ -347,6 +405,8 @@ var TSOS;
                 $('#showWTTAT').html("Show WT/TAT: <b>OFF</b>");
             }
         };
+        Control.processDefaultMessage = "<tr><td colspan=\"10\">No Programs In Execution</td></tr>";
+        Control.processDefaultMessageCheck = "<tr><tdcolspan=\"10\">NoProgramsInExecution</td></tr>";
         return Control;
     }());
     TSOS.Control = Control;

@@ -58,6 +58,7 @@ module TSOS {
             this.krnTrace("Loading the file system driver.");
             _krnFileSystemDriver = new DeviceDriverFs();
             _krnFileSystemDriver.driverEntry();
+            Control.initializeHDDDisplay();
             this.krnTrace(_krnFileSystemDriver.status);
 
             //

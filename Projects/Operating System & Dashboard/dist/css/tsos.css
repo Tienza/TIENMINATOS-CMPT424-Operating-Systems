@@ -54,8 +54,22 @@ td {
 #taProgramInput {
   font-family: monospace;
   font-weight: bold;
+  height: 76px;
+  width: 100%;
+}
+
+#hddDisplayHolder {
+  border: solid 1px;
+  border-color: #DDDDDD;
+  border-radius: 5px;
+  font-family: monospace;
+  font-weight: bold;
   height: 196px;
   width: 100%;
+}
+
+#hddDisplay {
+  font-size: 8px;
 }
 
 #taHostLog {
@@ -115,6 +129,10 @@ td {
 
 .debugger {
   background-color: #FD8A10
+}
+
+.instruction {
+  color: #B31B1B;
 }
 
 .currentOp {
