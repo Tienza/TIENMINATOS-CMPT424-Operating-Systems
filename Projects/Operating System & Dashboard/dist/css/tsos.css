@@ -65,11 +65,17 @@ td {
   font-family: monospace;
   font-weight: bold;
   height: 196px;
+  overflow-x: hidden;
+  overflow-y: scroll;
   width: 100%;
 }
 
+#hddDisplayHeader {
+  font-size: 12px;
+}
+
 #hddDisplay {
-  font-size: 8px;
+  font-size: 10.60px;
 }
 
 #taHostLog {
@@ -149,4 +155,20 @@ td {
 
 .readFromLoc {
   color: #F0AD4E;
+}
+
+.hddTSB {
+  color: #275927;
+}
+
+.hddFlag {
+  color: #990000;
+}
+
+.hddNext {
+  color: #BC7410;
+}
+
+.hddData {
+  color: #214F78;
 }

@@ -278,6 +278,7 @@ var TSOS;
             }
         };
         Control.initializeHDDDisplay = function () {
+            var MBRRow = true;
             var hddDisplay = "";
             for (var track = 0; track <= _HDD.tracks; track++) {
                 for (var sector = 0; sector <= _HDD.sectors; sector++) {
@@ -292,9 +293,16 @@ var TSOS;
                             for (var i = 0; i < _HDD.bytes; i++)
                                 bytes += 0;
                         }
-                        var TSB = _krnFileSystemDriver.removeCommaFromTSB(_HDDAccessor.getTSB(track, sector, block));
-                        var id = "tsb-" + TSB;
-                        hddDisplay += "<tr id=\"" + id + "\"><td>" + TSB + "</td><td>" + bytes[0] + "</td><td>" + _krnFileSystemDriver.getTSBFromVal(bytes) + "</td><td>" + _krnFileSystemDriver.getVal(bytes) + "</td></tr>";
+                        var trackSectorBlock = _krnFileSystemDriver.removeCommaFromTSB(_HDDAccessor.getTSB(track, sector, block));
+                        var id = "tsb-" + trackSectorBlock;
+                        if (MBRRow) {
+                            hddDisplay += "<tr id=\"" + id + "\"><td class=\"hddTSB\">" + Control.formatTSBWithColon(trackSectorBlock) + "</td><td class=\"hddFlag\">" + bytes[0] + "</td><td class=\"hddNext\">" + _HDDAccessor.getTSB(bytes[0], bytes[1], bytes[2]) + "</td><td class=\"hddData\">" + bytes.substring(3, 63) + "</td></tr>";
+                            ;
+                            MBRRow = false;
+                        }
+                        else {
+                            hddDisplay += "<tr id=\"" + id + "\"><td class=\"hddTSB\">" + Control.formatTSBWithColon(trackSectorBlock) + "</td><td class=\"hddFlag\">" + bytes[0] + "</td><td class=\"hddNext\">" + _krnFileSystemDriver.getTSBFromVal(bytes) + "</td><td class=\"hddData\">" + _krnFileSystemDriver.getVal(bytes) + "</td></tr>";
+                        }
                     }
                 }
             }
@@ -302,15 +310,38 @@ var TSOS;
         };
         Control.updateHDDDisplay = function (trackSectorBlock, bytes) {
             var id = "#tsb-" + _krnFileSystemDriver.removeCommaFromTSB(trackSectorBlock);
-            console.log(id);
             var updatedVal = "";
             if (id === "#tsb-000") {
-                updatedVal = "<td>" + trackSectorBlock + "</td><td>" + bytes[0] + "</td><td>" + _HDDAccessor.getTSB(bytes[0], bytes[1], bytes[2]) + "</td><td>" + bytes.substring(3, 63) + "</td>";
+                updatedVal = "<td class=\"hddTSB\">" + Control.formatTSBWithColon(_krnFileSystemDriver.removeCommaFromTSB(trackSectorBlock)) + "</td><td class=\"hddFlag\">" + bytes[0] + "</td><td class=\"hddNext\">" + _HDDAccessor.getTSB(bytes[0], bytes[1], bytes[2]) + "</td><td class=\"hddData\">" + bytes.substring(3, 63) + "</td>";
             }
             else {
-                updatedVal = "<td>" + trackSectorBlock + "</td><td>" + bytes[0] + "</td><td>" + _krnFileSystemDriver.getTSBFromVal(bytes) + "</td><td>" + _krnFileSystemDriver.getVal(bytes) + "</td>";
+                updatedVal = "<td class=\"hddTSB\">" + Control.formatTSBWithColon(_krnFileSystemDriver.removeCommaFromTSB(trackSectorBlock)) + "</td><td class=\"hddFlag\">" + bytes[0] + "</td><td class=\"hddNext\">" + _krnFileSystemDriver.getTSBFromVal(bytes) + "</td><td class=\"hddData\">" + _krnFileSystemDriver.getVal(bytes) + "</td>";
             }
             $(id).html(updatedVal);
+        };
+        /*public static updateHDDDisplay(): void {
+            var hddDisplay: string = "";
+            for (var TSB in _HDD.storage) {
+                var hddVal: string = _HDDAccessor.readFromHDD(TSB);
+                if (TSB === "0,0,0") {
+                    hddDisplay += "<tr id=\"tsb-" + _krnFileSystemDriver.removeCommaFromTSB(TSB) + "\"><td>" + Control.formatTSBWithColon(_krnFileSystemDriver.removeCommaFromTSB(TSB)) + "</td><td>" + hddVal[0] + "</td><td>" + _HDDAccessor.getTSB(hddVal[0], hddVal[1], hddVal[2]) + "</td><td>" + hddVal.substring(3, 63) + "</td></tr>";
+                }
+                else {
+                    hddDisplay += "<tr id=\"tsb-" + _krnFileSystemDriver.removeCommaFromTSB(TSB) + "\"><td>" + Control.formatTSBWithColon(_krnFileSystemDriver.removeCommaFromTSB(TSB)) + "</td><td>" + hddVal[0] + "</td><td>" +  _krnFileSystemDriver.getTSBFromVal(hddVal) +"</td><td>" + _krnFileSystemDriver.getVal(hddVal) + "</td></tr>";
+                }
+            }
+            $('#hddDisplay').html(hddDisplay);
+        }*/
+        Control.scrollToHDD = function (id) {
+            // Format Memory Cell Id
+            id = id.substr(1);
+            // Get the position of the current memory cell
+            var position = document.getElementById(id).offsetTop;
+            // Scroll to position
+            document.getElementById('hddDisplayHolder').scrollTop = position;
+        };
+        Control.formatTSBWithColon = function (trackSectorBlock) {
+            return trackSectorBlock[0] + ":" + trackSectorBlock[1] + ":" + trackSectorBlock[2];
         };
         Control.formatHex = function (input) {
             var hex = input.toString(16);

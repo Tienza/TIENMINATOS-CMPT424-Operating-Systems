@@ -276,10 +276,10 @@ var TSOS;
                 if (directoryValSize <= _HDD.bytes) {
                     // Zero fill directory data
                     directoryVal = this.zeroFillTSBVal(directoryValSize, directoryVal);
-                    console.log("diractoryVal Size: " + directoryVal.length);
+                    /*console.log("diractoryVal Size: " + directoryVal.length);
                     console.log("directoryVal: " + directoryVal);
-                    var translatedVal = this.translateDirectoryInformation(directoryVal);
-                    console.log("File Name: " + translatedVal[0], "Create Date: " + translatedVal[1], "Size: " + translatedVal[2]);
+                    var translatedVal: string[] = this.translateDirectoryInformation(directoryVal);
+                    console.log("File Name: " + translatedVal[0], "Create Date: " + translatedVal[1], "Size: " + translatedVal[2]);*/
                     // Create the file - Notate as in-use, final file location, and empty data
                     var fileInfo = "1uuu" + EMPTY_FILE_DATA;
                     // Write to the HDD - Directory first then file

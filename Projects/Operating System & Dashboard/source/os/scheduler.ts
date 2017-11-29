@@ -141,7 +141,7 @@ module TSOS {
                 // Check for free partitions
                 var freePartition: {[key: string]: any} = _MemoryManager.checkFreePartition();
                 // Roll out - If there are no free partitions and the ReadyQueue is longer has more than 2 PCBs
-                if (freePartition.isFree === undefined && _ProcessManager.readyQueue.q.length > 2) {
+                if (freePartition.isFree === undefined && _ProcessManager.readyQueue.q.length > 2 && _ProcessManager.readyQueue.q[0].location === _ProcessManager.processLocations.hdd) {
                     // Faux Kernal Interrupt
                     _Kernel.krnTrace("Handling IRQ~" + FILE_SYSTEM_IRQ);
                     // Roll out the current PCB

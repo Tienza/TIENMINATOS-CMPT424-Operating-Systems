@@ -451,8 +451,11 @@ var TSOS;
         };
         Shell.prototype.shellFormat = function (args) {
             if (args.length > 0) {
-                if (args[0] === "-f" || args[0] === "-full")
+                if (args[0] === "-f" || args[0] === "-full") {
                     _HDD.init();
+                    TSOS.Control.initializeHDDDisplay();
+                    _StdOut.printLongText("Hard Drive fully formatted, no recovery possible");
+                }
                 else if (args[0] === "-q" || args[0] === "-quick")
                     console.log("This currently does nothing");
                 else
