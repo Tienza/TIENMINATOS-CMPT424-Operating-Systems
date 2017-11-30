@@ -302,7 +302,7 @@ var TSOS;
                 var dateTimeHex = TSOS.Utils.toHex(dateTime);
                 var fileSize = TSOS.Utils.toHex("0");
                 // Assign all the associated variables to directoryVal
-                directoryVal = fileTSBString + fileNameHex + this.seperatorHex + dateTimeHex + this.seperatorHex + fileSize + this.seperatorHex;
+                directoryVal = fileTSBString + fileNameHex + this.seperatorHex + dateTimeHex + this.seperatorHex + fileSize;
                 var directoryValSize = directoryVal.length;
                 if (directoryValSize <= _HDD.bytes) {
                     // Zero fill directory data

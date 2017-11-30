@@ -361,7 +361,12 @@ module TSOS {
                 updatedVal = "<td class=\"hddTSB\">" + Control.formatTSBWithColon(_krnFileSystemDriver.removeCommaFromTSB(trackSectorBlock)) + "</td><td class=\"hddFlag\">" + bytes[0] + "</td><td class=\"hddNext\">" + _HDDAccessor.getTSB(bytes[0], bytes[1], bytes[2]) + "</td><td class=\"hddData\">" + bytes.substring(3, 63) + "</td>";
             }
             else {
-                updatedVal = "<td class=\"hddTSB\">" + Control.formatTSBWithColon(_krnFileSystemDriver.removeCommaFromTSB(trackSectorBlock)) + "</td><td class=\"hddFlag\">" + bytes[0] + "</td><td class=\"hddNext\">" +  _krnFileSystemDriver.getTSBFromVal(bytes) + "</td><td class=\"hddData\">" + _krnFileSystemDriver.getVal(bytes) + "</td>";
+                var bytesToWrite: string = _krnFileSystemDriver.getVal(bytes)
+                // Cut down the string to display if it is too large
+                if (bytesToWrite.length > 60)
+                    bytesToWrite = bytesToWrite.substring(0, 60);
+
+                updatedVal = "<td class=\"hddTSB\">" + Control.formatTSBWithColon(_krnFileSystemDriver.removeCommaFromTSB(trackSectorBlock)) + "</td)><td class=\"hddFlag\">" + bytes[0] + "</td><td class=\"hddNext\">" +  _krnFileSystemDriver.getTSBFromVal(bytes) + "</td><td class=\"hddData\">" + bytesToWrite + "</td>";
             }
 
             $(id).html(updatedVal);
