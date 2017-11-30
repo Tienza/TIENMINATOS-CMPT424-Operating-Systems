@@ -55,12 +55,12 @@ module TSOS {
                             this.deleteFile(fileName);
                             break;
                         case "read":
-                            this.readFile(fileName);
+                            this.readFile(fileName, true);
                             break;
                     }
                 }
                 else {
-                    _StdOut.printOSFeedBack("Error: Disk not formatted! Please use the format command");
+                    _StdOut.printOSFeedBack("Error: Disk not formatted! Please use the 'format' command");
                 }
             }
         }
@@ -112,6 +112,8 @@ module TSOS {
             if (directoryTSB !== this.noSuchFile) {
                 var directoryVal: string = _HDDAccessor.readFromHDD(directoryTSB);
                 var fileTSB: string = this.getTSBFromVal(directoryVal);
+                // Before deleting the file, read it and store its content for recovery
+                var fileContent: string = this.readFile(fileName, false);
                 // Wipe the file sections
                 do {
                     var fileVal: string = _HDDAccessor.readFromHDD(fileTSB);
@@ -125,10 +127,27 @@ module TSOS {
                 this.alterNextFileLoc();
                 // Print confirmation message
                 _StdOut.printLongText("File '" + fileName + "' successfully removed");
+                // Push to recovery partition in case user wants to recovery at a later point
+                _HDD.hddRecovery.push({fileName: fileName,
+                                       fileContent: fileContent});
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
+        }
+
+        public deleteProgramFromHDD(pcb: PCB): void {
+            var fileTSB: string = pcb.hddTSB;
+            do {
+                var fileVal: string = _HDDAccessor.readFromHDD(fileTSB);
+                _HDDAccessor.writeToHDD(fileTSB, "0000" + EMPTY_FILE_DATA);
+                fileTSB = this.getTSBFromVal(fileVal);
+            } while (fileTSB !== "u,u,u");
+            // Update the Master Boot Record
+            this.alterNextDirLoc();
+            this.alterNextFileLoc();
+            // Print confirmation message
+            _StdOut.printLn("Process PID " + pcb.programId + " Successfully Removed From Hard Disk");
         }
 
         public wipeFile(fileName: string): void {
@@ -160,7 +179,7 @@ module TSOS {
             }
         }
 
-        public readFile(fileName: string): void {
+        public readFile(fileName: string, print: boolean): string {
             var directoryTSB: string = this.checkFileExists(fileName);
             
             if (directoryTSB !== this.noSuchFile) {
@@ -180,10 +199,16 @@ module TSOS {
                         fileTSB = this.getTSBFromVal(fileVal);
                     } while (fileTSB !== "u,u,u");
                     // Print file contents to the console
-                    _StdOut.printLongText(fileContent)
+                    if (print)
+                        _StdOut.printLongText(fileContent)
+                    // Return the contents of a file to be used in Recovery
+                    return fileContent;
                 }
                 else {
-                    _StdOut.printLongText("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
+                    if (print)
+                        _StdOut.printLongText("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
+                    // Return an empty string if the file is empty
+                    return "";
                 }
                 
             }
@@ -308,6 +333,18 @@ module TSOS {
             }
         } 
 
+        public recoverFile(fileName): void {
+            var fileInfo: {[key: string]: any} = this.checkHDDRecovery(fileName);
+
+            if (fileInfo.fileName !== undefined) {
+                this.createFile(fileInfo.fileName);
+                this.writeFile(fileInfo.fileName, fileInfo.fileContent);
+            }
+            else {
+                _StdOut.printLongText("File '" + fileName + "' was not recovered or never existed. Please try again");
+            }
+        }
+
         public rollOut(programId: number, userProgram: string[]) {
             // Send the actions message to the log
             var rollOutMessage: string = "Rolling Out ProgramId " + programId + " To HDD";
@@ -396,6 +433,24 @@ module TSOS {
             _MemoryManager.loadProgramFromHDD(pcb, userProgram);
         }
 
+        public chkDsk(): void {
+            var recoveryList: string[] = [];
+            // Get the file names in the hddRecovery array for the user
+            for (var i: number = 0; i < _HDD.hddRecovery.length; i++) {
+                recoveryList.push("[" + _HDD.hddRecovery[i].fileName + "]");
+            }
+            var fileInfo: string = "Files Rediscovered: " + recoveryList.join(" | ");
+            // Print out a message for the user
+            _StdOut.printLn("Scanning Hard Disk...");
+            _StdOut.printLn("Rediscovering files...");
+            _StdOut.printLn("Rediscovering content...");
+            _StdOut.printLn("Associating files with content...");
+            _StdOut.printLn("Freeing space on Hard Disk...");
+            _StdOut.printLn("Check Disk complete!");
+            // Print file names
+            _StdOut.printLongText(fileInfo);
+        }
+
         public fetchNextFreeDirectoryLoc(): string {
             var mbr: string = _HDDAccessor.readFromHDD("0,0,0");
             return _HDDAccessor.getTSB(mbr[0], mbr[1], mbr[2]);
@@ -406,8 +461,8 @@ module TSOS {
             return _HDDAccessor.getTSB(mbr[3], mbr[4], mbr[5]);
         }
 
-        public removeCommaFromTSB(TSB): string {
-            return TSB[0] + TSB[2] + TSB[4];
+        public removeCommaFromTSB(trackSectorBlock): string {
+            return trackSectorBlock[0] + trackSectorBlock[2] + trackSectorBlock[4];
         }
 
         public alterNextDirLoc(): void {
@@ -485,6 +540,17 @@ module TSOS {
             }
 
             return trackSectorBlock;
+        }
+
+        public checkHDDRecovery(fileName: string): {[key: string]: any} {
+            var fileInfo: {[key: string]: any} = {};
+
+            for (var i: number = 0; i < _HDD.hddRecovery.length; i++) {
+                if (fileName === _HDD.hddRecovery[i].fileName)
+                    fileInfo = _HDD.hddRecovery[i];
+            }
+
+            return fileInfo;
         }
 
         public getHeader(tsbVal: string): string {

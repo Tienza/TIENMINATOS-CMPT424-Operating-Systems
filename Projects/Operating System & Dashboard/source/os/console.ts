@@ -158,6 +158,13 @@ module TSOS {
             }
         }
 
+        public printLn(text: string): void {
+            for (var i: number = 0; i < text.length; i++) {
+                this.putText(text[i]);
+            }
+            this.advanceLine();
+        }
+
         public verticalList(textList: string[]): void {
             for (var i: number = 0; i < textList.length; i ++) {
                 this.printLongText(textList[i]);

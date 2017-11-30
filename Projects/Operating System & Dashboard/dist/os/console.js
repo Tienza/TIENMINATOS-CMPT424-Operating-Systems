@@ -147,6 +147,12 @@ var TSOS;
                 this.putText(text[i]);
             }
         };
+        Console.prototype.printLn = function (text) {
+            for (var i = 0; i < text.length; i++) {
+                this.putText(text[i]);
+            }
+            this.advanceLine();
+        };
         Console.prototype.verticalList = function (textList) {
             for (var i = 0; i < textList.length; i++) {
                 this.printLongText(textList[i]);

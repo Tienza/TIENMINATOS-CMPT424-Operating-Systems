@@ -16,7 +16,8 @@ module TSOS {
                     public bytes: number = 64,
                     public blockSize: number = 60,
                     public storage: Storage = sessionStorage,
-                    public isFormatted: boolean = false) {
+                    public isFormatted: boolean = false,
+                    public hddRecovery: {[key: string]: any}[] = []) {
         }
 
         public init() {

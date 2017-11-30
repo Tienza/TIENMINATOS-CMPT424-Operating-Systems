@@ -108,18 +108,24 @@ module TSOS {
         public terminateProcess(pcb: PCB): void {
             // Set PCB isExecuted to true
             pcb.isExecuted = true;
-            // Wipe the associated memory partition
-            _MemoryManager.wipeParition(pcb.memoryIndex);
-            // Free the associated memory partition
-            _MemoryManager.freePartition(pcb.memoryIndex);
+            if (pcb.location === _ProcessManager.processLocations.memory) {
+                // Wipe the associated memory partition
+                _MemoryManager.wipeParition(pcb.memoryIndex);
+                // Free the associated memory partition
+                _MemoryManager.freePartition(pcb.memoryIndex);
+                // Update the Memory Display
+                Control.updateMemoryDisplay(pcb.memoryIndex);
+            }
+            else {
+                // Delete process from the HDD
+                _krnFileSystemDriver.deleteProgramFromHDD(pcb);
+            }
+            // Remove the Process Display
+            Control.removeProcessDisplay(pcb.programId);
             // Add the process to the terminatedList
             this.terminatedList.push(pcb);
             // Remove the process from the processList
             this.removePCB(pcb.programId);
-            // Update the Memory Display
-            Control.updateMemoryDisplay(pcb.memoryIndex);
-            // Remove the Process Display
-            Control.removeProcessDisplay(pcb.programId);
             /*// Show Memory Partitions
             _MemoryManager.showAllPartitions();*/
             // Toggle CPU execution off

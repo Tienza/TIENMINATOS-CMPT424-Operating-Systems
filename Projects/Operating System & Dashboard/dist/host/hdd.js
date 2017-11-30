@@ -7,7 +7,7 @@
 var TSOS;
 (function (TSOS) {
     var HDD = /** @class */ (function () {
-        function HDD(tracks, sectors, blocks, bytes, blockSize, storage, isFormatted) {
+        function HDD(tracks, sectors, blocks, bytes, blockSize, storage, isFormatted, hddRecovery) {
             if (tracks === void 0) { tracks = 3; }
             if (sectors === void 0) { sectors = 7; }
             if (blocks === void 0) { blocks = 7; }
@@ -15,6 +15,7 @@ var TSOS;
             if (blockSize === void 0) { blockSize = 60; }
             if (storage === void 0) { storage = sessionStorage; }
             if (isFormatted === void 0) { isFormatted = false; }
+            if (hddRecovery === void 0) { hddRecovery = []; }
             this.tracks = tracks;
             this.sectors = sectors;
             this.blocks = blocks;
@@ -22,6 +23,7 @@ var TSOS;
             this.blockSize = blockSize;
             this.storage = storage;
             this.isFormatted = isFormatted;
+            this.hddRecovery = hddRecovery;
         }
         HDD.prototype.init = function () {
             this.storage.clear();

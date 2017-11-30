@@ -66,6 +66,12 @@ module TSOS {
             // format
             sc = new TSOS.ShellCommand(this.shellFormat, "format", "< -quick | -full > - Format the HDD.");
             this.commandList[this.commandList.length] = sc;
+            // chDsk
+            sc = new TSOS.ShellCommand(this.shellchkDsk, "chkdsk", " - Rediscover files on the HDD after delete or format.");
+            this.commandList[this.commandList.length] = sc;
+            // recover
+            sc = new TSOS.ShellCommand(this.shellRecover, "recover", "< filename > - Recover file and restore on HDD.");
+            this.commandList[this.commandList.length] = sc;
             // ls
             sc = new TSOS.ShellCommand(this.shellLS, "ls", " - Lists the files found on the HDD.");
             this.commandList[this.commandList.length] = sc;
@@ -390,7 +396,7 @@ module TSOS {
                     if (_ProcessManager.isRunningAll) {
                         _ProcessManager.removePCBFromReadyQueue(pcb.programId);
                     }
-                    _StdOut.putText("Process PID: " + pcb.programId + " Successfully Killed");
+                    _StdOut.putText("Process PID " + pcb.programId + " Successfully Killed");
                 }
                 else {
                     _StdOut.putText("Specified PID is not active or does not exist")
@@ -498,6 +504,26 @@ module TSOS {
             }
         }
 
+        public shellchkDsk(args) {
+            if (_HDD.isFormatted) {
+                _krnFileSystemDriver.chkDsk();
+            }
+            else {
+                _StdOut.printLongText("Error: Disk not formatted! Please use the 'format' command");
+            }
+        }
+
+        public shellRecover(args) {
+            if (args.length > 0) {
+                var fileName: string = args[0];
+                _krnFileSystemDriver.recoverFile(fileName);
+                _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, 0));
+            }
+            else {
+                _StdOut.putText("Please provide a file name and try again");
+            }
+        }
+
         public shellLS(args) {
             if (args.length > 0) {
                 if (args[0] === "-l")
@@ -541,7 +567,7 @@ module TSOS {
         public shellRead(args) {
             if (args.length > 0) {
                 var fileName: string = args[0];
-                _krnFileSystemDriver.readFile(fileName);
+                _krnFileSystemDriver.readFile(fileName, true);
                 _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, 0));
             }
             else {

@@ -66,12 +66,12 @@ var TSOS;
                             this.deleteFile(fileName);
                             break;
                         case "read":
-                            this.readFile(fileName);
+                            this.readFile(fileName, true);
                             break;
                     }
                 }
                 else {
-                    _StdOut.printOSFeedBack("Error: Disk not formatted! Please use the format command");
+                    _StdOut.printOSFeedBack("Error: Disk not formatted! Please use the 'format' command");
                 }
             }
         };
@@ -117,6 +117,8 @@ var TSOS;
             if (directoryTSB !== this.noSuchFile) {
                 var directoryVal = _HDDAccessor.readFromHDD(directoryTSB);
                 var fileTSB = this.getTSBFromVal(directoryVal);
+                // Before deleting the file, read it and store its content for recovery
+                var fileContent = this.readFile(fileName, false);
                 // Wipe the file sections
                 do {
                     var fileVal = _HDDAccessor.readFromHDD(fileTSB);
@@ -130,10 +132,26 @@ var TSOS;
                 this.alterNextFileLoc();
                 // Print confirmation message
                 _StdOut.printLongText("File '" + fileName + "' successfully removed");
+                // Push to recovery partition in case user wants to recovery at a later point
+                _HDD.hddRecovery.push({ fileName: fileName,
+                    fileContent: fileContent });
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
+        };
+        DeviceDriverFs.prototype.deleteProgramFromHDD = function (pcb) {
+            var fileTSB = pcb.hddTSB;
+            do {
+                var fileVal = _HDDAccessor.readFromHDD(fileTSB);
+                _HDDAccessor.writeToHDD(fileTSB, "0000" + EMPTY_FILE_DATA);
+                fileTSB = this.getTSBFromVal(fileVal);
+            } while (fileTSB !== "u,u,u");
+            // Update the Master Boot Record
+            this.alterNextDirLoc();
+            this.alterNextFileLoc();
+            // Print confirmation message
+            _StdOut.printLn("Process PID " + pcb.programId + " Successfully Removed From Hard Disk");
         };
         DeviceDriverFs.prototype.wipeFile = function (fileName) {
             var directoryTSB = this.checkFileExists(fileName);
@@ -160,7 +178,7 @@ var TSOS;
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
         };
-        DeviceDriverFs.prototype.readFile = function (fileName) {
+        DeviceDriverFs.prototype.readFile = function (fileName, print) {
             var directoryTSB = this.checkFileExists(fileName);
             if (directoryTSB !== this.noSuchFile) {
                 // Fetch the TSB of the file from the first file block stored in the directory
@@ -179,10 +197,16 @@ var TSOS;
                         fileTSB = this.getTSBFromVal(fileVal);
                     } while (fileTSB !== "u,u,u");
                     // Print file contents to the console
-                    _StdOut.printLongText(fileContent);
+                    if (print)
+                        _StdOut.printLongText(fileContent);
+                    // Return the contents of a file to be used in Recovery
+                    return fileContent;
                 }
                 else {
-                    _StdOut.printLongText("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
+                    if (print)
+                        _StdOut.printLongText("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
+                    // Return an empty string if the file is empty
+                    return "";
                 }
             }
             else {
@@ -296,6 +320,16 @@ var TSOS;
                 }
             }
         };
+        DeviceDriverFs.prototype.recoverFile = function (fileName) {
+            var fileInfo = this.checkHDDRecovery(fileName);
+            if (fileInfo.fileName !== undefined) {
+                this.createFile(fileInfo.fileName);
+                this.writeFile(fileInfo.fileName, fileInfo.fileContent);
+            }
+            else {
+                _StdOut.printLongText("File '" + fileName + "' was not recovered or never existed. Please try again");
+            }
+        };
         DeviceDriverFs.prototype.rollOut = function (programId, userProgram) {
             // Send the actions message to the log
             var rollOutMessage = "Rolling Out ProgramId " + programId + " To HDD";
@@ -380,6 +414,23 @@ var TSOS;
             // Load the program into Memory
             _MemoryManager.loadProgramFromHDD(pcb, userProgram);
         };
+        DeviceDriverFs.prototype.chkDsk = function () {
+            var recoveryList = [];
+            // Get the file names in the hddRecovery array for the user
+            for (var i = 0; i < _HDD.hddRecovery.length; i++) {
+                recoveryList.push("[" + _HDD.hddRecovery[i].fileName + "]");
+            }
+            var fileInfo = "Files Rediscovered: " + recoveryList.join(" | ");
+            // Print out a message for the user
+            _StdOut.printLn("Scanning Hard Disk...");
+            _StdOut.printLn("Rediscovering files...");
+            _StdOut.printLn("Rediscovering content...");
+            _StdOut.printLn("Associating files with content...");
+            _StdOut.printLn("Freeing space on Hard Disk...");
+            _StdOut.printLn("Check Disk complete!");
+            // Print file names
+            _StdOut.printLongText(fileInfo);
+        };
         DeviceDriverFs.prototype.fetchNextFreeDirectoryLoc = function () {
             var mbr = _HDDAccessor.readFromHDD("0,0,0");
             return _HDDAccessor.getTSB(mbr[0], mbr[1], mbr[2]);
@@ -388,8 +439,8 @@ var TSOS;
             var mbr = _HDDAccessor.readFromHDD("0,0,0");
             return _HDDAccessor.getTSB(mbr[3], mbr[4], mbr[5]);
         };
-        DeviceDriverFs.prototype.removeCommaFromTSB = function (TSB) {
-            return TSB[0] + TSB[2] + TSB[4];
+        DeviceDriverFs.prototype.removeCommaFromTSB = function (trackSectorBlock) {
+            return trackSectorBlock[0] + trackSectorBlock[2] + trackSectorBlock[4];
         };
         DeviceDriverFs.prototype.alterNextDirLoc = function () {
             var mbr = _HDDAccessor.readFromHDD("0,0,0");
@@ -458,6 +509,14 @@ var TSOS;
                 }
             }
             return trackSectorBlock;
+        };
+        DeviceDriverFs.prototype.checkHDDRecovery = function (fileName) {
+            var fileInfo = {};
+            for (var i = 0; i < _HDD.hddRecovery.length; i++) {
+                if (fileName === _HDD.hddRecovery[i].fileName)
+                    fileInfo = _HDD.hddRecovery[i];
+            }
+            return fileInfo;
         };
         DeviceDriverFs.prototype.getHeader = function (tsbVal) {
             return tsbVal.substring(0, 4);
