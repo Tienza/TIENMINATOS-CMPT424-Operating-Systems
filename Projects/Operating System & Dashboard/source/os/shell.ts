@@ -545,7 +545,7 @@ module TSOS {
         public shellCreate(args) {
             if (args.length > 0) {
                 var fileName: string = args[0];
-                _krnFileSystemDriver.createFile(fileName);
+                _krnFileSystemDriver.createFile(fileName, true);
                 _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, 0));
             }
             else {
@@ -581,7 +581,7 @@ module TSOS {
                 var writeData: string[] = args.slice(1, args.length);
                 if (TSOS.Utils.isProperWriteData(writeData)) {
                     var data: string = writeData.join(" ");
-                    _krnFileSystemDriver.writeFile(fileName, data);
+                    _krnFileSystemDriver.writeFile(fileName, data, true);
                     _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, 0));
                 }
                 else {

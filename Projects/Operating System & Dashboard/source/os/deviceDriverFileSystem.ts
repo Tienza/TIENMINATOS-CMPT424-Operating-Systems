@@ -46,10 +46,10 @@ module TSOS {
                 if (_HDD.isFormatted) {
                     switch (operation) {
                         case "create":
-                            this.createFile(fileName);
+                            this.createFile(fileName, true);
                             break;
                         case "write":
-                            this.writeFile(fileName, data);
+                            this.writeFile(fileName, data, true);
                             break;
                         case "delete":
                             this.deleteFile(fileName);
@@ -129,7 +129,7 @@ module TSOS {
                 _StdOut.printLongText("File '" + fileName + "' successfully removed");
                 // Push to recovery partition in case user wants to recovery at a later point
                 _HDD.hddRecovery.push({fileName: fileName,
-                                       fileContent: fileContent});
+                                       fileContent: "'" + fileContent + "'"});
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
@@ -179,7 +179,7 @@ module TSOS {
             }
         }
 
-        public readFile(fileName: string, print: boolean): string {
+        public readFile(fileName: string, notFromRecovery: boolean): string {
             var directoryTSB: string = this.checkFileExists(fileName);
             
             if (directoryTSB !== this.noSuchFile) {
@@ -199,13 +199,13 @@ module TSOS {
                         fileTSB = this.getTSBFromVal(fileVal);
                     } while (fileTSB !== "u,u,u");
                     // Print file contents to the console
-                    if (print)
+                    if (notFromRecovery)
                         _StdOut.printLongText(fileContent)
                     // Return the contents of a file to be used in Recovery
                     return fileContent;
                 }
                 else {
-                    if (print)
+                    if (notFromRecovery)
                         _StdOut.printLongText("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
                     // Return an empty string if the file is empty
                     return "";
@@ -217,7 +217,7 @@ module TSOS {
             }
         }
 
-        public writeFile(fileName: string, data: string): void {
+        public writeFile(fileName: string, data: string, notFromRecovery: boolean): boolean {
             var directoryTSB: string = this.checkFileExists(fileName);
 
             if (directoryTSB !== this.noSuchFile) {
@@ -243,7 +243,8 @@ module TSOS {
                         var workingTSB: string = this.fetchNextFreeFileLoc();
                         if (workingTSB === "u,u,u") {
                             nextTSB = "uuu";
-                            _StdOut.printLongText("File partially written. HDD is at capacity.");
+                            if (notFromRecovery)
+                                _StdOut.printLongText("File partially written. HDD is at capacity.");
                             data = "";
                         }
                         else {
@@ -279,22 +280,29 @@ module TSOS {
                 // Write the updatedVal back to the directoryTSB
                 _HDDAccessor.writeToHDD(directoryTSB, updatedVal);
                 // Print confirmation
-                _StdOut.printLongText("Successfully wrote to file '" + fileName + "'");
+                if (notFromRecovery)
+                    _StdOut.printLongText("Successfully wrote to file '" + fileName + "'");
+
+                return true;
             }
             else {
-                _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                if (notFromRecovery)
+                    _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                return false;
             }
         }
 
-        public createFile(fileName: string): void {
+        public createFile(fileName: string, notFromRecovery: boolean): boolean {
             var directoryTSB: string = this.fetchNextFreeDirectoryLoc();
             var fileTSB: string = this.fetchNextFreeFileLoc();
 
             if (directoryTSB === this.isFull || fileTSB === this.isFull) {
                 _StdOut.printLongText("HDD is at full capacity. Please delete files or format the disk");
+                return false;
             }
             else if (this.checkFileExists(fileName) !== "FILE DOES NOT EXIST") {
-                _StdOut.printLongText("A file named " + fileName + " already exists. Please rename and try again");
+                _StdOut.printLongText("A file named '" + fileName + "' already exists. Please rename and try again");
+                return false;
             }
             else {
                 var directoryVal = "";
@@ -323,11 +331,15 @@ module TSOS {
                     this.alterNextDirLoc();
                     this.alterNextFileLoc();
                     // Confirm file creation
-                    _StdOut.printLongText("File '" + fileName + "' successfully created");
+                    if (notFromRecovery)
+                        _StdOut.printLongText("File '" + fileName + "' successfully created");
+
+                    return true;
 
                 }
                 else {
-                    _StdOut.printLongText("File name exceeds allocated memory. Please shorten and try again");
+                    if (notFromRecovery)
+                        _StdOut.printLongText("File name exceeds allocated memory. Please shorten and try again");
                 }
 
             }
@@ -337,8 +349,20 @@ module TSOS {
             var fileInfo: {[key: string]: any} = this.checkHDDRecovery(fileName);
 
             if (fileInfo.fileName !== undefined) {
-                this.createFile(fileInfo.fileName);
-                this.writeFile(fileInfo.fileName, fileInfo.fileContent);
+                var fileCreated: boolean = this.createFile(fileInfo.fileName, false);
+                var fileWrote: boolean = false;
+                if (fileCreated) {
+                    fileWrote = this.writeFile(fileInfo.fileName, fileInfo.fileContent, false);
+                    if (fileWrote) {
+                        _StdOut.printLongText("File '" + fileName + "' successfully recovered");
+                        // Remove from hddRecovery
+                        _HDDAccessor.removeFromRecovery(fileName);
+                    }
+                }
+                else {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("File recovery process failed")
+                }
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' was not recovered or never existed. Please try again");
@@ -439,6 +463,9 @@ module TSOS {
             for (var i: number = 0; i < _HDD.hddRecovery.length; i++) {
                 recoveryList.push("[" + _HDD.hddRecovery[i].fileName + "]");
             }
+            // Sort the array before printing
+            recoveryList.sort();
+            // Assemble the Recovery String
             var fileInfo: string = "Files Rediscovered: " + recoveryList.join(" | ");
             // Print out a message for the user
             _StdOut.printLn("Scanning Hard Disk...");

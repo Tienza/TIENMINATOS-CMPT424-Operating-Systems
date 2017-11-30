@@ -19,6 +19,12 @@ var TSOS;
             TSOS.Control.updateHDDDisplay(trackSectorBlock, bytes);
             return _HDD.storage.setItem(trackSectorBlock, bytes);
         };
+        HDDAccessor.prototype.removeFromRecovery = function (fileName) {
+            for (var i = 0; i < _HDD.hddRecovery.length; i++) {
+                if (_HDD.hddRecovery[i].fileName === fileName)
+                    _HDD.hddRecovery.splice(i, 1);
+            }
+        };
         return HDDAccessor;
     }());
     TSOS.HDDAccessor = HDDAccessor;

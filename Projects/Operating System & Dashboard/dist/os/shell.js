@@ -508,7 +508,7 @@ var TSOS;
         Shell.prototype.shellCreate = function (args) {
             if (args.length > 0) {
                 var fileName = args[0];
-                _krnFileSystemDriver.createFile(fileName);
+                _krnFileSystemDriver.createFile(fileName, true);
                 _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, 0));
             }
             else {
@@ -541,7 +541,7 @@ var TSOS;
                 var writeData = args.slice(1, args.length);
                 if (TSOS.Utils.isProperWriteData(writeData)) {
                     var data = writeData.join(" ");
-                    _krnFileSystemDriver.writeFile(fileName, data);
+                    _krnFileSystemDriver.writeFile(fileName, data, true);
                     _KernelInterruptQueue.enqueue(new TSOS.Interrupt(FILE_SYSTEM_IRQ, 0));
                 }
                 else {

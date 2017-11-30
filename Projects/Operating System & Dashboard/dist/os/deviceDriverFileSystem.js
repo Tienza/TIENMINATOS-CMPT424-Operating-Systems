@@ -57,10 +57,10 @@ var TSOS;
                 if (_HDD.isFormatted) {
                     switch (operation) {
                         case "create":
-                            this.createFile(fileName);
+                            this.createFile(fileName, true);
                             break;
                         case "write":
-                            this.writeFile(fileName, data);
+                            this.writeFile(fileName, data, true);
                             break;
                         case "delete":
                             this.deleteFile(fileName);
@@ -134,7 +134,7 @@ var TSOS;
                 _StdOut.printLongText("File '" + fileName + "' successfully removed");
                 // Push to recovery partition in case user wants to recovery at a later point
                 _HDD.hddRecovery.push({ fileName: fileName,
-                    fileContent: fileContent });
+                    fileContent: "'" + fileContent + "'" });
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
@@ -178,7 +178,7 @@ var TSOS;
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
         };
-        DeviceDriverFs.prototype.readFile = function (fileName, print) {
+        DeviceDriverFs.prototype.readFile = function (fileName, notFromRecovery) {
             var directoryTSB = this.checkFileExists(fileName);
             if (directoryTSB !== this.noSuchFile) {
                 // Fetch the TSB of the file from the first file block stored in the directory
@@ -197,13 +197,13 @@ var TSOS;
                         fileTSB = this.getTSBFromVal(fileVal);
                     } while (fileTSB !== "u,u,u");
                     // Print file contents to the console
-                    if (print)
+                    if (notFromRecovery)
                         _StdOut.printLongText(fileContent);
                     // Return the contents of a file to be used in Recovery
                     return fileContent;
                 }
                 else {
-                    if (print)
+                    if (notFromRecovery)
                         _StdOut.printLongText("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
                     // Return an empty string if the file is empty
                     return "";
@@ -213,7 +213,7 @@ var TSOS;
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
             }
         };
-        DeviceDriverFs.prototype.writeFile = function (fileName, data) {
+        DeviceDriverFs.prototype.writeFile = function (fileName, data, notFromRecovery) {
             var directoryTSB = this.checkFileExists(fileName);
             if (directoryTSB !== this.noSuchFile) {
                 // Format the file and write over the currently allocated space
@@ -237,7 +237,8 @@ var TSOS;
                         var workingTSB = this.fetchNextFreeFileLoc();
                         if (workingTSB === "u,u,u") {
                             nextTSB = "uuu";
-                            _StdOut.printLongText("File partially written. HDD is at capacity.");
+                            if (notFromRecovery)
+                                _StdOut.printLongText("File partially written. HDD is at capacity.");
                             data = "";
                         }
                         else {
@@ -272,20 +273,26 @@ var TSOS;
                 // Write the updatedVal back to the directoryTSB
                 _HDDAccessor.writeToHDD(directoryTSB, updatedVal);
                 // Print confirmation
-                _StdOut.printLongText("Successfully wrote to file '" + fileName + "'");
+                if (notFromRecovery)
+                    _StdOut.printLongText("Successfully wrote to file '" + fileName + "'");
+                return true;
             }
             else {
-                _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                if (notFromRecovery)
+                    _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                return false;
             }
         };
-        DeviceDriverFs.prototype.createFile = function (fileName) {
+        DeviceDriverFs.prototype.createFile = function (fileName, notFromRecovery) {
             var directoryTSB = this.fetchNextFreeDirectoryLoc();
             var fileTSB = this.fetchNextFreeFileLoc();
             if (directoryTSB === this.isFull || fileTSB === this.isFull) {
                 _StdOut.printLongText("HDD is at full capacity. Please delete files or format the disk");
+                return false;
             }
             else if (this.checkFileExists(fileName) !== "FILE DOES NOT EXIST") {
-                _StdOut.printLongText("A file named " + fileName + " already exists. Please rename and try again");
+                _StdOut.printLongText("A file named '" + fileName + "' already exists. Please rename and try again");
+                return false;
             }
             else {
                 var directoryVal = "";
@@ -313,18 +320,33 @@ var TSOS;
                     this.alterNextDirLoc();
                     this.alterNextFileLoc();
                     // Confirm file creation
-                    _StdOut.printLongText("File '" + fileName + "' successfully created");
+                    if (notFromRecovery)
+                        _StdOut.printLongText("File '" + fileName + "' successfully created");
+                    return true;
                 }
                 else {
-                    _StdOut.printLongText("File name exceeds allocated memory. Please shorten and try again");
+                    if (notFromRecovery)
+                        _StdOut.printLongText("File name exceeds allocated memory. Please shorten and try again");
                 }
             }
         };
         DeviceDriverFs.prototype.recoverFile = function (fileName) {
             var fileInfo = this.checkHDDRecovery(fileName);
             if (fileInfo.fileName !== undefined) {
-                this.createFile(fileInfo.fileName);
-                this.writeFile(fileInfo.fileName, fileInfo.fileContent);
+                var fileCreated = this.createFile(fileInfo.fileName, false);
+                var fileWrote = false;
+                if (fileCreated) {
+                    fileWrote = this.writeFile(fileInfo.fileName, fileInfo.fileContent, false);
+                    if (fileWrote) {
+                        _StdOut.printLongText("File '" + fileName + "' successfully recovered");
+                        // Remove from hddRecovery
+                        _HDDAccessor.removeFromRecovery(fileName);
+                    }
+                }
+                else {
+                    _StdOut.advanceLine();
+                    _StdOut.putText("File recovery process failed");
+                }
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' was not recovered or never existed. Please try again");
@@ -420,6 +442,9 @@ var TSOS;
             for (var i = 0; i < _HDD.hddRecovery.length; i++) {
                 recoveryList.push("[" + _HDD.hddRecovery[i].fileName + "]");
             }
+            // Sort the array before printing
+            recoveryList.sort();
+            // Assemble the Recovery String
             var fileInfo = "Files Rediscovered: " + recoveryList.join(" | ");
             // Print out a message for the user
             _StdOut.printLn("Scanning Hard Disk...");
