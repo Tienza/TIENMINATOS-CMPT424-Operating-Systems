@@ -20,7 +20,7 @@ var TSOS;
             if (state === void 0) { state = "New"; }
             if (programId === void 0) { programId = _ProcessCount; }
             if (location === void 0) { location = null; }
-            if (priority === void 0) { priority = 3; }
+            if (priority === void 0) { priority = 50; }
             if (waitTime === void 0) { waitTime = 0; }
             if (turnAroundTime === void 0) { turnAroundTime = 0; }
             if (burstTime === void 0) { burstTime = 0; }

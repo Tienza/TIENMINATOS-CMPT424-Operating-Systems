@@ -74,7 +74,7 @@ module TSOS {
                 ll = true;
                 
             for (var TSB in _HDD.storage) {
-                // Check if the TSB is in the 0 track and if it is currently in use
+                // Check if the TSB is on the 0 track and if it is currently in use
                 if (TSB[0] === "0" && _HDDAccessor.readFromHDD(TSB)[0] === "1") {
                     var directoryVal: string = _HDDAccessor.readFromHDD(TSB);
                     var translatedVal: string[] = this.translateDirectoryInformation(directoryVal);
@@ -133,6 +133,20 @@ module TSOS {
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+            }
+        }
+
+        public moveFilesToRecovery(): void {
+            for (var TSB in _HDD.storage) {
+                // Check if the TSB is on the 0 track and if it is currently in use
+                if (TSB[0] === "0" && _HDDAccessor.readFromHDD(TSB)[0] === "1") {
+                    var directoryVal: string = _HDDAccessor.readFromHDD(TSB);
+                    var translatedVal: string[] = this.translateDirectoryInformation(directoryVal);
+                    // Move all files on the HDD to hddRecovery
+                    var fileContent: string = this.readFile(translatedVal[0], false);
+                    _HDD.hddRecovery.push({fileName: translatedVal[0],
+                                           fileContent: "'" + fileContent + "'"});
+                }
             }
         }
 

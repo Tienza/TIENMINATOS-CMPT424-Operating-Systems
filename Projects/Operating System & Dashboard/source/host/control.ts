@@ -406,6 +406,10 @@ module TSOS {
                 hex = "0" + hex;
             return hex.toUpperCase();                
         }
+
+        public static updateTeeth(imageName: string): void {
+            $('#teeth').attr('src', 'dist/img/' + imageName + '.png');
+        }
         //
         // Host Events
         //
@@ -424,6 +428,9 @@ module TSOS {
 
             // .. set focus on the OS console display ...
             document.getElementById("display").focus();
+
+            // Change the teeth
+            Control.updateTeeth("teeth");
 
             // ... Create and initialize the CPU (because it's part of the hardware)  ...
             _CPU = new CPU();  // Note: We could simulate multi-core systems by instantiating more than one instance of the CPU here.

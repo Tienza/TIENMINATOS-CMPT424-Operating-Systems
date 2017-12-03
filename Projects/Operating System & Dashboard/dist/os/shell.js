@@ -31,8 +31,11 @@ var TSOS;
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
+            // clockspeed
+            sc = new TSOS.ShellCommand(this.shellClockSpeed, "clockspeed", "< [empty] | [int] > - Get/Set the CPU clock interval.");
+            this.commandList[this.commandList.length] = sc;
             // load
-            sc = new TSOS.ShellCommand(this.shellLoad, "load", " < [empty] | [int] > - Verify user input and load user program into memory. If priority null, default is 3");
+            sc = new TSOS.ShellCommand(this.shellLoad, "load", " < [empty] | [int] > - Verify user input and load user program into memory. If priority null, default is 50");
             this.commandList[this.commandList.length] = sc;
             // run
             sc = new TSOS.ShellCommand(this.shellRun, "run", "< PID > - Run the designated program.");
@@ -294,6 +297,15 @@ var TSOS;
                 _StdOut.putText(messageArray[i]);
             }
         };
+        Shell.prototype.shellClockSpeed = function (args) {
+            if (args.length > 0 && /\d+/.test(args[0])) {
+                CPU_CLOCK_INTERVAL = parseInt(args[0]);
+                _StdOut.putText("CPU Clock Speed set to: " + CPU_CLOCK_INTERVAL + " milliseconds");
+            }
+            else {
+                _StdOut.putText("Current CPU Clock Speed: " + CPU_CLOCK_INTERVAL + " milliseconds");
+            }
+        };
         Shell.prototype.shellLoad = function (args) {
             var userInput = $('#taProgramInput').val();
             userInput = TSOS.Utils.cleanInput(userInput);
@@ -314,7 +326,7 @@ var TSOS;
                         // Do Nothing
                     }
                     else {
-                        _StdOut.putText("Invalid priority argument. Defaulting to 3");
+                        _StdOut.putText("Invalid priority argument. Defaulting to 50");
                     }
                     // Increment the _ProcessCount
                     _ProcessCount++;
@@ -458,12 +470,12 @@ var TSOS;
         Shell.prototype.shellFormat = function (args) {
             if (args.length > 0) {
                 if (args[0] === "-f" || args[0] === "-full") {
-                    _HDD.init();
-                    TSOS.Control.initializeHDDDisplay();
-                    _StdOut.printLongText("Hard Drive fully formatted, no recovery possible");
+                    _HDDAccessor.fullFormat();
                 }
-                else if (args[0] === "-q" || args[0] === "-quick")
-                    console.log("This currently does nothing");
+                else if (args[0] === "-q" || args[0] === "-quick") {
+                    // Initialize the first 4 bytes of every TSB and update Master Boot Record
+                    _HDDAccessor.quickFormat();
+                }
                 else
                     _StdOut.putText("Invalid argument! Try '-q' or '-f'");
             }

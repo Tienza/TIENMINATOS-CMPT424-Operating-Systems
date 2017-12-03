@@ -25,6 +25,27 @@ var TSOS;
                     _HDD.hddRecovery.splice(i, 1);
             }
         };
+        HDDAccessor.prototype.fullFormat = function () {
+            _HDD.init();
+            TSOS.Control.initializeHDDDisplay();
+            // Print confirmation message
+            _StdOut.printLongText("Hard Drive fully formatted, no recovery possible");
+        };
+        HDDAccessor.prototype.quickFormat = function () {
+            // Delete all files on the HDD and store in recovery
+            _krnFileSystemDriver.moveFilesToRecovery();
+            // Initialize the first 4 bytes of each TSB
+            for (var TSB in _HDD.storage) {
+                var quickFormatString = _krnFileSystemDriver.getVal(_HDDAccessor.readFromHDD(TSB));
+                quickFormatString = "0000" + quickFormatString;
+                _HDDAccessor.writeToHDD(TSB, quickFormatString);
+            }
+            // Update the Master Boot Record
+            _krnFileSystemDriver.alterNextDirLoc();
+            _krnFileSystemDriver.alterNextFileLoc();
+            // Print confirmation message
+            _StdOut.putText("Quick format complete");
+        };
         return HDDAccessor;
     }());
     TSOS.HDDAccessor = HDDAccessor;

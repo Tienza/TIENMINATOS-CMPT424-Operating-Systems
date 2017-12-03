@@ -15,7 +15,7 @@ const APP_NAME: string    = "TienminatOS";   // 'cause Bob and I were at a loss 
 const APP_VERSION: string = "0.01";   // What did you expect?
 const USER_AGENT = navigator.userAgent; // Extraneous Information about current environment.
 
-const CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
+var CPU_CLOCK_INTERVAL: number = 100;   // This is in ms (milliseconds) so 1000 = 1 second.
 
 // Interrupt Constants
 const TIMER_IRQ: number = 0;  // Pages 23 (timer), 9 (interrupts), and 561 (interrupt priority).

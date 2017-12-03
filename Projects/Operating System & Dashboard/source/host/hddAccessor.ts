@@ -31,5 +31,28 @@ module TSOS {
                     _HDD.hddRecovery.splice(i, 1);
             }
         }
+
+        public fullFormat(): void {
+            _HDD.init();
+            Control.initializeHDDDisplay();
+            // Print confirmation message
+            _StdOut.printLongText("Hard Drive fully formatted, no recovery possible");
+        }
+
+        public quickFormat(): void {
+            // Delete all files on the HDD and store in recovery
+            _krnFileSystemDriver.moveFilesToRecovery();
+            // Initialize the first 4 bytes of each TSB
+            for (var TSB in _HDD.storage) {
+                var quickFormatString: string = _krnFileSystemDriver.getVal(_HDDAccessor.readFromHDD(TSB));
+                quickFormatString = "0000" + quickFormatString;
+                _HDDAccessor.writeToHDD(TSB, quickFormatString);
+            }
+            // Update the Master Boot Record
+            _krnFileSystemDriver.alterNextDirLoc();
+            _krnFileSystemDriver.alterNextFileLoc();
+            // Print confirmation message
+            _StdOut.putText("Quick format complete");
+        }
     }
 } 

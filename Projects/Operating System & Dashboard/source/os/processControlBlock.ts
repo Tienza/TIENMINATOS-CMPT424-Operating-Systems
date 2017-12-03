@@ -22,7 +22,7 @@ module TSOS {
                     public state: string = "New",
                     public programId: number = _ProcessCount,
                     public location: string = null,
-                    public priority: number = 3,
+                    public priority: number = 50,
                     public waitTime: number = 0,
                     public turnAroundTime: number = 0,
                     public burstTime: number = 0,
