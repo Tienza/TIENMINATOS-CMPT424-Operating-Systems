@@ -36,6 +36,9 @@ module TSOS {
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
+            // hddscroll
+            sc = new TSOS.ShellCommand(this.shellScroll, "hddscroll", " < on | off > - Enable dynamic scrolling of Hard Drive Display.");
+            this.commandList[this.commandList.length] = sc;
             // clockspeed
             sc = new TSOS.ShellCommand(this.shellClockSpeed, "clockspeed", "< [empty] | [int] > - Get/Set the CPU clock interval.");
             this.commandList[this.commandList.length] = sc;
@@ -208,6 +211,7 @@ module TSOS {
                     this.putPrompt();
                 } 
                 else { // It's just a bad command. {
+                    Control.shakeOS();
                     this.execute(this.shellInvalidCommand);
                 }
             }
@@ -263,7 +267,7 @@ module TSOS {
         // Shell Command Functions.  Kinda not part of Shell() class exactly, but
         // called from here, so kept here to avoid violating the law of least astonishment.
         //
-        public shellInvalidCommand() {
+        public shellInvalidCommand(): void {
             _StdOut.putText("Invalid Command. ");
             if (_SarcasticMode) {
                 _StdOut.putText("Unbelievable. You, [subject name here],");
@@ -274,14 +278,14 @@ module TSOS {
             }
         }
 
-        public shellCurse() {
+        public shellCurse(): void {
             _StdOut.putText("Oh, so that's how it's going to be, eh? Fine.");
             _StdOut.advanceLine();
             _StdOut.putText("Bitch.");
             _SarcasticMode = true;
         }
 
-        public shellApology() {
+        public shellApology(): void {
             if (_SarcasticMode) {
                 _StdOut.putText("I think we can put our differences behind us.");
                 _StdOut.advanceLine();
@@ -292,7 +296,7 @@ module TSOS {
             }
         }
 
-        public shellAlan(args) {
+        public shellAlan(args): void {
             _StdOut.putText("I apologies...It had to be done");
             _StdOut.advanceLine();
 
@@ -306,11 +310,12 @@ module TSOS {
             else {
                 //Browser has blocked it
                 _StdOut.putText("Damn it! Please allow popups for this feature.");
+                Control.shakeOS();
                 _StdOut.advanceLine();
             }
         }
 
-        public shellVer(args) {
+        public shellVer(args): void {
             var version: string = APP_NAME + " version " + APP_VERSION + ": " + USER_AGENT;
             var messageArray: string[] = version.split("");
             for (var i = 0; i < messageArray.length; i++) {
@@ -318,7 +323,25 @@ module TSOS {
             }
         }
 
-        public shellClockSpeed(args) {
+        public shellScroll(args): void {
+            if (args.length > 0) {
+                var argument: string = args[0].toLowerCase();
+                if (argument === "on")
+                    _EnableHDDScroll = true;
+                else if (argument === "off")
+                    _EnableHDDScroll = false;
+                else {
+                    _StdOut.putText("Invalid argument. Try < on | off >");
+                    Control.shakeOS();
+                }
+            }
+            else {
+                var status: string = (_EnableHDDScroll) ? "ON" : "OFF";
+                _StdOut.printLongText("Hard Drive Display Scrolling Status: " + status);
+            }
+        }
+
+        public shellClockSpeed(args): void {
             if (args.length > 0 && /\d+/.test(args[0])) {
                 CPU_CLOCK_INTERVAL = parseInt(args[0]);
                 _StdOut.putText("CPU Clock Speed set to: " + CPU_CLOCK_INTERVAL + " milliseconds");
@@ -328,7 +351,7 @@ module TSOS {
             }
         }
 
-        public shellLoad(args) {
+        public shellLoad(args): void {
             var userInput = $('#taProgramInput').val();
             userInput = TSOS.Utils.cleanInput(userInput);
             var hexObj: { [key: string]: any } = TSOS.Utils.isHex(userInput);
@@ -359,13 +382,15 @@ module TSOS {
                 }
                 else
                     _StdOut.putText("Please enter valid HEX and try again.");
+                    Control.shakeOS();
             }
             else {
                 _StdOut.putText("User input is too large, please reduce size and try again");
+                Control.shakeOS();
             }
         }
 
-        public shellRun(args) {
+        public shellRun(args): void {
             if (args.length > 0) {
                 var pcb: PCB = _ProcessManager.getPCB(parseInt(args[0]));
                 if (pcb) {
@@ -376,19 +401,23 @@ module TSOS {
                     _StdOut.putText("Specified PID does not exist.");
                 }
             }
-            else 
+            else {
                 _StdOut.putText("Missing/Invalid PID. Please try again");
+                Control.shakeOS();
+            }
         }
 
-        public shellRunAll(args) {
+        public shellRunAll(args): void {
             if (_ProcessManager.processList.length > 0) {
                 _ProcessManager.runAllProcess();
             }
-            else
+            else {
                 _StdOut.putText("Memory is empty! Please load processes and try again");
+                Control.shakeOS();
+            }
         }
 
-        public shellPS(args) {
+        public shellPS(args): void {
             // Format the list of active processes
             var ps: string = ""
             for (var i: number = 0; i < _ProcessManager.processList.length; i++) {
@@ -401,7 +430,7 @@ module TSOS {
            _StdOut.printLongText(ps);
         }
 
-        public shellKill(args) {
+        public shellKill(args): void {
             if (args.length > 0) {
                 var pcb: PCB = _ProcessManager.getPCB(parseInt(args[0]));
                 if (pcb) {
@@ -413,14 +442,16 @@ module TSOS {
                 }
                 else {
                     _StdOut.putText("Specified PID is not active or does not exist")
+                    Control.shakeOS();
                 }
             }
             else {
                 _StdOut.putText("Missing/Invalid PID. Please try again");
+                Control.shakeOS();
             }
         }
 
-        public shellClearmem(args) {
+        public shellClearmem(args): void {
             if (args.length > 0 && /\d+/.test(args[0])) {
                 var partition: number = parseInt(args[0]);
                 var pcb: PCB = _ProcessManager.getPCBbyParition(partition);
@@ -437,6 +468,7 @@ module TSOS {
                 }
                 else {
                     _StdOut.putText("Invalid partition number: " + partition + ". Please try again")
+                    Control.shakeOS();
                 }
             }
             else {
@@ -448,9 +480,9 @@ module TSOS {
             }
         }
 
-        public shellQuantum(args) {
+        public shellQuantum(args): void {
             if (args.length > 0 && /\d+/.test(args[0])) {
-                _StdOut.putText("Quantum changed from " + _Scheduler.roundRobinQuantum + " cycles to " + args[0] + " cycles")
+                _StdOut.putText(":Quantum changed from " + _Scheduler.roundRobinQuantum + " cycles to " + args[0] + " cycles")
                 _Scheduler.roundRobinQuantum = parseInt(args[0]);
             }
             else {
@@ -458,7 +490,7 @@ module TSOS {
             }
         }
 
-        public shellScheduler(args) {
+        public shellScheduler(args): void {
             if (args.length > 0) {
                 var scheduleIndex = _Scheduler.algoType.indexOf(args[0]);
                 if (scheduleIndex > -1) {
@@ -470,6 +502,7 @@ module TSOS {
                 }
                 else {
                     _StdOut.putText("Invalid scheduling algorithm. Please try again");
+                    Control.shakeOS();
                 }
             }
             else {
@@ -477,7 +510,7 @@ module TSOS {
             }
         }
 
-        public shellToggle(args) {
+        public shellToggle(args): void {
             if (args.length > 0) {
                 var modes: string[] = ["wttat", "ssm"];
                 var mode: string = args[0];
@@ -493,6 +526,7 @@ module TSOS {
                 }
                 else {
                     _StdOut.putText("Invalid mode. Please try again");
+                    Control.shakeOS();
                 }
             }
             else {
@@ -500,7 +534,7 @@ module TSOS {
             }
         }
 
-        public shellFormat(args) {
+        public shellFormat(args): void {
             if (args.length > 0) {
                 if (args[0] === "-f" || args[0] === "-full") {
                     _HDDAccessor.fullFormat();
@@ -511,22 +545,25 @@ module TSOS {
                 }  
                 else
                     _StdOut.putText("Invalid argument! Try '-q' or '-f'"); 
+                    Control.shakeOS();
             }
             else {
                 _StdOut.putText("Please specify a mode! Try '-q' or '-f'");
+                Control.shakeOS();
             }
         }
 
-        public shellchkDsk(args) {
+        public shellchkDsk(args): void {
             if (_HDD.isFormatted) {
                 _krnFileSystemDriver.chkDsk();
             }
             else {
                 _StdOut.printLongText("Error: Disk not formatted! Please use the 'format' command");
+                Control.shakeOS();
             }
         }
 
-        public shellRecover(args) {
+        public shellRecover(args): void {
             if (args.length > 0) {
                 var fileName: string = args[0];
                 _krnFileSystemDriver.recoverFile(fileName);
@@ -534,15 +571,17 @@ module TSOS {
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
+                Control.shakeOS();
             }
         }
 
-        public shellLS(args) {
+        public shellLS(args): void {
             if (args.length > 0) {
                 if (args[0] === "-l")
                     _krnFileSystemDriver.listFiles(args[0]);
                 else
                     _StdOut.putText("Invalid argument! Try '-l'");
+                    Control.shakeOS();
             }
             else {
                 _krnFileSystemDriver.listFiles(null);
@@ -550,12 +589,12 @@ module TSOS {
             _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, 0));
         }
 
-        public shellLL(args) {
+        public shellLL(args): void {
             _krnFileSystemDriver.listFiles("-l");
             _KernelInterruptQueue.enqueue(new Interrupt(FILE_SYSTEM_IRQ, 0));
         }
 
-        public shellCreate(args) {
+        public shellCreate(args): void {
             if (args.length > 0) {
                 var fileName: string = args[0];
                 _krnFileSystemDriver.createFile(fileName, true);
@@ -563,10 +602,11 @@ module TSOS {
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
+                Control.shakeOS();
             }
         }
 
-        public shellDelete(args) {
+        public shellDelete(args): void {
             if (args.length > 0) {
                 var fileName: string = args[0];
                 _krnFileSystemDriver.deleteFile(fileName);
@@ -574,10 +614,11 @@ module TSOS {
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
+                Control.shakeOS();
             }
         }
 
-        public shellRead(args) {
+        public shellRead(args): void {
             if (args.length > 0) {
                 var fileName: string = args[0];
                 _krnFileSystemDriver.readFile(fileName, true);
@@ -585,10 +626,11 @@ module TSOS {
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
+                Control.shakeOS();
             }
         }
 
-        public shellWrite(args) {
+        public shellWrite(args): void {
             if (args.length > 0) {
                 var fileName: string = args[0];
                 var writeData: string[] = args.slice(1, args.length);
@@ -599,14 +641,16 @@ module TSOS {
                 }
                 else {
                     _StdOut.printLongText("The data that you want to write to the file must be surrounded by \"double quotes\" or 'single quotes'");
+                    Control.shakeOS();
                 }
             }
             else {
                 _StdOut.putText("Please provide a file name and/or data to write to file");
+                Control.shakeOS();
             }
         }
 
-        public shellHelp(args) {
+        public shellHelp(args): void {
             _StdOut.putText("Commands:");
             for (var i in _OsShell.commandList) {
                 _StdOut.advanceLine();
@@ -617,14 +661,14 @@ module TSOS {
             }
         }
 
-        public shellShutdown(args) {
+        public shellShutdown(args): void {
             _StdOut.putText("Shutting down...");
             // Call Kernel shutdown routine.
             _Kernel.krnShutdown();
             // TODO: Stop the final prompt from being displayed.  If possible.  Not a high priority.  (Damn OCD!)
         }
 
-        public shellShiWoHoShii(args) {
+        public shellShiWoHoShii(args): void {
             // Trunkate the Canvas
             $('#display').attr('height', 414);
             $('#canvasScroll').css('background-color', '#000000');
@@ -642,13 +686,14 @@ module TSOS {
             _Kernel.krnTrapError("In death we are all equal...");
         }
 
-        public shellCls(args) {
+        public shellCls(args): void {
             $('#display').attr('height', 414);
+            Control.updateTeeth('teeth');
             _StdOut.clearScreen();
             _StdOut.resetXY();
         }
 
-        public shellMan(args) {
+        public shellMan(args): void {
             if (args.length > 0) {
                 var topic = args[0];
                 var description: string = undefined;
@@ -669,10 +714,11 @@ module TSOS {
             } 
             else {
                 _StdOut.putText("Usage: man <topic>  Please supply a topic.");
+                Control.shakeOS();
             }
         }
 
-        public shellTrace(args) {
+        public shellTrace(args): void {
             if (args.length > 0) {
                 var setting = args[0];
                 switch (setting) {
@@ -689,31 +735,38 @@ module TSOS {
                         _StdOut.putText("Trace OFF");
                         break;
                     default:
-                        _StdOut.putText("Invalid arguement.  Usage: trace <on | off>.");
+                        _StdOut.putText("Invalid argument.  Usage: trace <on | off>.");
+                        Control.shakeOS();
                 }
-            } else {
+            } 
+            else {
                 _StdOut.putText("Usage: trace <on | off>");
+                Control.shakeOS();
             }
         }
 
-        public shellRot13(args) {
+        public shellRot13(args): void {
             if (args.length > 0) {
                 // Requires Utils.ts for rot13() function.
                 _StdOut.putText(args.join(' ') + " = '" + Utils.rot13(args.join(' ')) + "'");
-            } else {
+            } 
+            else {
                 _StdOut.putText("Usage: rot13 <string>  Please supply a string.");
+                Control.shakeOS();
             }
         }
 
-        public shellPrompt(args) {
+        public shellPrompt(args): void {
             if (args.length > 0) {
                 _OsShell.promptStr = args[0];
-            } else {
+            } 
+            else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
+                Control.shakeOS();
             }
         }
 
-        public shellStatus(args) {
+        public shellStatus(args): void {
             if (args.length > 0) {
                 var status = "";
                 for (var i = 0; i < args.length; i++) {
@@ -723,6 +776,7 @@ module TSOS {
             }
             else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
+                Control.shakeOS();
             }
 
             function encodeHTML(string: string) {
@@ -730,7 +784,7 @@ module TSOS {
             }
         }
 
-        public shellDate(args) {
+        public shellDate(args): void {
             var today: Date = new Date();
             var dd: number = today.getDate();
             var mm: number = today.getMonth() + 1; //January is 0!
@@ -750,7 +804,7 @@ module TSOS {
             _StdOut.putText(todayDate);
         }
 
-        public shellTime(args) {
+        public shellTime(args): void {
             var d = new Date();
 
             var hh = (d.getHours() < 10 ? "0" : "") + d.getHours();
@@ -762,11 +816,11 @@ module TSOS {
             _StdOut.putText(time);
         }
 
-        public shellDateTime(args) {
+        public shellDateTime(args): void {
             _StdOut.putText(TSOS.Utils.getDateTime());
         }
 
-        public shellLatLong(args) {
+        public shellLatLong(args): void {
             getLocation();
 
             function getLocation(): void {
@@ -784,13 +838,9 @@ module TSOS {
             }
         }
 
-        public shellWhereAmI(args) {
+        public shellWhereAmI(args): void {
             var existentialCrisis: string = "Where are any of us really? Is there even a point to contemplate such a moot point? We are here, we are there, we can be anywhere we want if we change our point of reference. So the question becomes - Should you ask where you are to the rest of the world or where the rest of the world is to you? For the real answer type 'latlong'";
-            var message: string[] = existentialCrisis.split("");
-            // Sends the message to the console
-            for (var i = 0; i < message.length; i++) {
-                _StdOut.putText(message[i]);
-            }
+            _StdOut.printLongText(existentialCrisis);
         }
     }
 }

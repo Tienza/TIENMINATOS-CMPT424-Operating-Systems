@@ -64,6 +64,8 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Memory partitions are full");
+                // Visual Feedback
+                TSOS.Control.shakeOS();
             }
         };
         MemoryManager.prototype.loadProgramFromHDD = function (pcb, userProgram) {

@@ -89,6 +89,8 @@ var TSOS;
                     _StdOut.putText(accessViolationMsg[i]);
                 }
                 this.terminateProcess(pcb);
+                // Visual Feedback
+                TSOS.Control.shakeOS();
             }
         };
         ProcessManager.prototype.terminateProcess = function (pcb) {

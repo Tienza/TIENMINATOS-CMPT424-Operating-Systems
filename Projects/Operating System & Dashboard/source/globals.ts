@@ -118,6 +118,9 @@ var _hardwareClockID: number = null;
 // Global Variable For Log Message
 var _LastLogMsg: string = null;
 
+// Global Variable FOR HDD Scrolling
+var _EnableHDDScroll: boolean = false;
+
 // For testing (and enrichment)...
 var Glados: any = null;  // This is the function Glados() in glados.js on Labouseur.com.
 var _GLaDOS: any = null; // If the above is linked in, this is the instantiated instance of Glados.

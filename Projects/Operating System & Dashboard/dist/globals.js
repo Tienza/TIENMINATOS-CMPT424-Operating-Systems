@@ -89,6 +89,8 @@ var _krnFileSystemDriver;
 var _hardwareClockID = null;
 // Global Variable For Log Message
 var _LastLogMsg = null;
+// Global Variable FOR HDD Scrolling
+var _EnableHDDScroll = false;
 // For testing (and enrichment)...
 var Glados = null; // This is the function Glados() in glados.js on Labouseur.com.
 var _GLaDOS = null; // If the above is linked in, this is the instantiated instance of Glados.

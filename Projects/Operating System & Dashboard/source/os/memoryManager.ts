@@ -67,6 +67,8 @@ module TSOS {
             }
             else {
                 _StdOut.putText("Memory partitions are full");
+                // Visual Feedback
+                Control.shakeOS();
             }
         }
 

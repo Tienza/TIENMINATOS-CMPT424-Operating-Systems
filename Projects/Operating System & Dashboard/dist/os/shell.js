@@ -31,6 +31,9 @@ var TSOS;
             // ver
             sc = new TSOS.ShellCommand(this.shellVer, "ver", "- Displays the current version data.");
             this.commandList[this.commandList.length] = sc;
+            // hddscroll
+            sc = new TSOS.ShellCommand(this.shellScroll, "hddscroll", " < on | off > - Enable dynamic scrolling of Hard Drive Display.");
+            this.commandList[this.commandList.length] = sc;
             // clockspeed
             sc = new TSOS.ShellCommand(this.shellClockSpeed, "clockspeed", "< [empty] | [int] > - Get/Set the CPU clock interval.");
             this.commandList[this.commandList.length] = sc;
@@ -200,6 +203,7 @@ var TSOS;
                     this.putPrompt();
                 }
                 else {
+                    TSOS.Control.shakeOS();
                     this.execute(this.shellInvalidCommand);
                 }
             }
@@ -287,6 +291,7 @@ var TSOS;
             else {
                 //Browser has blocked it
                 _StdOut.putText("Damn it! Please allow popups for this feature.");
+                TSOS.Control.shakeOS();
                 _StdOut.advanceLine();
             }
         };
@@ -295,6 +300,23 @@ var TSOS;
             var messageArray = version.split("");
             for (var i = 0; i < messageArray.length; i++) {
                 _StdOut.putText(messageArray[i]);
+            }
+        };
+        Shell.prototype.shellScroll = function (args) {
+            if (args.length > 0) {
+                var argument = args[0].toLowerCase();
+                if (argument === "on")
+                    _EnableHDDScroll = true;
+                else if (argument === "off")
+                    _EnableHDDScroll = false;
+                else {
+                    _StdOut.putText("Invalid argument. Try < on | off >");
+                    TSOS.Control.shakeOS();
+                }
+            }
+            else {
+                var status = (_EnableHDDScroll) ? "ON" : "OFF";
+                _StdOut.printLongText("Hard Drive Display Scrolling Status: " + status);
             }
         };
         Shell.prototype.shellClockSpeed = function (args) {
@@ -336,9 +358,11 @@ var TSOS;
                 }
                 else
                     _StdOut.putText("Please enter valid HEX and try again.");
+                TSOS.Control.shakeOS();
             }
             else {
                 _StdOut.putText("User input is too large, please reduce size and try again");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellRun = function (args) {
@@ -352,15 +376,19 @@ var TSOS;
                     _StdOut.putText("Specified PID does not exist.");
                 }
             }
-            else
+            else {
                 _StdOut.putText("Missing/Invalid PID. Please try again");
+                TSOS.Control.shakeOS();
+            }
         };
         Shell.prototype.shellRunAll = function (args) {
             if (_ProcessManager.processList.length > 0) {
                 _ProcessManager.runAllProcess();
             }
-            else
+            else {
                 _StdOut.putText("Memory is empty! Please load processes and try again");
+                TSOS.Control.shakeOS();
+            }
         };
         Shell.prototype.shellPS = function (args) {
             // Format the list of active processes
@@ -385,10 +413,12 @@ var TSOS;
                 }
                 else {
                     _StdOut.putText("Specified PID is not active or does not exist");
+                    TSOS.Control.shakeOS();
                 }
             }
             else {
                 _StdOut.putText("Missing/Invalid PID. Please try again");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellClearmem = function (args) {
@@ -408,6 +438,7 @@ var TSOS;
                 }
                 else {
                     _StdOut.putText("Invalid partition number: " + partition + ". Please try again");
+                    TSOS.Control.shakeOS();
                 }
             }
             else {
@@ -420,7 +451,7 @@ var TSOS;
         };
         Shell.prototype.shellQuantum = function (args) {
             if (args.length > 0 && /\d+/.test(args[0])) {
-                _StdOut.putText("Quantum changed from " + _Scheduler.roundRobinQuantum + " cycles to " + args[0] + " cycles");
+                _StdOut.putText(":Quantum changed from " + _Scheduler.roundRobinQuantum + " cycles to " + args[0] + " cycles");
                 _Scheduler.roundRobinQuantum = parseInt(args[0]);
             }
             else {
@@ -439,6 +470,7 @@ var TSOS;
                 }
                 else {
                     _StdOut.putText("Invalid scheduling algorithm. Please try again");
+                    TSOS.Control.shakeOS();
                 }
             }
             else {
@@ -461,6 +493,7 @@ var TSOS;
                 }
                 else {
                     _StdOut.putText("Invalid mode. Please try again");
+                    TSOS.Control.shakeOS();
                 }
             }
             else {
@@ -478,9 +511,11 @@ var TSOS;
                 }
                 else
                     _StdOut.putText("Invalid argument! Try '-q' or '-f'");
+                TSOS.Control.shakeOS();
             }
             else {
                 _StdOut.putText("Please specify a mode! Try '-q' or '-f'");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellchkDsk = function (args) {
@@ -489,6 +524,7 @@ var TSOS;
             }
             else {
                 _StdOut.printLongText("Error: Disk not formatted! Please use the 'format' command");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellRecover = function (args) {
@@ -499,6 +535,7 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellLS = function (args) {
@@ -507,6 +544,7 @@ var TSOS;
                     _krnFileSystemDriver.listFiles(args[0]);
                 else
                     _StdOut.putText("Invalid argument! Try '-l'");
+                TSOS.Control.shakeOS();
             }
             else {
                 _krnFileSystemDriver.listFiles(null);
@@ -525,6 +563,7 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellDelete = function (args) {
@@ -535,6 +574,7 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellRead = function (args) {
@@ -545,6 +585,7 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Please provide a file name and try again");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellWrite = function (args) {
@@ -558,10 +599,12 @@ var TSOS;
                 }
                 else {
                     _StdOut.printLongText("The data that you want to write to the file must be surrounded by \"double quotes\" or 'single quotes'");
+                    TSOS.Control.shakeOS();
                 }
             }
             else {
                 _StdOut.putText("Please provide a file name and/or data to write to file");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellHelp = function (args) {
@@ -596,6 +639,7 @@ var TSOS;
         };
         Shell.prototype.shellCls = function (args) {
             $('#display').attr('height', 414);
+            TSOS.Control.updateTeeth('teeth');
             _StdOut.clearScreen();
             _StdOut.resetXY();
         };
@@ -620,6 +664,7 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Usage: man <topic>  Please supply a topic.");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellTrace = function (args) {
@@ -640,11 +685,13 @@ var TSOS;
                         _StdOut.putText("Trace OFF");
                         break;
                     default:
-                        _StdOut.putText("Invalid arguement.  Usage: trace <on | off>.");
+                        _StdOut.putText("Invalid argument.  Usage: trace <on | off>.");
+                        TSOS.Control.shakeOS();
                 }
             }
             else {
                 _StdOut.putText("Usage: trace <on | off>");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellRot13 = function (args) {
@@ -654,6 +701,7 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Usage: rot13 <string>  Please supply a string.");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellPrompt = function (args) {
@@ -662,6 +710,7 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Usage: prompt <string>  Please supply a string.");
+                TSOS.Control.shakeOS();
             }
         };
         Shell.prototype.shellStatus = function (args) {
@@ -674,6 +723,7 @@ var TSOS;
             }
             else {
                 _StdOut.putText("Usage: status <string>  Please supply a string.");
+                TSOS.Control.shakeOS();
             }
             function encodeHTML(string) {
                 return string.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
@@ -725,11 +775,7 @@ var TSOS;
         };
         Shell.prototype.shellWhereAmI = function (args) {
             var existentialCrisis = "Where are any of us really? Is there even a point to contemplate such a moot point? We are here, we are there, we can be anywhere we want if we change our point of reference. So the question becomes - Should you ask where you are to the rest of the world or where the rest of the world is to you? For the real answer type 'latlong'";
-            var message = existentialCrisis.split("");
-            // Sends the message to the console
-            for (var i = 0; i < message.length; i++) {
-                _StdOut.putText(message[i]);
-            }
+            _StdOut.printLongText(existentialCrisis);
         };
         return Shell;
     }());

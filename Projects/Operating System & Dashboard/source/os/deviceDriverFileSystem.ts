@@ -61,6 +61,8 @@ module TSOS {
                 }
                 else {
                     _StdOut.printOSFeedBack("Error: Disk not formatted! Please use the 'format' command");
+                    // Visual Feedback
+                    Control.shakeOS();
                 }
             }
         }
@@ -133,6 +135,8 @@ module TSOS {
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                // Visual Feedback
+                Control.shakeOS();
             }
         }
 
@@ -190,6 +194,8 @@ module TSOS {
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                // Visual Feedback
+                Control.shakeOS();
             }
         }
 
@@ -219,8 +225,11 @@ module TSOS {
                     return fileContent;
                 }
                 else {
-                    if (notFromRecovery)
+                    if (notFromRecovery) {
                         _StdOut.printLongText("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
+                        // Visual Feedback
+                        Control.shakeOS();
+                    }
                     // Return an empty string if the file is empty
                     return "";
                 }
@@ -228,6 +237,8 @@ module TSOS {
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                // Visual Feedback
+                Control.shakeOS();
             }
         }
 
@@ -300,8 +311,11 @@ module TSOS {
                 return true;
             }
             else {
-                if (notFromRecovery)
+                if (notFromRecovery) {
                     _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                    // Visual Feedback
+                    Control.shakeOS();
+                }
                 return false;
             }
         }
@@ -316,6 +330,8 @@ module TSOS {
             }
             else if (this.checkFileExists(fileName) !== "FILE DOES NOT EXIST") {
                 _StdOut.printLongText("A file named '" + fileName + "' already exists. Please rename and try again");
+                // Visual Feedback
+                Control.shakeOS();
                 return false;
             }
             else {
@@ -352,8 +368,11 @@ module TSOS {
 
                 }
                 else {
-                    if (notFromRecovery)
+                    if (notFromRecovery) {
                         _StdOut.printLongText("File name exceeds allocated memory. Please shorten and try again");
+                        // Visual Feedback
+                        Control.shakeOS();
+                    }
                 }
 
             }
@@ -375,11 +394,15 @@ module TSOS {
                 }
                 else {
                     _StdOut.advanceLine();
-                    _StdOut.putText("File recovery process failed")
+                    _StdOut.putText("File recovery process failed");
+                    // Visual Feedback
+                    Control.shakeOS();
                 }
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' was not recovered or never existed. Please try again");
+                // Visual Feedback
+                Control.shakeOS();
             }
         }
 

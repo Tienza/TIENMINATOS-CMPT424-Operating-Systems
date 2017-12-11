@@ -370,22 +370,10 @@ module TSOS {
             }
 
             $(id).html(updatedVal);
+            
+            if (_EnableHDDScroll)
+                Control.scrollToHDD(id);
         }
-
-
-        /*public static updateHDDDisplay(): void {
-            var hddDisplay: string = "";
-            for (var TSB in _HDD.storage) {
-                var hddVal: string = _HDDAccessor.readFromHDD(TSB);
-                if (TSB === "0,0,0") {
-                    hddDisplay += "<tr id=\"tsb-" + _krnFileSystemDriver.removeCommaFromTSB(TSB) + "\"><td>" + Control.formatTSBWithColon(_krnFileSystemDriver.removeCommaFromTSB(TSB)) + "</td><td>" + hddVal[0] + "</td><td>" + _HDDAccessor.getTSB(hddVal[0], hddVal[1], hddVal[2]) + "</td><td>" + hddVal.substring(3, 63) + "</td></tr>";
-                }
-                else {
-                    hddDisplay += "<tr id=\"tsb-" + _krnFileSystemDriver.removeCommaFromTSB(TSB) + "\"><td>" + Control.formatTSBWithColon(_krnFileSystemDriver.removeCommaFromTSB(TSB)) + "</td><td>" + hddVal[0] + "</td><td>" +  _krnFileSystemDriver.getTSBFromVal(hddVal) +"</td><td>" + _krnFileSystemDriver.getVal(hddVal) + "</td></tr>";
-                }
-            }
-            $('#hddDisplay').html(hddDisplay);
-        }*/
 
         public static scrollToHDD(id: string) {
             // Format Memory Cell Id
@@ -409,6 +397,11 @@ module TSOS {
 
         public static updateTeeth(imageName: string): void {
             $('#teeth').attr('src', 'dist/img/' + imageName + '.png');
+        }
+
+        public static shakeOS(): void {
+            $('body').effect('shake');
+            Control.updateTeeth('parseTeeth');
         }
         //
         // Host Events

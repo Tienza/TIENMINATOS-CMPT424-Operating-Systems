@@ -102,6 +102,8 @@ module TSOS {
                     _StdOut.putText(accessViolationMsg[i]);
                 }
                 this.terminateProcess(pcb);
+                // Visual Feedback
+                Control.shakeOS();
             }
         }
 

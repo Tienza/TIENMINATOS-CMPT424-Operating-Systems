@@ -72,6 +72,8 @@ var TSOS;
                 }
                 else {
                     _StdOut.printOSFeedBack("Error: Disk not formatted! Please use the 'format' command");
+                    // Visual Feedback
+                    TSOS.Control.shakeOS();
                 }
             }
         };
@@ -138,6 +140,8 @@ var TSOS;
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                // Visual Feedback
+                TSOS.Control.shakeOS();
             }
         };
         DeviceDriverFs.prototype.moveFilesToRecovery = function () {
@@ -189,6 +193,8 @@ var TSOS;
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                // Visual Feedback
+                TSOS.Control.shakeOS();
             }
         };
         DeviceDriverFs.prototype.readFile = function (fileName, notFromRecovery) {
@@ -216,14 +222,19 @@ var TSOS;
                     return fileContent;
                 }
                 else {
-                    if (notFromRecovery)
+                    if (notFromRecovery) {
                         _StdOut.printLongText("File '" + fileName + "' is empty. Please write to the file or specify another file to read");
+                        // Visual Feedback
+                        TSOS.Control.shakeOS();
+                    }
                     // Return an empty string if the file is empty
                     return "";
                 }
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                // Visual Feedback
+                TSOS.Control.shakeOS();
             }
         };
         DeviceDriverFs.prototype.writeFile = function (fileName, data, notFromRecovery) {
@@ -291,8 +302,11 @@ var TSOS;
                 return true;
             }
             else {
-                if (notFromRecovery)
+                if (notFromRecovery) {
                     _StdOut.printLongText("File '" + fileName + "' does not exist. Please try again");
+                    // Visual Feedback
+                    TSOS.Control.shakeOS();
+                }
                 return false;
             }
         };
@@ -305,6 +319,8 @@ var TSOS;
             }
             else if (this.checkFileExists(fileName) !== "FILE DOES NOT EXIST") {
                 _StdOut.printLongText("A file named '" + fileName + "' already exists. Please rename and try again");
+                // Visual Feedback
+                TSOS.Control.shakeOS();
                 return false;
             }
             else {
@@ -338,8 +354,11 @@ var TSOS;
                     return true;
                 }
                 else {
-                    if (notFromRecovery)
+                    if (notFromRecovery) {
                         _StdOut.printLongText("File name exceeds allocated memory. Please shorten and try again");
+                        // Visual Feedback
+                        TSOS.Control.shakeOS();
+                    }
                 }
             }
         };
@@ -359,10 +378,14 @@ var TSOS;
                 else {
                     _StdOut.advanceLine();
                     _StdOut.putText("File recovery process failed");
+                    // Visual Feedback
+                    TSOS.Control.shakeOS();
                 }
             }
             else {
                 _StdOut.printLongText("File '" + fileName + "' was not recovered or never existed. Please try again");
+                // Visual Feedback
+                TSOS.Control.shakeOS();
             }
         };
         DeviceDriverFs.prototype.rollOut = function (programId, userProgram) {
