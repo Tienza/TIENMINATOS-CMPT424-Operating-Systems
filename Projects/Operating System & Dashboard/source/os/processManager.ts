@@ -137,6 +137,8 @@ module TSOS {
                 this.isRunningAll = false;
                 // Remove All Debuggers
                 _Debuggers = [];
+                // Re-enable Programs Button
+                (<HTMLButtonElement>document.getElementById("btnPrograms")).disabled = false;
                 // Print Wait Time and Turn Around Time
                 this.printWTTAT();
                 // Break Line

@@ -356,9 +356,10 @@ var TSOS;
                     // Switch to active Memory Tab
                     TSOS.Control.switchMemoryTab(pcb);
                 }
-                else
+                else {
                     _StdOut.putText("Please enter valid HEX and try again.");
-                TSOS.Control.shakeOS();
+                    TSOS.Control.shakeOS();
+                }
             }
             else {
                 _StdOut.putText("User input is too large, please reduce size and try again");
@@ -369,7 +370,11 @@ var TSOS;
             if (args.length > 0) {
                 var pcb = _ProcessManager.getPCB(parseInt(args[0]));
                 if (pcb) {
+                    // Disable Programs Button
+                    document.getElementById("btnPrograms").disabled = true;
+                    // Switch to approriate Memory Tab View
                     TSOS.Control.switchMemoryTab(pcb);
+                    // Run the Program
                     _ProcessManager.runProcess(pcb);
                 }
                 else {
@@ -409,7 +414,7 @@ var TSOS;
                     if (_ProcessManager.isRunningAll) {
                         _ProcessManager.removePCBFromReadyQueue(pcb.programId);
                     }
-                    _StdOut.putText("Process PID " + pcb.programId + " Successfully Killed");
+                    _StdOut.putText("Process PID: " + pcb.programId + " Successfully Killed");
                 }
                 else {
                     _StdOut.putText("Specified PID is not active or does not exist");
@@ -469,7 +474,7 @@ var TSOS;
                     $('#schedulingAlgo').html(_Scheduler.aFullName[scheduleIndex]);
                 }
                 else {
-                    _StdOut.putText("Invalid scheduling algorithm. Please try again");
+                    _StdOut.printLongText("Invalid scheduling algorithm. Please try < rr | sjf | fcfs | priority >");
                     TSOS.Control.shakeOS();
                 }
             }
@@ -492,7 +497,7 @@ var TSOS;
                     }
                 }
                 else {
-                    _StdOut.putText("Invalid mode. Please try again");
+                    _StdOut.putText("Invalid mode. Please try < wttat | ssm >");
                     TSOS.Control.shakeOS();
                 }
             }

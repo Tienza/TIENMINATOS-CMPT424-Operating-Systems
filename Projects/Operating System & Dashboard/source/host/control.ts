@@ -416,6 +416,7 @@ module TSOS {
             // .. enable the Halt and Reset buttons ...and other buttons
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
+            (<HTMLButtonElement>document.getElementById("btnPrograms")).disabled = false;
             (<HTMLButtonElement>document.getElementById("singleStepBtn")).disabled = false;
             (<HTMLButtonElement>document.getElementById("showWTTAT")).disabled = false;
 

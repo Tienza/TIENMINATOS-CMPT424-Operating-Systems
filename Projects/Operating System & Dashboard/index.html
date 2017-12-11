@@ -59,6 +59,25 @@
                                 <button type="button" class="btn btn-primary btn-lg" id="btnStartOS" name="brnStartOS" value="Start" onclick="TSOS.Control.hostBtnStartOS_click(this);">Start</button>
                                 <button type="button" class="btn btn-success btn-lg" id="btnHaltOS" name="brnHaltOS" disabled="disabled" value="Halt" onclick="TSOS.Control.hostBtnHaltOS_click(this);">Halt</button>
                                 <button type="button" class="btn btn-warning btn-lg" id="btnReset" name="brnReset" disabled="disabled" value="Reset" onclick="TSOS.Control.hostBtnReset_click(this);">Reset</button>
+                                <div class="btn-group">
+					<button type="button" class="btn btn-info btn-lg dropdown-toggle" id="btnPrograms" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" disabled="disabled">Programs <span class="caret"></span>
+					</button>
+					<ul class="dropdown-menu">
+                                                <li><a onclick="TSOS.Utils.insertProgram(0)">Blank Program</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(1)">Simple Print</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(2)">Simple Boolean Print</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(3)">Long Test Case</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(4)">If Statement</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(5)">Boolean Statement</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(6)">While != 5</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(7)">a != 3</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(8)">Bool Expr Print</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(9)">IntOp Bool Expr Print</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(10)">Addition: Print && Check</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(11)">Variable Addition: While Condition</a></li>
+                                                <li><a onclick="TSOS.Utils.insertProgram(12)">Infinite Loop && Max Memory</a></li>
+                                        </ul>
+                                </div>
                         </div>
                 </div>
                 <!-- /.row -->
