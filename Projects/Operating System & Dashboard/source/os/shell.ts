@@ -548,9 +548,10 @@ module TSOS {
                     // Initialize the first 4 bytes of every TSB and update Master Boot Record
                     _HDDAccessor.quickFormat();
                 }  
-                else
+                else {
                     _StdOut.putText("Invalid argument! Try '-q' or '-f'"); 
                     Control.shakeOS();
+                }
             }
             else {
                 _StdOut.putText("Please specify a mode! Try '-q' or '-f'");

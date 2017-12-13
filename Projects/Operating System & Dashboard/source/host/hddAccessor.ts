@@ -33,6 +33,7 @@ module TSOS {
         }
 
         public fullFormat(): void {
+            _HDD.hddRecovery = [];
             _HDD.init();
             Control.initializeHDDDisplay();
             // Print confirmation message
@@ -40,13 +41,17 @@ module TSOS {
         }
 
         public quickFormat(): void {
+            // Available Tracks
+            var trackArray: string[] = ["0", "1", "2", "3"];
             // Delete all files on the HDD and store in recovery
             _krnFileSystemDriver.moveFilesToRecovery();
             // Initialize the first 4 bytes of each TSB
             for (var TSB in _HDD.storage) {
-                var quickFormatString: string = _krnFileSystemDriver.getVal(_HDDAccessor.readFromHDD(TSB));
-                quickFormatString = "0000" + quickFormatString;
-                _HDDAccessor.writeToHDD(TSB, quickFormatString);
+                if (trackArray.indexOf(TSB[0]) > -1) {
+                    var quickFormatString: string = _krnFileSystemDriver.getVal(_HDDAccessor.readFromHDD(TSB));
+                    quickFormatString = "0000" + quickFormatString;
+                    _HDDAccessor.writeToHDD(TSB, quickFormatString);
+                }
             }
             // Update the Master Boot Record
             _krnFileSystemDriver.alterNextDirLoc();
