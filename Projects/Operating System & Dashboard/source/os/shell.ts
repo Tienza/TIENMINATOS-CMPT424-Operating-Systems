@@ -92,7 +92,8 @@ module TSOS {
             this.commandList[this.commandList.length] = sc;
             // delete
             sc = new TSOS.ShellCommand(this.shellDelete, "delete", "< filename > - Remove a file from the hard disk.");
-            // delete
+            this.commandList[this.commandList.length] = sc;
+            // rm
             sc = new TSOS.ShellCommand(this.shellDelete, "rm", " - Alias for 'delete'.");
             this.commandList[this.commandList.length] = sc;
             // read
@@ -268,14 +269,50 @@ module TSOS {
         // called from here, so kept here to avoid violating the law of least astonishment.
         //
         public shellInvalidCommand(): void {
-            _StdOut.putText("Invalid Command. ");
+            var similarObjects: {[key: string]: any} = [];
+            var suggestedCommands: string[] = [];
+            var command: string = _Console.buffer.split(" ")[0];
+            // Print feedback message
+            _StdOut.putText("Invalid Command '" + command + "'. ");
+
             if (_SarcasticMode) {
                 _StdOut.putText("Unbelievable. You, [subject name here],");
                 _StdOut.advanceLine();
                 _StdOut.putText("must be the pride of [subject hometown here].");
             } else {
-                _StdOut.putText("Type 'help' for, well... help.");
+                _StdOut.printLn("Type 'help' for, well... help.");
             }
+
+            /* Find similar commands to suggest to the user */
+            for (var i: number = 0; i < _ShellCommandList.length; i++) {
+                var suggestedCommand: string =  _ShellCommandList[i];
+                var similarity = TSOS.Utils.similarity(command,suggestedCommand);
+                // Find the similarity and add to list if greater than 0.5
+                if (similarity >= 0.5)
+                    similarObjects.push({command: suggestedCommand, similarity: similarity});
+            }
+            // Sort the array of command objects in order of similarity
+            similarObjects.sort(function (a, b) {
+                // If a has higher similarity, a comes first
+                if (a.similarity > b.similarity)
+                    return -1;
+                // If a has lower similarity Burst Time, b comes first
+                if (a.similarity < b.similarity)
+                    return 1;
+                return 0
+            });
+            // Assemble the suggestedCommands array
+            for (var i: number = 0; i < similarObjects.length; i++) {
+                suggestedCommands.push("[" + similarObjects[i].command + "]");
+            }
+
+            // Format the suggested command array into a string
+            var suggestedCommandsString: string = suggestedCommands.join(" | ");
+
+            if (suggestedCommandsString === "")
+                suggestedCommandsString = "I literally cannot even begin to comprehend what you want...";
+
+            _StdOut.printLongText("Suggested Commands: " + suggestedCommandsString);
         }
 
         public shellCurse(): void {
