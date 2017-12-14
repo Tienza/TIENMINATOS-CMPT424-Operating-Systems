@@ -8,6 +8,42 @@ module TSOS {
 
     export class Utils {
 
+        public static findSimilarCommands(command: string) {
+            var similarObjects: {[key: string]: any} = [];
+            var suggestedCommands: string[] = [];
+            
+            /* Find similar commands to suggest to the user */
+            for (var i: number = 0; i < _ShellCommandList.length; i++) {
+                var suggestedCommand: string =  _ShellCommandList[i];
+                var similarity = TSOS.Utils.similarity(command,suggestedCommand);
+                // Find the similarity and add to list if greater than 0.5
+                if (similarity >= 0.5)
+                    similarObjects.push({command: suggestedCommand, similarity: similarity});
+            }
+            // Sort the array of command objects in order of similarity
+            similarObjects.sort(function (a, b) {
+                // If a has higher similarity, a comes first
+                if (a.similarity > b.similarity)
+                    return -1;
+                // If a has lower similarity Burst Time, b comes first
+                if (a.similarity < b.similarity)
+                    return 1;
+                return 0
+            });
+            // Assemble the suggestedCommands array
+            for (var i: number = 0; i < similarObjects.length; i++) {
+                suggestedCommands.push("[" + similarObjects[i].command + "]");
+            }
+
+            // Format the suggested command array into a string
+            var suggestedCommandsString: string = suggestedCommands.join(" | ");
+
+            if (suggestedCommandsString === "")
+                suggestedCommandsString = "I literally cannot even begin to comprehend what you want...";
+
+            return "Suggested Commands: " + suggestedCommandsString;
+        }
+
         public static isProperWriteData(data: string[]): boolean {
             var isProper = false;
             var firstWord: string = data[0];

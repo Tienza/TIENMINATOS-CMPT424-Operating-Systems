@@ -252,8 +252,6 @@ var TSOS;
         // called from here, so kept here to avoid violating the law of least astonishment.
         //
         Shell.prototype.shellInvalidCommand = function () {
-            var similarObjects = [];
-            var suggestedCommands = [];
             var command = _Console.buffer.split(" ")[0];
             // Print feedback message
             _StdOut.putText("Invalid Command '" + command + "'. ");
@@ -265,33 +263,9 @@ var TSOS;
             else {
                 _StdOut.printLn("Type 'help' for, well... help.");
             }
-            /* Find similar commands to suggest to the user */
-            for (var i = 0; i < _ShellCommandList.length; i++) {
-                var suggestedCommand = _ShellCommandList[i];
-                var similarity = TSOS.Utils.similarity(command, suggestedCommand);
-                // Find the similarity and add to list if greater than 0.5
-                if (similarity >= 0.5)
-                    similarObjects.push({ command: suggestedCommand, similarity: similarity });
-            }
-            // Sort the array of command objects in order of similarity
-            similarObjects.sort(function (a, b) {
-                // If a has higher similarity, a comes first
-                if (a.similarity > b.similarity)
-                    return -1;
-                // If a has lower similarity Burst Time, b comes first
-                if (a.similarity < b.similarity)
-                    return 1;
-                return 0;
-            });
-            // Assemble the suggestedCommands array
-            for (var i = 0; i < similarObjects.length; i++) {
-                suggestedCommands.push("[" + similarObjects[i].command + "]");
-            }
-            // Format the suggested command array into a string
-            var suggestedCommandsString = suggestedCommands.join(" | ");
-            if (suggestedCommandsString === "")
-                suggestedCommandsString = "I literally cannot even begin to comprehend what you want...";
-            _StdOut.printLongText("Suggested Commands: " + suggestedCommandsString);
+            // Print out similar command suggestions
+            var similarCommands = TSOS.Utils.findSimilarCommands(command);
+            _StdOut.printLongText(similarCommands);
         };
         Shell.prototype.shellCurse = function () {
             _StdOut.putText("Oh, so that's how it's going to be, eh? Fine.");
