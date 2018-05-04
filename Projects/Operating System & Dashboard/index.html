@@ -78,6 +78,7 @@
                                                 <li><a onclick="TSOS.Utils.insertProgram(12)">Infinite Loop && Max Memory</a></li>
                                         </ul>
                                 </div>
+                                <button type="button" class="btn btn-danger btn-lg" id="btnCompiler" name="brnCompiler" disabled="disabled" value="Compiler" data-toggle="modal" data-target="#myModal">Compiler</button>
                         </div>
                 </div>
                 <!-- /.row -->
@@ -329,6 +330,27 @@
                 </div>
         </footer>
         <!-- /.footer -->
+        <!-- Modal -->
+        <div id="myModal" class="modal fade" role="dialog">
+                <div id="tienminatorModal" class="modal-dialog modal-lg">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                                <div class="modal-header">
+                                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                        <h4 class="modal-title">Compiler</h4>
+                                </div>
+                                <div id="tienminatorBody" class="modal-body">
+                                        <iframe style="width: 100%; height: 100%;" src="http://labouseur.com/courses/compilers/compilers/tien/pages/index.html">
+                                                <p>Your browser does not support iframes.</p>
+                                        </iframe>
+                                              
+                                </div>
+                                <div class="modal-footer">
+                                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </div>
+                        </div>
+                </div>
+        </div>
         <!-- Global JS: jQuery -->
         <script src="dist/jquery/jquery.min.js"></script>
         <!-- Global JS: jQuery UI -->

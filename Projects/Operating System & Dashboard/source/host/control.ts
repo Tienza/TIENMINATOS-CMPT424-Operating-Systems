@@ -417,6 +417,7 @@ module TSOS {
             (<HTMLButtonElement>document.getElementById("btnHaltOS")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnReset")).disabled = false;
             (<HTMLButtonElement>document.getElementById("btnPrograms")).disabled = false;
+            (<HTMLButtonElement>document.getElementById("btnCompiler")).disabled = false;
             (<HTMLButtonElement>document.getElementById("singleStepBtn")).disabled = false;
             (<HTMLButtonElement>document.getElementById("showWTTAT")).disabled = false;
 

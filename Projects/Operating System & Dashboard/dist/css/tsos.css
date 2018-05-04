@@ -42,6 +42,19 @@ a {
   cursor: pointer;
 }
 
+#myModal {
+  padding-left: 15px !important;
+  padding-right: 15px !important;
+}
+
+#tienminatorModal {
+  width: 100% !important;
+}
+
+#tienminatorBody {
+  height: 500px;
+}
+
 #canvasScroll {
   border: 1px solid #CCCCCC;
   border-radius: 5px;

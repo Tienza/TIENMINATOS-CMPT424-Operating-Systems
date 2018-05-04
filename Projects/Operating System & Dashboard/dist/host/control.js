@@ -361,6 +361,7 @@ var TSOS;
             document.getElementById("btnHaltOS").disabled = false;
             document.getElementById("btnReset").disabled = false;
             document.getElementById("btnPrograms").disabled = false;
+            document.getElementById("btnCompiler").disabled = false;
             document.getElementById("singleStepBtn").disabled = false;
             document.getElementById("showWTTAT").disabled = false;
             // .. set focus on the OS console display ...
